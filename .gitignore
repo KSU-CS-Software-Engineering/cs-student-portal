@@ -6,3 +6,8 @@ Homestead.json
 /public/.htaccess
 /resources/assets/bower
 todo.txt
+
+/public/css/
+/public/fonts/
+/public/js/
+/public/mix-manifest.json
