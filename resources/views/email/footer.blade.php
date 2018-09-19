@@ -1,0 +1,1 @@
+<a href="{{ url('/') }}">Visit the Advising System</a>
