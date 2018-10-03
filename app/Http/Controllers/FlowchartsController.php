@@ -216,7 +216,7 @@ class FlowchartsController extends Controller
           $data['student_id'] = $plan->student_id;
           if($plan->validate($data)){
             $plan->fill($data);
-            $plan->save();
+            $plan->save(); //This writes to the DB. do the rules checking before this.
             return response()->json(trans('messages.item_saved'));
           }else{
             return response()->json($plan->errors(), 422);

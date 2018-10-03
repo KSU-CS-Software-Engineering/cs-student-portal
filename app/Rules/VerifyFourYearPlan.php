@@ -20,26 +20,25 @@ use App\Models\Degreerequirement;
   //Check completed classes for graduation ability.
   //Check Advisor flag.
 
-
-
-
-//We don't want to take in the planrequirement or degree requirements.
-//I want FlowchartsController to send over the array of Planrequirements
-//and degree requirements which can then be checked against each other.
-
-//I want to send over a plan object and degree program object.
+  //This is untested.
   public function CheckCISRequirementsPlan(Plan $plan) {
     //We need to test ot make sure all classes in Requirements are in plan
+    //Create array to put the missing classes in.
+    $returnarray = [];
+    //Get all of the degree requirements in a collection.
     $degreerequirements = App\Models\Degreerequirement::where('degreeprogram_id', $plan->degreeprogram_id)->get();
+    //Get all of the planned classes to compare
     $planrequirements = App\Models\Planrequirement::where('plan_id', $plan->id);
+    //Iterate through the degree requirements testing each against the planned classes
     foreach($degreerequirements as $degreerequirement) {
-      if($planrequirements.contains())
+      //If the degree requirement is not in the plan requirements
+      if(!$planrequirements.contains('degreerequirement_id', $degreerequirement->id)) {
+        //Add the missing degree requirement to the array.
+        $returnarray->push($degreerequirement);
+      }
     }
-    //Pseudocode
-    //Get the arrays for the Plan and Degree Requirements
-    //Foreach degreerequirement, use the .contains() on the plan collection
-    //to check if the Degreerequirement is in the plan requirement.
-    //If this ever returns false, the plan fails the check.
+    //Return the array.
+    return $returnarray;
   }
 
 ?>
