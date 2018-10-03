@@ -30,6 +30,12 @@ class Plan extends Validatable
     	return $this->belongsTo('App\Models\Student')->withTrashed();
     }
 
+
+    //public function checkRules() check to see if degree requirements are met.
+    //If rules are all met, allow graduation.
+  //}
+
+
     public function degreeprogram(){
         return $this->belongsTo('App\Models\Degreeprogram')->withTrashed();
     }
@@ -64,11 +70,15 @@ class Plan extends Validatable
       }
     }
 
+
+    //
+
     public function fillRequirementsFromDegree(){
       $degreeprogram = $this->degreeprogram;
       $maxSemester = $degreeprogram->requirements->max('semester');
       $sem = $this->start_semester;
       $year = $this->start_year;
+      //$user = $this->student; that'll get the student.
       $order = 0;
       $semesters = array();
       if($sem == 0){
@@ -126,6 +136,7 @@ class Plan extends Validatable
         $semester->number = $maxSemester + 1;
         $semester->ordering = $order++;
         $semester->plan_id = $this->id;
+        //CheckPreReqs
         $sem = 3;
         $semester->save();
       }
@@ -133,6 +144,7 @@ class Plan extends Validatable
         if($sem == 1){
           $semester = new Semester();
           $semester->name = "Spring " . $year;
+          //CheckPreReqs
           $semester->number = $i;
           $semester->ordering = $order++;
           $semester->plan_id = $this->id;
@@ -142,6 +154,7 @@ class Plan extends Validatable
           $semester = new Semester();
           $semester->name = "Fall " . $year;
           $semester->number = $i;
+          //CheckPreReqs
           $semester->ordering = $order++;
           $semester->plan_id = $this->id;
           $sem = 1;

@@ -1,5 +1,4 @@
 <?php
-
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -57,7 +56,7 @@ Route::get('flowcharts/edit/{id}', 'FlowchartsController@editFlowchart');
 Route::post('flowcharts/edit/{id}', 'FlowchartsController@saveFlowchart');
 Route::post('flowcharts/delete', 'FlowchartsController@deleteFlowchart');
 Route::post('flowcharts/reset', 'FlowchartsController@resetFlowchart');
-Route::get('flowcharts/semesters/{id}', 'FlowchartsController@getSemesterData');
+Route::get('flowcharts/semesters/{id}', 'FlowchartsController@getSemesterData'); //I think these and below pertain to semester.
 Route::post('flowcharts/semesters/{id}/save', 'FlowchartsController@postSemesterSave');
 Route::post('flowcharts/semesters/{id}/delete', 'FlowchartsController@postSemesterDelete');
 Route::post('flowcharts/semesters/{id}/add', 'FlowchartsController@postSemesterAdd');

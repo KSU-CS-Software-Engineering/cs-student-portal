@@ -19,6 +19,8 @@ use App\Models\Plan;
 use App\Models\Semester;
 use App\Models\Planrequirement;
 use App\Models\Degreeprogram;
+//This is my dependency that I've added.
+use App\Rules\VerifyFourYearPlan;
 
 class FlowchartsController extends Controller
 {
@@ -34,7 +36,7 @@ class FlowchartsController extends Controller
      */
     public function getIndex($id = -1)
     {
-        $user = Auth::user();
+        $user = Auth::user(); //I think this gets the user in question.
 
         if($id < 0){
           //no particular student requested
@@ -111,6 +113,10 @@ class FlowchartsController extends Controller
     }
 
     public function saveNewFlowchart($id = -1, Request $request){
+      //Rules processing here.
+      //getUserCourses();from completed courses.
+      //CheckRules():
+      //Send the output of CheckRules to here.
       if($id < 0){
         abort(404);
       }else{
@@ -125,9 +131,15 @@ class FlowchartsController extends Controller
         }
 
         if($plan->validate($data)){
+          //Check user classses
+          //$userClasses = $user->GetClasses(); return as JSON.
+          //Take user class data, check against rules
+          //$userRulesResults = $plan->checkRules($userClasses); TAKE JSON, FORCE THROUGH RULES
+          //Have the plan know whether or not degree requirements are met.
           $plan->fill($data);
           $plan->save();
           $plan->fillRequirementsFromDegree();
+          //Check taken against requirements.
           $request->session()->put('message', trans('messages.item_saved'));
           $request->session()->put('type', 'success');
           return response()->json(url('flowcharts/view/' . $plan->id));
