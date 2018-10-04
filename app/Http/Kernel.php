@@ -54,6 +54,12 @@ class Kernel extends HttpKernel
           //  \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
 
+        'dashboard' => [
+            'cas',
+            'update_profile',
+            'advisors_only',
+        ],
+
         'api' => [
             'throttle:60,1',
             'auth:api',
