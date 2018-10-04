@@ -11,13 +11,6 @@ use App\Models\Plan;
 
 class PlansController extends Controller
 {
-  public function __construct()
-  {
-    $this->middleware('cas');
-    $this->middleware('update_profile');
-    $this->middleware('advisors_only');
-  }
-
   public function getPlans(Request $request, $id = -1){
     if($id < 0){
       if($request->has('deleted')){

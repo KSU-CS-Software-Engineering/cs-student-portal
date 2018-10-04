@@ -20,9 +20,6 @@ class PlanrequirementsController extends Controller
 
   public function __construct()
   {
-    $this->middleware('cas');
-    $this->middleware('update_profile');
-    $this->middleware('advisors_only');
     $this->fractal = new Manager();
   }
 

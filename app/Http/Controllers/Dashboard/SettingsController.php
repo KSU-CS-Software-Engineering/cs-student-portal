@@ -10,13 +10,6 @@ use DbConfig;
 
 class SettingsController extends Controller
 {
-  public function __construct()
-  {
-    $this->middleware('cas');
-    $this->middleware('update_profile');
-    $this->middleware('advisors_only');
-  }
-
   public function getSettings(){
     $settings = DbConfig::listDb()->orderBy('key', 'asc')->get();
     return view('dashboard.settings')->with('page_title', "Edit Settings")->with('settings', $settings);

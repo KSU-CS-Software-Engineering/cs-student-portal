@@ -22,14 +22,6 @@ use App\Http\Controllers\Controller;
 
 class DashboardController extends Controller
 {
-
-    public function __construct()
-  	{
-  		$this->middleware('cas');
-  		$this->middleware('update_profile');
-      $this->middleware('advisors_only');
-  	}
-
     /**
      * Display a listing of the resource.
      *

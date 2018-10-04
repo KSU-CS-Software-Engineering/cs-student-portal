@@ -11,13 +11,6 @@ use App\Models\Transfercourse;
 
 class CompletedcoursesController extends Controller
 {
-  public function __construct()
-  {
-    $this->middleware('cas');
-    $this->middleware('update_profile');
-    $this->middleware('advisors_only');
-  }
-
   public function getCompletedcourses(Request $request, $id = -1){
     if($id < 0){
       $completedcourses = Completedcourse::with('student', 'requirements', 'transfercourse')->get();

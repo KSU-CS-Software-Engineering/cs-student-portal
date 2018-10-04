@@ -10,13 +10,6 @@ use App\Models\Groupsession;
 
 class GroupsessionsController extends Controller
 {
-  public function __construct()
-  {
-    $this->middleware('cas');
-    $this->middleware('update_profile');
-    $this->middleware('advisors_only');
-  }
-
   public function getGroupsessions(Request $request, $id = -1){
     if($id < 0){
       $groupsessions = Groupsession::with('advisor', 'student')->get();

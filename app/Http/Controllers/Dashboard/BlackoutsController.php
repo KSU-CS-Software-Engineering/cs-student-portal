@@ -10,13 +10,6 @@ use App\Models\Blackout;
 
 class BlackoutsController extends Controller
 {
-  public function __construct()
-  {
-    $this->middleware('cas');
-    $this->middleware('update_profile');
-    $this->middleware('advisors_only');
-  }
-
   public function getBlackouts(Request $request, $id = -1){
     if($id < 0){
       $blackouts = Blackout::with('advisor', 'events')->get();

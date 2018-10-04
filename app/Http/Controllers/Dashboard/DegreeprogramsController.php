@@ -11,13 +11,6 @@ use App\Models\Department;
 
 class DegreeprogramsController extends Controller
 {
-  public function __construct()
-  {
-    $this->middleware('cas');
-    $this->middleware('update_profile');
-    $this->middleware('advisors_only');
-  }
-
   public function getDegreeprograms(Request $request, $id = -1){
       if($id < 0){
         if($request->has('deleted')){

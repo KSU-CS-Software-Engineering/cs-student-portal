@@ -10,13 +10,6 @@ use App\Models\Electivelist;
 
 class ElectivelistsController extends Controller
 {
-  public function __construct()
-  {
-    $this->middleware('cas');
-    $this->middleware('update_profile');
-    $this->middleware('advisors_only');
-  }
-
   public function getElectivelists(Request $request, $id = -1){
       if($id < 0){
         if($request->has('deleted')){
