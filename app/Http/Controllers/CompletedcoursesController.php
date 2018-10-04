@@ -6,7 +6,7 @@ use Auth;
 
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
-use App\JsonSerializer;
+use App\Helpers\JsonSerializer;
 
 use App\Models\Completedcourse;
 

@@ -8,7 +8,7 @@ use App\Models\Advisor;
 
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
-use App\JsonSerializer;
+use App\Helpers\JsonSerializer;
 
 use Auth;
 use Illuminate\Http\Request;

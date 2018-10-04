@@ -3,13 +3,13 @@
 Homestead.yaml
 Homestead.json
 .env
-/public/.htaccess
 /resources/assets/bower
 todo.txt
 
 /public/css/
 /public/fonts/
 /public/js/
+/public/sounds/
 /public/mix-manifest.json
 
 /.idea/

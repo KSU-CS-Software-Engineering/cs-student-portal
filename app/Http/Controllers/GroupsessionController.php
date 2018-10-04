@@ -21,7 +21,7 @@ use App\Http\Controllers\Controller;
 
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
-use App\JsonSerializer;
+use App\Helpers\JsonSerializer;
 
 class GroupsessionController extends Controller
 {

@@ -17,7 +17,7 @@ use DateInterval;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
-use App\JsonSerializer;
+use App\Helpers\JsonSerializer;
 
 use Cas;
 use Carbon\Carbon;

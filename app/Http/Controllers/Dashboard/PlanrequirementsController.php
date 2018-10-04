@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
-use App\JsonSerializer;
+use App\Helpers\JsonSerializer;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\MessageBag;

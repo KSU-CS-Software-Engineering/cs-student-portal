@@ -6,7 +6,7 @@ use App\Models\Electivelist;
 
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
-use App\JsonSerializer;
+use App\Helpers\JsonSerializer;
 
 use Illuminate\Http\Request;
 

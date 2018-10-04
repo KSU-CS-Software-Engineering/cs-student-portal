@@ -3,7 +3,7 @@
 
 //https://www.snip2code.com/Snippet/564933/Remove-data-key-from--thephpleague-fract
 
-namespace App;
+namespace App\Helpers;
 
 use League\Fractal\Serializer\ArraySerializer;
 
@@ -31,5 +31,5 @@ class JsonSerializer extends ArraySerializer
 	{
 		return ($resourceKey && $resourceKey !== 'data') ? array($resourceKey => $data) : $data;
 	}
-	
+
 }
