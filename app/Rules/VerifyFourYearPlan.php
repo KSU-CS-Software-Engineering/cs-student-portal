@@ -13,7 +13,24 @@ use App\Models\Degreerequirement;
 use App\Models\Completedcourse;
 
 //How do we want to test the validity of the 4yr plan?
+  private Plan $plan;
+  private Student = $student;
 
+  public function CheckFourYearPlanRules(Plan $planParam) {
+    //Set the global variables.
+    $plan = $planParam;
+    $student = $planParam->student_id;
+
+    $cisRequirements = CheckCISRequirementsPlan();
+    //Handle the output
+    $ksuGraduationRequirements = CheckGraduationValidityDegreeRequirements();
+    //Handle the output
+    $planGraduationRequirements = CheckGraduationValidityPlan();
+    //Handle the output.
+
+    //Return something to be used.
+
+  }
 
 //We will want to:
   //Implemented
@@ -25,7 +42,7 @@ use App\Models\Completedcourse;
   //Check Advisor flag.
 
   //This is untested.
-  public function CheckCISRequirementsPlan(Plan $plan) {
+  public function CheckCISRequirementsPlan() {
     //We need to test ot make sure all classes in Requirements are in plan
     //Create array to put the missing classes in.
     $returnarray = [];
@@ -52,7 +69,7 @@ use App\Models\Completedcourse;
   //This is untested.
   //This checks that the user has completed all of the required classes to graduate
   //This does the same thing that the above function does.
-  public function CheckGraduationValidityDegreeRequirements(Student $student, Plan $plan) {
+  public function CheckGraduationValidityDegreeRequirements() {
     $returnarray = [];
 
     $completedcourses = App\Models\Completedcourse::where('student_id', $student->id)->get();
@@ -68,7 +85,7 @@ use App\Models\Completedcourse;
     return $returnarray;
   }
 
-  public function CheckGraduationValidityPlan(Student $student, Plan $plan) {
+  public function CheckGraduationValidityPlan() {
     $returnarray = [];
 
     $completedcourses = App\Models\Completedcourse::where('student_id', $student->id)->get();
