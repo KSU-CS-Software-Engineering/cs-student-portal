@@ -43,17 +43,17 @@ class PostDeploy extends Command
         $settings_off = array("groupsessionenabled", "showmessage");
         $settings_on = array("navbar_showflowcharts", "navbar_showgroupsession", "navbar_showcourses");
         $bar = $this->output->createProgressBar(count($settings_off) + count($settings_on));
-        foreach($settings_off as $setting){
-          if(!DbConfig::has($setting)){
-            DbConfig::store($setting, false);
-          }
-          $bar->advance();
+        foreach ($settings_off as $setting) {
+            if (!DbConfig::has($setting)) {
+                DbConfig::store($setting, false);
+            }
+            $bar->advance();
         }
-        foreach($settings_on as $setting){
-          if(!DbConfig::has($setting)){
-            DbConfig::store($setting, true);
-          }
-          $bar->advance();
+        foreach ($settings_on as $setting) {
+            if (!DbConfig::has($setting)) {
+                DbConfig::store($setting, true);
+            }
+            $bar->advance();
         }
         $bar->finish();
         $this->line('');
@@ -61,16 +61,20 @@ class PostDeploy extends Command
         //ADD EDITABLES TO App/Providers/ComposerServiceProvider AS WELL!
         $bar = $this->output->createProgressBar(7);
 
-        $editables = Editable::where('controller', 'GroupsessionController')->where('action', 'getIndex')->where('key', 'head')->where('version', 0)->get();
-        if($editables->count() == 0){
-          $editable = new Editable;
-          $editable->controller = "GroupsessionController";
-          $editable->action = "getIndex";
-          $editable->key = "head";
-          $editable->version = 0;
-          $editable->user_id = 1;
-          $editable->contents= '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 bg-light-purple rounded">
-	<h3 class="top-header text-center">Group Advising</h3>
+        $editables = Editable::where('controller', 'GroupsessionController')
+            ->where('action', 'getIndex')
+            ->where('key', 'head')
+            ->where('version', 0)
+            ->get();
+        if ($editables->count() == 0) {
+            $editable = new Editable();
+            $editable->controller = "GroupsessionController";
+            $editable->action = "getIndex";
+            $editable->key = "head";
+            $editable->version = 0;
+            $editable->user_id = 1;
+            $editable->contents = '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 bg-light-purple rounded">
+    <h3 class="top-header text-center">Group Advising</h3>
 </div>
 
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -105,102 +109,126 @@ class PostDeploy extends Command
      </div>
    </div>
 </div>';
-          $editable->save();
+            $editable->save();
         }
 
         $bar->advance();
 
-        $editables = Editable::where('controller', 'AdvisingController')->where('action', 'getIndex')->where('key', 'message')->where('version', 0)->get();
-        if($editables->count() == 0){
-          $editable = new Editable;
-          $editable->controller = "AdvisingController";
-          $editable->action = "getIndex";
-          $editable->key = "message";
-          $editable->version = 0;
-          $editable->user_id = 1;
-          $editable->contents= '<div class="alert alert-danger" role="alert">The CS Department is holding <b>Group Advising</b> sessions this year. Click <a href="/groupsession" class="alert-link"><b>here</b></a> to learn more! Please attend a group session if possible unless you require an in-depth advising appointment. This will help us keep individual times available for students who need them most.</div>';
-          $editable->save();
+        $editables = Editable::where('controller', 'AdvisingController')
+            ->where('action', 'getIndex')
+            ->where('key', 'message')
+            ->where('version', 0)
+            ->get();
+        if ($editables->count() == 0) {
+            $editable = new Editable();
+            $editable->controller = "AdvisingController";
+            $editable->action = "getIndex";
+            $editable->key = "message";
+            $editable->version = 0;
+            $editable->user_id = 1;
+            $editable->contents = '<div class="alert alert-danger" role="alert">The CS Department is holding <b>Group Advising</b> sessions this year. Click <a href="/groupsession" class="alert-link"><b>here</b></a> to learn more! Please attend a group session if possible unless you require an in-depth advising appointment. This will help us keep individual times available for students who need them most.</div>';
+            $editable->save();
         }
 
         $bar->advance();
 
-        $editables = Editable::where('controller', 'RootRouteController')->where('action', 'getIndex')->where('key', 'header')->where('version', 0)->get();
-        if($editables->count() == 0){
-          $editable = new Editable;
-          $editable->controller = "RootRouteController";
-          $editable->action = "getIndex";
-          $editable->key = "header";
-          $editable->version = 0;
-          $editable->user_id = 1;
-          $editable->contents= '<div class="jumbotron">
+        $editables = Editable::where('controller', 'RootRouteController')
+            ->where('action', 'getIndex')
+            ->where('key', 'header')
+            ->where('version', 0)
+            ->get();
+        if ($editables->count() == 0) {
+            $editable = new Editable();
+            $editable->controller = "RootRouteController";
+            $editable->action = "getIndex";
+            $editable->key = "header";
+            $editable->version = 0;
+            $editable->user_id = 1;
+            $editable->contents = '<div class="jumbotron">
   <div class="container">
     <h1>Engineering Advising</h1>
     <p>Welcome to the new K-State Engineering Advising System. This is your one-stop-shop to find classes, view your flowcharts and degree progress, schedule advising appointments, and more! Check out the sections below to get started.</p>
     <p><a class="btn btn-primary btn-lg" href="/about" role="button">Learn more &raquo;</a></p>
   </div>
 </div>';
-          $editable->save();
+            $editable->save();
         }
 
         $bar->advance();
 
-        $editables = Editable::where('controller', 'RootRouteController')->where('action', 'getIndex')->where('key', 'advising')->where('version', 0)->get();
-        if($editables->count() == 0){
-          $editable = new Editable;
-          $editable->controller = "RootRouteController";
-          $editable->action = "getIndex";
-          $editable->key = "advising";
-          $editable->version = 0;
-          $editable->user_id = 1;
-          $editable->contents= '<h2>Advising</h2>
+        $editables = Editable::where('controller', 'RootRouteController')
+            ->where('action', 'getIndex')
+            ->where('key', 'advising')
+            ->where('version', 0)
+            ->get();
+        if ($editables->count() == 0) {
+            $editable = new Editable();
+            $editable->controller = "RootRouteController";
+            $editable->action = "getIndex";
+            $editable->key = "advising";
+            $editable->version = 0;
+            $editable->user_id = 1;
+            $editable->contents = '<h2>Advising</h2>
   <p>When you are ready to enroll or if you have any questions, quickly schedule an appointment with your academic advisor.</p>
   <p><a class="btn btn-default" href="/advising" role="button">Schedule an Appointment &raquo;</a></p>';
-          $editable->save();
+            $editable->save();
         }
 
         $bar->advance();
 
-        $editables = Editable::where('controller', 'RootRouteController')->where('action', 'getIndex')->where('key', 'groupsession')->where('version', 0)->get();
-        if($editables->count() == 0){
-          $editable = new Editable;
-          $editable->controller = "RootRouteController";
-          $editable->action = "getIndex";
-          $editable->key = "groupsession";
-          $editable->version = 0;
-          $editable->user_id = 1;
-          $editable->contents= '<h2>Group Advising</h2>
+        $editables = Editable::where('controller', 'RootRouteController')
+            ->where('action', 'getIndex')
+            ->where('key', 'groupsession')
+            ->where('version', 0)
+            ->get();
+        if ($editables->count() == 0) {
+            $editable = new Editable();
+            $editable->controller = "RootRouteController";
+            $editable->action = "getIndex";
+            $editable->key = "groupsession";
+            $editable->version = 0;
+            $editable->user_id = 1;
+            $editable->contents = '<h2>Group Advising</h2>
   <p>Attending a group advising session? Click here to get on the waiting list or find your place in the queue.</p>
   <p><a class="btn btn-default" href="/groupsession" role="button">Group Advising &raquo;</a></p>';
-          $editable->save();
+            $editable->save();
         }
 
         $bar->advance();
 
-        $editables = Editable::where('controller', 'RootRouteController')->where('action', 'getIndex')->where('key', 'help')->where('version', 0)->get();
-        if($editables->count() == 0){
-          $editable = new Editable;
-          $editable->controller = "RootRouteController";
-          $editable->action = "getIndex";
-          $editable->key = "help";
-          $editable->version = 0;
-          $editable->user_id = 1;
-          $editable->contents= '<h2>Help</h2>
+        $editables = Editable::where('controller', 'RootRouteController')
+            ->where('action', 'getIndex')
+            ->where('key', 'help')
+            ->where('version', 0)
+            ->get();
+        if ($editables->count() == 0) {
+            $editable = new Editable();
+            $editable->controller = "RootRouteController";
+            $editable->action = "getIndex";
+            $editable->key = "help";
+            $editable->version = 0;
+            $editable->user_id = 1;
+            $editable->contents = '<h2>Help</h2>
   <p>Not sure how to use the new system? Click here for help!</p>
   <p><a class="btn btn-default" href="/help" role="button">Help &raquo;</a></p>';
-          $editable->save();
+            $editable->save();
         }
 
-        $editables = Editable::where('controller', 'RootRouteController')->where('action', 'getAbout')->where('key', 'about')->where('version', 0)->get();
-        if($editables->count() == 0){
-          $editable = new Editable;
-          $editable->controller = "RootRouteController";
-          $editable->action = "getAbout";
-          $editable->key = "about";
-          $editable->version = 0;
-          $editable->user_id = 1;
-          $editable->contents= '<h2>About the new Engineering Advising System</h2>
+        $editables = Editable::where('controller', 'RootRouteController')
+            ->where('action', 'getAbout')
+            ->where('key', 'about')
+            ->where('version', 0)
+            ->get();
+        if ($editables->count() == 0) {
+            $editable = new Editable();
+            $editable->controller = "RootRouteController";
+            $editable->action = "getAbout";
+            $editable->key = "about";
+            $editable->version = 0;
+            $editable->user_id = 1;
+            $editable->contents = '<h2>About the new Engineering Advising System</h2>
   <p>This site is a work in progress. Our goal is to create the best academic advising experience for students and advisors alike. Contact russfeld@ksu.edu if you have any questions or comments</p>';
-          $editable->save();
+            $editable->save();
         }
 
         $bar->advance();

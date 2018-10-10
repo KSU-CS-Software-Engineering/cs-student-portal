@@ -20,7 +20,7 @@ class GroupsessionEnd extends Event implements ShouldBroadcast
      */
     public function __construct()
     {
-      $this->id = 0;
+        $this->id = 0;
     }
 
     /**

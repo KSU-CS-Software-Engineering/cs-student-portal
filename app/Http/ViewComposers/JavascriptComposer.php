@@ -13,15 +13,15 @@ class JavascriptComposer
 
     public function __construct(Route $route)
     {
-      $action = $route->getActionName();
-      if(strpos($action, "@") === false){
-        $this->controllerName = "index";
-        $this->actionName = "index";
-      }else{
-        list($controller, $method) = explode('@', $action);
-        $this->controllerName = preg_replace('/.*\\\/', '', $controller);
-        $this->actionName = preg_replace('/.*\\\/', '', $method);
-      }
+        $action = $route->getActionName();
+        if (strpos($action, "@") === false) {
+            $this->controllerName = "index";
+            $this->actionName = "index";
+        } else {
+            list($controller, $method) = explode('@', $action);
+            $this->controllerName = preg_replace('/.*\\\/', '', $controller);
+            $this->actionName = preg_replace('/.*\\\/', '', $method);
+        }
     }
 
     /**
@@ -32,6 +32,6 @@ class JavascriptComposer
      */
     public function compose(View $view)
     {
-      $view->with('controller', $this->controllerName)->with('action', $this->actionName);
+        $view->with('controller', $this->controllerName)->with('action', $this->actionName);
     }
 }

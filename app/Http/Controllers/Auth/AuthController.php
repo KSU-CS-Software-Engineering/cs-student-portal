@@ -10,7 +10,6 @@ use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-
 class AuthController extends Controller
 {
 
@@ -54,29 +53,30 @@ class AuthController extends Controller
         return redirect('/');
     }
 
-    public function ForceLogin(Request $request){
-        if(config('app.auth_type') == 'force'){
-          if(!$request->has('eid')){
-            return ('eid required');
-          }
-          $user = User::where('eid', $request->input('eid'))->first();
-          if($user === null){
-            $user = new User();
-            $data = $request->all();
-            if($user->validate($data)){
-              $user->fill($data);
-              $user->is_advisor = false;
-              $user->save();
-              $student = Student::buildFromUser($user);
-              $student->save();
-            }else{
-              return $user->errors()->all();
+    public function ForceLogin(Request $request)
+    {
+        if (config('app.auth_type') == 'force') {
+            if (!$request->has('eid')) {
+                return ('eid required');
             }
-          }
-          Auth::login($user);
-          return redirect('/');
-        }else{
-          abort(404);
+            $user = User::where('eid', $request->input('eid'))->first();
+            if ($user === null) {
+                $user = new User();
+                $data = $request->all();
+                if ($user->validate($data)) {
+                    $user->fill($data);
+                    $user->is_advisor = false;
+                    $user->save();
+                    $student = Student::buildFromUser($user);
+                    $student->save();
+                } else {
+                    return $user->errors()->all();
+                }
+            }
+            Auth::login($user);
+            return redirect('/');
+        } else {
+            abort(404);
         }
     }
 

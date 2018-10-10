@@ -13,15 +13,15 @@ class EditableComposer
 
     public function __construct(Route $route)
     {
-      $action = $route->getActionName();
-      if(strpos($action, "@") === false){
-        $this->controllerName = "index";
-        $this->actionName = "index";
-      }else{
-        list($controller, $method) = explode('@', $action);
-        $this->controllerName = preg_replace('/.*\\\/', '', $controller);
-        $this->actionName = preg_replace('/.*\\\/', '', $method);
-      }
+        $action = $route->getActionName();
+        if (strpos($action, "@") === false) {
+            $this->controllerName = "index";
+            $this->actionName = "index";
+        } else {
+            list($controller, $method) = explode('@', $action);
+            $this->controllerName = preg_replace('/.*\\\/', '', $controller);
+            $this->actionName = preg_replace('/.*\\\/', '', $method);
+        }
     }
 
     /**
@@ -32,14 +32,17 @@ class EditableComposer
      */
     public function compose(View $view)
     {
-      $editables = Editable::where('controller', $this->controllerName)->where('action', $this->actionName)->where('version', 0)->get();
+        $editables = Editable::where('controller', $this->controllerName)
+            ->where('action', $this->actionName)
+            ->where('version', 0)
+            ->get();
 
-      //https://adamwathan.me/2016/07/14/customizing-keys-when-mapping-collections/ 
-      $editableAssoc = $editables->reduce(function($editableAssoc, $editable){
-          $editableAssoc[$editable->key] = $editable;
-          return $editableAssoc;
-      }, []);
+        //https://adamwathan.me/2016/07/14/customizing-keys-when-mapping-collections/ 
+        $editableAssoc = $editables->reduce(function ($editableAssoc, $editable) {
+            $editableAssoc[$editable->key] = $editable;
+            return $editableAssoc;
+        }, []);
 
-      $view->with('editables', $editableAssoc);
+        $view->with('editables', $editableAssoc);
     }
 }

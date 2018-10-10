@@ -12,30 +12,33 @@ class Semester extends Validatable
 
     //https://github.com/felixkiss/uniquewith-validator
 
-    protected function rules($params){
-      if($params[0] < 0){
-        return array(
-          'name' => 'required|string',
-          'ordering' => 'required|integer|unique_with:semesters,plan_id',
-          'plan_id' => 'required|exists:plans,id',
-        );
-      }else{
-        return array(
-          'name' => 'required|string',
-          'ordering' => 'required|integer|unique_with:semesters,plan_id,'. $params[0],
-          'plan_id' => 'required|exists:plans,id',
-        );
-      }
+    protected function rules($params)
+    {
+        if ($params[0] < 0) {
+            return array(
+                'name' => 'required|string',
+                'ordering' => 'required|integer|unique_with:semesters,plan_id',
+                'plan_id' => 'required|exists:plans,id',
+            );
+        } else {
+            return array(
+                'name' => 'required|string',
+                'ordering' => 'required|integer|unique_with:semesters,plan_id,' . $params[0],
+                'plan_id' => 'required|exists:plans,id',
+            );
+        }
     }
 
     protected $fillable = ['name', 'ordering', 'plan_id'];
 
-    public function plan(){
+    public function plan()
+    {
         return $this->belongsTo('App\Models\Plan')->withTrashed();
     }
 
-    public function requirements(){
-      return $this->hasMany('App\Models\Planrequirement');
+    public function requirements()
+    {
+        return $this->hasMany('App\Models\Planrequirement');
     }
 
 }

@@ -17,12 +17,12 @@ class UpdateProfileMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if(Auth::check()){
-          $user = Auth::user();
-          if(!($user->update_profile)){
-            $request->session()->put('lastUrl', $request->path());
-            return redirect('/profile');
-          }
+        if (Auth::check()) {
+            $user = Auth::user();
+            if (!($user->update_profile)) {
+                $request->session()->put('lastUrl', $request->path());
+                return redirect('/profile');
+            }
         }
         return $next($request);
     }

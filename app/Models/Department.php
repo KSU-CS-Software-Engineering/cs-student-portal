@@ -12,23 +12,26 @@ class Department extends Validatable
     protected $dates = ['deleted_at', 'created_at', 'updated_at'];
 
     protected $rules = array(
-      'name' => 'required|string',
-      'email' => 'required|string|email',
-      'office' => 'required|string',
-      'phone' => 'required|string',
+        'name' => 'required|string',
+        'email' => 'required|string|email',
+        'office' => 'required|string',
+        'phone' => 'required|string',
     );
 
     protected $fillable = ['name', 'email', 'office', 'phone'];
 
-    public function advisors(){
+    public function advisors()
+    {
         return $this->hasMany('App\Models\Advisor')->orderBy('name');
     }
 
-    public function students(){
+    public function students()
+    {
         return $this->hasMany('App\Models\Student')->orderBy('last_name');
     }
 
-    public function programs(){
-    	return $this->hasMany('App\Models\Degreeprogram')->withTrashed();
+    public function programs()
+    {
+        return $this->hasMany('App\Models\Degreeprogram')->withTrashed();
     }
 }

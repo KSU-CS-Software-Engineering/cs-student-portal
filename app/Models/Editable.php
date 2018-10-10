@@ -7,15 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class Editable extends Validatable
 {
 
-  public function user(){
-      return $this->belongsTo('App\Models\User')->withTrashed();
-  }
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User')->withTrashed();
+    }
 
-  protected $dates = ['created_at', 'updated_at'];
+    protected $dates = ['created_at', 'updated_at'];
 
-  protected $rules = array(
-    'contents' => 'required|string',
-  );
+    protected $rules = array(
+        'contents' => 'required|string',
+    );
 
-  protected $fillable = ['contents'];
+    protected $fillable = ['contents'];
 }
