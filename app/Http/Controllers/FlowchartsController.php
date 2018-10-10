@@ -34,8 +34,7 @@ class FlowchartsController extends Controller
     /**
      * Responds to requests to GET /courses
      */
-    public function getIndex($id = -1)
-    {
+    public function getIndex($id = -1){
         $user = Auth::user(); //I think this gets the user in question.
 
         if($id < 0){

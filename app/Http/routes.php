@@ -48,21 +48,21 @@ Route::get('completedcourses/completedcoursefeed/{id}', 'CompletedcoursesControl
  */
 //Route::controller('flowcharts', 'FlowchartsController');
 Route::get('flowcharts/new/{id}', 'FlowchartsController@newFlowchart');
-Route::post('flowcharts/new/{id}', 'FlowchartsController@saveNewFlowchart');
+Route::post('flowcharts/new/{id}', 'FlowchartsController@saveNewFlowchart'); //Check 4yr rules in this
 Route::get('flowcharts/{id?}', 'FlowchartsController@getIndex');
 Route::get('flowcharts/view/{id}', 'FlowchartsController@getFlowchart');
 Route::get('flowcharts/data/{id}', 'FlowchartsController@getFlowchartData');
 Route::get('flowcharts/edit/{id}', 'FlowchartsController@editFlowchart');
-Route::post('flowcharts/edit/{id}', 'FlowchartsController@saveFlowchart');
+Route::post('flowcharts/edit/{id}', 'FlowchartsController@saveFlowchart'); //Check 4yr rules in this
 Route::post('flowcharts/delete', 'FlowchartsController@deleteFlowchart');
 Route::post('flowcharts/reset', 'FlowchartsController@resetFlowchart');
-Route::get('flowcharts/semesters/{id}', 'FlowchartsController@getSemesterData'); //I think these and below pertain to semester.
-Route::post('flowcharts/semesters/{id}/save', 'FlowchartsController@postSemesterSave');
+Route::get('flowcharts/semesters/{id}', 'FlowchartsController@getSemesterData');
+Route::post('flowcharts/semesters/{id}/save', 'FlowchartsController@postSemesterSave'); //Maybe semester rules here?
 Route::post('flowcharts/semesters/{id}/delete', 'FlowchartsController@postSemesterDelete');
 Route::post('flowcharts/semesters/{id}/add', 'FlowchartsController@postSemesterAdd');
 Route::post('flowcharts/semesters/{id}/move', 'FlowchartsController@postSemesterMove');
 Route::post('flowcharts/data/{id}/move', 'FlowchartsController@postCourseMove');
-Route::post('flowcharts/data/{id}/save', 'FlowchartsController@postCourseSave');
+Route::post('flowcharts/data/{id}/save', 'FlowchartsController@postCourseSave'); //Maybe semester rules here?
 Route::post('flowcharts/data/{id}/delete', 'FlowchartsController@postCourseDelete');
 
 /*

@@ -19,7 +19,7 @@ use App\Models\Completedcourse;
   public function CheckFourYearPlanRules(Plan $planParam) {
     //Set the global variables.
     $plan = $planParam;
-    $student = $planParam->student_id;
+    $student = App\Models\Student::where('Id', $planParam->student_id);
 
     $cisRequirements = CheckCISRequirementsPlan();
     //Handle the output

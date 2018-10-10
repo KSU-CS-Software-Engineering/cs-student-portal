@@ -61,3 +61,9 @@ $factory->define(Department::class, function (Faker\Generator $faker) {
         'office' => $faker->secondaryAddress,
     ];
 });
+
+$factory->define(Completedclasses::class, function (Fake\Generator $faker) {
+    return [
+
+    ];
+});
