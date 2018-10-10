@@ -16,20 +16,10 @@ use App\Models\Completedcourse;
   private Plan $plan;
   private Student = $student;
 
-  public function CheckFourYearPlanRules(Plan $planParam) {
+  public function SetRuleVariables(Plan $planParam) {
     //Set the global variables.
     $plan = $planParam;
     $student = App\Models\Student::where('Id', $planParam->student_id);
-
-    $cisRequirements = CheckCISRequirementsPlan();
-    //Handle the output
-    $ksuGraduationRequirements = CheckGraduationValidityDegreeRequirements();
-    //Handle the output
-    $planGraduationRequirements = CheckGraduationValidityPlan();
-    //Handle the output.
-
-    //Return something to be used.
-
   }
 
 //We will want to:
