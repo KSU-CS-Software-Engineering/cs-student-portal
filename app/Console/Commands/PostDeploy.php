@@ -69,11 +69,11 @@ class PostDeploy extends Command
           $editable->key = "head";
           $editable->version = 0;
           $editable->user_id = 1;
-          $editable->contents= "<div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 bg-light-purple rounded'>
-	<h3 class='top-header text-center'>Group Advising</h3>
+          $editable->contents= '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 bg-light-purple rounded">
+	<h3 class="top-header text-center">Group Advising</h3>
 </div>
 
-<div class='col-xs-12 col-sm-12 col-md-12 col-lg-12'>
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
   <p>The CS department holding group advising sessions as part of Fall 2018 enrollment. Please plan to attend the appropriate session from the list below. All group advising sessions will be held in Fiedler Auditorium (DUF 1107).</p>
 
   <ul>
@@ -88,23 +88,23 @@ class PostDeploy extends Command
 
   <p>If you have additional questions or are unable to make ANY of the listed group advising times, then you may schedule an individual appointment with your advisor. However, these individual times will be limited.<br></p>
 
-  <div class='panel panel-primary'>
-    <div class='panel-heading'>
+  <div class="panel panel-primary">
+    <div class="panel-heading">
       Make sure you have the following available, either on paper or electronically, <b>before</b> you check in:
     </div>
-    <div class='panel-body'>
+    <div class="panel-body">
       <ul>
-        <li>A copy of your DARS report (<a href='http://www.k-state.edu/ksis/help/students/stuViewDARS.html'>Instructions</a>)</li>
+        <li>A copy of your DARS report (<a href="http://www.k-state.edu/ksis/help/students/stuViewDARS.html">Instructions</a>)</li>
         <li>A proposed schedule for the next semester.
           <ul>
-            <li>When planning your schedule, you should consult both your DARS report and your current CS flowchart (<a href='https://flowcharts.engg.ksu.edu/'>Engineering Flowchart Site</a>)</li>
+            <li>When planning your schedule, you should consult both your DARS report and your current CS flowchart (<a href="https://flowcharts.engg.ksu.edu/">Engineering Flowchart Site</a>)</li>
             <li>Pay attention to which CS courses are marked as Fall-only or Spring-only in the flowchart.</li>
            </ul></li>
           </ul>
          <p><b>Students who do not have a DARS report and proposed schedule will not be seen by an advisor until these steps are completed</b></p>
      </div>
    </div>
-</div>";
+</div>';
           $editable->save();
         }
 
@@ -118,7 +118,7 @@ class PostDeploy extends Command
           $editable->key = "message";
           $editable->version = 0;
           $editable->user_id = 1;
-          $editable->contents= "<div class='alert alert-danger' role='alert'>The CS Department is holding <b>Group Advising</b> sessions this year. Click <a href='/groupsession' class='alert-link'><b>here</b></a> to learn more! Please attend a group session if possible unless you require an in-depth advising appointment. This will help us keep individual times available for students who need them most.</div>";
+          $editable->contents= '<div class="alert alert-danger" role="alert">The CS Department is holding <b>Group Advising</b> sessions this year. Click <a href="/groupsession" class="alert-link"><b>here</b></a> to learn more! Please attend a group session if possible unless you require an in-depth advising appointment. This will help us keep individual times available for students who need them most.</div>';
           $editable->save();
         }
 
@@ -132,13 +132,13 @@ class PostDeploy extends Command
           $editable->key = "header";
           $editable->version = 0;
           $editable->user_id = 1;
-          $editable->contents= "<div class='jumbotron'>
-  <div class='container'>
+          $editable->contents= '<div class="jumbotron">
+  <div class="container">
     <h1>Engineering Advising</h1>
     <p>Welcome to the new K-State Engineering Advising System. This is your one-stop-shop to find classes, view your flowcharts and degree progress, schedule advising appointments, and more! Check out the sections below to get started.</p>
-    <p><a class='btn btn-primary btn-lg' href='/about' role='button'>Learn more &raquo;</a></p>
+    <p><a class="btn btn-primary btn-lg" href="/about" role="button">Learn more &raquo;</a></p>
   </div>
-</div>";
+</div>';
           $editable->save();
         }
 
@@ -152,9 +152,9 @@ class PostDeploy extends Command
           $editable->key = "advising";
           $editable->version = 0;
           $editable->user_id = 1;
-          $editable->contents= "<h2>Advising</h2>
+          $editable->contents= '<h2>Advising</h2>
   <p>When you are ready to enroll or if you have any questions, quickly schedule an appointment with your academic advisor.</p>
-  <p><a class='btn btn-default' href='/advising' role='button'>Schedule an Appointment &raquo;</a></p>";
+  <p><a class="btn btn-default" href="/advising" role="button">Schedule an Appointment &raquo;</a></p>';
           $editable->save();
         }
 
@@ -168,9 +168,9 @@ class PostDeploy extends Command
           $editable->key = "groupsession";
           $editable->version = 0;
           $editable->user_id = 1;
-          $editable->contents= "<h2>Group Advising</h2>
+          $editable->contents= '<h2>Group Advising</h2>
   <p>Attending a group advising session? Click here to get on the waiting list or find your place in the queue.</p>
-  <p><a class='btn btn-default' href='/groupsession' role='button'>Group Advising &raquo;</a></p>";
+  <p><a class="btn btn-default" href="/groupsession" role="button">Group Advising &raquo;</a></p>';
           $editable->save();
         }
 
@@ -184,9 +184,9 @@ class PostDeploy extends Command
           $editable->key = "help";
           $editable->version = 0;
           $editable->user_id = 1;
-          $editable->contents= "<h2>Help</h2>
+          $editable->contents= '<h2>Help</h2>
   <p>Not sure how to use the new system? Click here for help!</p>
-  <p><a class='btn btn-default' href='/help' role='button'>Help &raquo;</a></p>";
+  <p><a class="btn btn-default" href="/help" role="button">Help &raquo;</a></p>';
           $editable->save();
         }
 
@@ -198,8 +198,8 @@ class PostDeploy extends Command
           $editable->key = "about";
           $editable->version = 0;
           $editable->user_id = 1;
-          $editable->contents= "<h2>About the new Engineering Advising System</h2>
-  <p>This site is a work in progress. Our goal is to create the best academic advising experience for students and advisors alike. Contact russfeld@ksu.edu if you have any questions or comments</p>";
+          $editable->contents= '<h2>About the new Engineering Advising System</h2>
+  <p>This site is a work in progress. Our goal is to create the best academic advising experience for students and advisors alike. Contact russfeld@ksu.edu if you have any questions or comments</p>';
           $editable->save();
         }
 
