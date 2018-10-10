@@ -3,10 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Meeting;
-
 use DateTime;
-use DateInterval;
-use Mail;
 use PHPMailer;
 
 class MeetingObserver

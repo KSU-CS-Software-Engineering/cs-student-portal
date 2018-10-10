@@ -5,8 +5,8 @@
 
 namespace App\Http\ViewComposers;
 
-use Illuminate\View\View;
 use Illuminate\Routing\Route;
+use Illuminate\View\View;
 
 class JavascriptComposer
 {

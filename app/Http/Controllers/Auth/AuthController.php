@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Models\User;
+use App\Http\Controllers\Controller;
 use App\Models\Student;
+use App\Models\User;
 use Auth;
 use Cas;
-use Validator;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller

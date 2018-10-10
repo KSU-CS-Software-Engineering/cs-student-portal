@@ -2,26 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Student;
-use App\Models\User;
-use App\Models\Advisor;
-use App\Models\Groupsession;
-
-use Event;
-use App\Events\GroupsessionRegister;
 use App\Events\GroupsessionEnd;
-
+use App\Events\GroupsessionRegister;
+use App\Helpers\JsonSerializer;
+use App\Models\Groupsession;
 use Auth;
-use Cas;
 use DbConfig;
-
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
-
+use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
-use App\Helpers\JsonSerializer;
 
 class GroupsessionController extends Controller
 {

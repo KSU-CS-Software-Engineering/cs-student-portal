@@ -2,16 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Student;
 use App\Models\Advisor;
-
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use App\Helpers\JsonSerializer;
-
+use App\Models\Student;
+use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
 
 class ProfilesController extends Controller
 {

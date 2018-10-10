@@ -3,12 +3,8 @@
 namespace App\Listeners;
 
 use App\Events\PlanRequirementSaved;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-
-use App\Models\Planrequirement;
-use App\Models\Course;
 use App\Models\Completedcourse;
+use App\Models\Course;
 
 class UpdatePlanCoursesMap
 {

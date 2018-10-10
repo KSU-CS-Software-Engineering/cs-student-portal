@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use Illuminate\Http\Request;
-
 use App\Http\Controllers\Controller;
-
-use App\Models\Student;
 use App\Models\Advisor;
 use App\Models\Department;
+use App\Models\Student;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class StudentsController extends Controller
 {

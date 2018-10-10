@@ -2,17 +2,14 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Helpers\JsonSerializer;
+use App\Http\Controllers\Controller;
+use App\Models\Degreeprogram;
+use App\Models\Degreerequirement;
+use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
-use App\Helpers\JsonSerializer;
-
-use Illuminate\Http\Request;
-
-use App\Http\Controllers\Controller;
-
-use App\Models\Degreeprogram;
-use App\Models\Degreerequirement;
 
 class DegreerequirementsController extends Controller
 {

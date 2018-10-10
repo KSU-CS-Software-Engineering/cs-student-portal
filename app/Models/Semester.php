@@ -2,10 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-use App\Models\Plan;
-
 class Semester extends Validatable
 {
     protected $dates = ['created_at', 'updated_at'];

@@ -2,23 +2,19 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use Illuminate\Http\Request;
-
-use App\Models\Student;
+use App\Http\Controllers\Controller;
 use App\Models\Advisor;
-use App\Models\Meeting;
-use App\Models\Groupsession;
 use App\Models\Blackout;
 use App\Models\Blackoutevent;
+use App\Models\Completedcourse;
 use App\Models\Course;
 use App\Models\Degreeprogram;
-use App\Models\Plan;
 use App\Models\Electivelist;
-use App\Models\Completedcourse;
+use App\Models\Groupsession;
+use App\Models\Meeting;
+use App\Models\Plan;
+use App\Models\Student;
 use App\Models\Transfercourse;
-
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
 
 class DashboardController extends Controller
 {

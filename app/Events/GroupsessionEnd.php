@@ -2,10 +2,9 @@
 
 namespace App\Events;
 
-use App\Events\Event;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Broadcasting\Channel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Queue\SerializesModels;
 
 class GroupsessionEnd extends Event implements ShouldBroadcast
 {

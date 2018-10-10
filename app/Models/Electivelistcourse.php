@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
 class Electivelistcourse extends Validatable
 {
     protected $dates = ['created_at', 'updated_at'];

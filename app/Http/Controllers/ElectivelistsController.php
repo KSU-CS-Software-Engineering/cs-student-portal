@@ -3,14 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Electivelist;
-
+use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
-use App\Helpers\JsonSerializer;
-
-use Illuminate\Http\Request;
-
-use App\Http\Controllers\Controller;
 
 class ElectivelistsController extends Controller
 {

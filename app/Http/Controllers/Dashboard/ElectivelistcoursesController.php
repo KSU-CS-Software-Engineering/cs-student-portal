@@ -2,17 +2,14 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Helpers\JsonSerializer;
+use App\Http\Controllers\Controller;
+use App\Models\Electivelist;
+use App\Models\Electivelistcourse;
+use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
-use App\Helpers\JsonSerializer;
-
-use Illuminate\Http\Request;
-
-use App\Http\Controllers\Controller;
-
-use App\Models\Electivelist;
-use App\Models\Electivelistcourse;
 
 class ElectivelistcoursesController extends Controller
 {

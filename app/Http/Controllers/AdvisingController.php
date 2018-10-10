@@ -2,25 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Department;
-use App\Models\Meeting;
-use App\Models\Blackoutevent;
+use App\Helpers\JsonSerializer;
 use App\Models\Advisor;
 use App\Models\Blackout;
-
+use App\Models\Blackoutevent;
+use App\Models\Department;
+use App\Models\Meeting;
 use Auth;
-use Illuminate\Http\Request;
-use DateTime;
+use Carbon\Carbon;
 use DateInterval;
-
+use DateTime;
+use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
-use App\Helpers\JsonSerializer;
-
-use Cas;
-use Carbon\Carbon;
 
 class AdvisingController extends Controller
 {

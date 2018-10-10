@@ -2,18 +2,15 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Helpers\JsonSerializer;
+use App\Http\Controllers\Controller;
+use App\Models\Plan;
+use App\Models\Planrequirement;
+use Illuminate\Http\Request;
+use Illuminate\Support\MessageBag;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
-use App\Helpers\JsonSerializer;
-
-use Illuminate\Http\Request;
-use Illuminate\Support\MessageBag;
-
-use App\Http\Controllers\Controller;
-
-use App\Models\Plan;
-use App\Models\Planrequirement;
 
 class PlanrequirementsController extends Controller
 {

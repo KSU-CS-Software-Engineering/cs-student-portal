@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use DbConfig;
-use Auth;
 
 class GroupsessionDisabled
 {

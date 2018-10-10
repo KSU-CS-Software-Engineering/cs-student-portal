@@ -2,15 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Completedcourse;
 use Auth;
-
+use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
-use App\Helpers\JsonSerializer;
-
-use App\Models\Completedcourse;
-
-use Illuminate\Http\Request;
 
 class CompletedcoursesController extends Controller
 {

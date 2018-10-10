@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Validator;
 use App\Events\PlanRequirementSaved;
+use Validator;
 
 class Planrequirement extends Validatable
 {

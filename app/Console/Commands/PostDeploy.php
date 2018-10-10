@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Editable;
 use DbConfig;
+use Illuminate\Console\Command;
 
 class PostDeploy extends Command
 {

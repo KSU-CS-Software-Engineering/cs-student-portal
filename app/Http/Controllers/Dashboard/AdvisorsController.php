@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use Illuminate\Http\Request;
-
 use App\Http\Controllers\Controller;
-
-use Auth;
-
 use App\Models\Advisor;
 use App\Models\Department;
 use App\Models\User;
+use Auth;
+use Illuminate\Http\Request;
 
 class AdvisorsController extends Controller
 {

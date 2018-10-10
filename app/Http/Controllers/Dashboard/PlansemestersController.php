@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
 use App\Helpers\JsonSerializer;
-
-use Illuminate\Http\Request;
-
 use App\Http\Controllers\Controller;
-
 use App\Models\Plan;
 use App\Models\Semester;
+use Illuminate\Http\Request;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
 
 class PlansemestersController extends Controller
 {

@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use Illuminate\Http\Request;
-
 use App\Http\Controllers\Controller;
-
 use App\Models\Degreeprogram;
 use App\Models\Department;
+use Illuminate\Http\Request;
 
 class DegreeprogramsController extends Controller
 {

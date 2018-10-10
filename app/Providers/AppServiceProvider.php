@@ -2,10 +2,9 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use App\Observers\MeetingObserver;
-
 use App\Models\Meeting;
+use App\Observers\MeetingObserver;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {

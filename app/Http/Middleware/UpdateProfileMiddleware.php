@@ -2,9 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
 use Auth;
-use App\Models\User;
+use Closure;
 
 class UpdateProfileMiddleware
 {

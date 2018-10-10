@@ -2,12 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\Planrequirement;
-use App\Models\Degreeprogram;
-use App\Models\Degreerequirement;
-use App\Models\Semester;
 
 class Plan extends Validatable
 {

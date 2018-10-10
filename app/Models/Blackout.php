@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
 use App\Events\BlackoutSaved;
+use Illuminate\Database\Eloquent\Model;
 
 class Blackout extends Model
 {

@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Editable;
-
 use Auth;
+use Illuminate\Http\Request;
 
 class EditableController extends Controller
 {

@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use Illuminate\Http\Request;
-
 use App\Http\Controllers\Controller;
-
 use App\Models\Completedcourse;
 use App\Models\Transfercourse;
+use Illuminate\Http\Request;
 
 class CompletedcoursesController extends Controller
 {

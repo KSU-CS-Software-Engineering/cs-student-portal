@@ -3,10 +3,9 @@
 namespace App\Events;
 
 use App\Models\Groupsession;
-use App\Events\Event;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Queue\SerializesModels;
 
 class GroupsessionRegister extends Event implements ShouldBroadcast
 {

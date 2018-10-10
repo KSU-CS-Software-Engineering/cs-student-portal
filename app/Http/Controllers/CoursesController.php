@@ -2,18 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\College;
+use App\Helpers\JsonSerializer;
 use App\Models\Category;
+use App\Models\College;
 use App\Models\Course;
-
+use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
-use App\Helpers\JsonSerializer;
-
-use Illuminate\Http\Request;
-
-use App\Http\Controllers\Controller;
 
 class CoursesController extends Controller
 {

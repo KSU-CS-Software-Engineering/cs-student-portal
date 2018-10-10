@@ -2,23 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\JsonSerializer;
+use App\Models\Degreeprogram;
+use App\Models\Plan;
+use App\Models\Planrequirement;
+use App\Models\Semester;
+use App\Models\Student;
 use Auth;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\MessageBag;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
-use App\Helpers\JsonSerializer;
-
-use Illuminate\Support\MessageBag;
-
-use App\Models\User;
-use App\Models\Student;
-use App\Models\Advisor;
-use App\Models\Plan;
-use App\Models\Semester;
-use App\Models\Planrequirement;
-use App\Models\Degreeprogram;
 
 class FlowchartsController extends Controller
 {
