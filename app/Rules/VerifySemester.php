@@ -7,24 +7,22 @@ use App\Models\Semester;
 use App\Models\Student;
 use spec\PhpSpec\Process\Prerequisites\SuitePrerequisitesSpec;
 
-
-Private Plan $plan;
-Private Student $student;
-
+class VerifySemester
+{
 
 
 //Checks to see if the student has the correct number of hours to be a full time student
 //Hours need to be less than 21 and greater than 0
-    public function CheckHours(Semester $semester){
+    public function CheckHours(Semester $semester)
+    {
 
 
-        $CreditHours = App\Models\Planrequirements:: where('semester_id' $semester->id)->sum('credits')->get();
+        $CreditHours = App\Models\Planrequirements:: where('semester_id', $semester->id)->sum('credits')->get();
 
-        if ($CreditHours > 21 || $CreditHours < 1){
+        if ($CreditHours > 21 || $CreditHours < 1) {
 
             return false;
-        }
-        else{
+        } else {
             return true;
         }
 
@@ -32,26 +30,26 @@ Private Student $student;
 
 
 //Checks to see if the student has the correct prereqs to take the current semester worth of classes
-    public function CheckPreReqs(Semester $semester){
+    public function CheckPreReqs(Semester $semester, Student $student)
+    {
 
-        %course = App\Models\Planrequirements:: where('semester_id' $semester->id)->get();
+
+        $courses = App\Models\Planrequirements:: where('semester_id', $semester->id)->get();
 
         $StudentCompletedCourses = $student->completedcourses();
         $prerequisites = Course::prerequisites();
 
-        foreach('course' $courses in %course->Course){
-            if (){
+        foreach ($courses as $course){
+        if () {
 
-                return false;
-            }
-            else{
-                return true;
-            }
-
+            return false;
+        } else {
+            return true;
         }
-
 
     }
 
 
-?>
+    }
+
+}
