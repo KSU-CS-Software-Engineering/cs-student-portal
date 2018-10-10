@@ -1,6 +1,6 @@
 ////https://mattstauffer.com/blog/introducing-laravel-mix-new-in-laravel-5-4/
 
-const { mix } = require('laravel-mix');
+const mix = require('laravel-mix');
 
 /*
  |--------------------------------------------------------------------------
@@ -30,28 +30,44 @@ mix.webpackConfig(webpack => {
 
 //Global CSS styles definition
 
-mix.setPublicPath('public')
+mix.setPublicPath('public');
 
 mix.sass('resources/assets/sass/app.scss', 'public/css');
 
-mix.sass('resources/assets/sass/flowchart.scss', 'public/css')
+mix.sass('resources/assets/sass/flowchart.scss', 'public/css');
 
-mix.styles([
-    //'node_modules/admin-lte/dist/css/AdminLTE.css',
-    "resources/assets/css/dashboard-custom.css",
-    "resources/assets/css/dashboard-skin.css",
-    "node_modules/datatables.net-bs/css/dataTables.bootstrap.css",
-], 'public/css/dashboard.css');
+mix.sass('resources/assets/sass/dashboard.scss', 'public/css/dashboard.css');
 
 
 //Global Javascript Stuff
 
 mix.js('resources/assets/js/app.js', 'public/js')
-    .extract(['jquery', 'bootstrap', 'lodash', 'axios', 'summernote', 'codemirror', 'fullcalendar', 'devbridge-autocomplete', 'moment', 'eonasdan-bootstrap-datetimepicker-russfeld', 'vue', 'pusher-js', 'ion-sound', 'laravel-echo', 'admin-lte', 'datatables.net', 'datatables.net-bs', 'sortablejs', 'vuedraggable'])
-    .sourceMaps();
+    .extract([
+        'jquery',
+        'bootstrap',
+        'lodash',
+        'axios',
+        'summernote',
+        'codemirror',
+        'fullcalendar',
+        'devbridge-autocomplete',
+        'moment',
+        'eonasdan-bootstrap-datetimepicker-russfeld',
+        'vue',
+        'pusher-js',
+        'ion-sound',
+        'laravel-echo',
+        'admin-lte',
+        'datatables.net',
+        'datatables.net-bs',
+        'sortablejs',
+        'vuedraggable'
+    ]);
 
 mix.copy('node_modules/ion-sound/sounds/door_bell*', 'public/sounds');
 
 if (mix.inProduction()) {
     mix.version();
+} else {
+    mix.sourceMaps();
 }
