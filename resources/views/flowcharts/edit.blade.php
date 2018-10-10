@@ -32,7 +32,7 @@
       @endif
       @if (isset($plan->id))
         <a type="button" class="btn btn-warning" href="{{ url('/flowcharts/view/' . $plan->id )}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
-        <button type="button" class="btn btn-info" id="repopulate"><i class="fa fa-refresh" aria-hidden="true"></i> Reset Degree Requirements</a>
+        <button type="button" class="btn btn-info" id="repopulate"><i class="fa fa-refresh" aria-hidden="true"></i> Reset Degree Requirements</button>
       @else
         <a type="button" class="btn btn-warning" href="{{ url('/flowcharts/' . $plan->student_id )}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
       @endif
