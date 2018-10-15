@@ -13,8 +13,10 @@ use App\Models\Degreerequirement;
 use App\Models\Completedcourse;
 
 //How do we want to test the validity of the 4yr plan?
-  private Plan $plan;
-  private Student = $student;
+class VerifyFourYearPlan {
+
+  //private $plan;
+  //private $student;
 
   public function SetRuleVariables(Plan $planParam) {
     //Set the global variables.
@@ -32,21 +34,23 @@ use App\Models\Completedcourse;
   //Check Advisor flag.
 
   //This is untested.
-  public function CheckCISRequirementsPlan() {
+  public function CheckCISRequirementsPlan(Plan $plan) {
+    $count = 0;
     //We need to test ot make sure all classes in Requirements are in plan
     //Create array to put the missing classes in.
     $returnarray = [];
     //Get all of the degree requirements in a collection.
-    $degreerequirements = App\Models\Degreerequirement::where('degreeprogram_id', $plan->degreeprogram_id)->get();
+    $degreerequirements = Degreerequirement::where('degreeprogram_id', $plan->degreeprogram_id)->get();
     //Get all of the planned classes to compare
-    $planrequirements = App\Models\Planrequirement::where('plan_id', $plan->id)->get();
+    $planrequirements = Planrequirement::where('plan_id', $plan->id)->get();
     //Iterate through the degree requirements testing each against the planned classes
     foreach($degreerequirements as $degreerequirement) {
       //If the degree requirement is not in the plan requirements
       if(!$planrequirements.contains('degreerequirement_id', $degreerequirement->id)) {
         //Add the missing degree requirement to the array.
-        $returnarray->push($degreerequirement);
+        $returnarray->push($degreerequirements[$count]);
       }
+      $count++;
     }
     //Return the array.
     return $returnarray;
@@ -59,8 +63,9 @@ use App\Models\Completedcourse;
   //This is untested.
   //This checks that the user has completed all of the required classes to graduate
   //This does the same thing that the above function does.
-  public function CheckGraduationValidityDegreeRequirements() {
+  public function CheckGraduationValidityDegreeRequirements(Plan $plan) {
     $returnarray = [];
+    $student = App\Models\Student::where('id', $plan->student_id);
 
     $completedcourses = App\Models\Completedcourse::where('student_id', $student->id)->get();
     $degreerequirements = App\Models\Degreerequirement::where('degreeprogram_id', $plan->degreeprogram_id)->get();
@@ -75,8 +80,9 @@ use App\Models\Completedcourse;
     return $returnarray;
   }
 
-  public function CheckGraduationValidityPlan() {
+  public function CheckGraduationValidityPlan(Plan $plan) {
     $returnarray = [];
+    $student = App\Models\Student::where('id', $plan->student_id);
 
     $completedcourses = App\Models\Completedcourse::where('student_id', $student->id)->get();
     $planrequirements = App\Models\Planrequirements::where('plan_id', $plan->id)->get();
@@ -90,4 +96,6 @@ use App\Models\Completedcourse;
     }
     return $returnarray;
   }
+}
+
 ?>

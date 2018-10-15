@@ -649,7 +649,7 @@ class FlowchartsController extends Controller
 
 
         //Set the variables for the rules case
-        VerifyFourYearPlan $rules;
+        $rules = new VerifyFourYearPlan();
         rules.SetRuleVariables($plan);
 
         //Check the first one.
