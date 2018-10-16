@@ -22,12 +22,8 @@ class RulesTest extends TestCase {
 
     public function test4YrPlanValidity() {
         //We will just choose this as the test case.
-        //Use the All() to get the object to an array.
-        $plan = App\Models\Plan::where('id', 1)->get()->All();
-
+        $plan = App\Models\Plan::where('id', 1)->get();
         $rules = new VerifyFourYearPlan();
-        //$rules.SetRuleVariables($plan);
-
         //Make sure to grab the first one in the array (it'sthe only one in the array)
         $this->AssertEmpty($rules->CheckCISRequirementsPlan($plan[0]));
     }
