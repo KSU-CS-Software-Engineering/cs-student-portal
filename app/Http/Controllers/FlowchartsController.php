@@ -651,6 +651,7 @@ class FlowchartsController extends Controller
         //Set the variables for the rules case
         $rules = new VerifyFourYearPlan();
         rules.SetRuleVariables($plan);
+        //s
 
         //Check the first one.
         $firstArr = rules.CheckCISRequirementsPlan();
