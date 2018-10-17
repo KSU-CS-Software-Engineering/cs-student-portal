@@ -317,7 +317,7 @@ class FlowchartsController extends Controller
         $plan = Plan::with('semesters')->findOrFail($id);
 
         //If the plan check comes back with a flag.
-        if(CheckFourYearRules($plan) > 0) {
+        if($this->CheckFourYearRules($plan) > 0) {
           //Don't save the change.
           abort(409);
         }
@@ -378,7 +378,7 @@ class FlowchartsController extends Controller
         $plan = Plan::with('semesters')->findOrFail($id);
 
         //If the plan check comes back with a flag.
-        if(CheckFourYearRules($plan) > 0) {
+        if($this->CheckFourYearRules($plan) > 0) {
           //Don't save the change.
           abort(409);
         }
@@ -427,7 +427,7 @@ class FlowchartsController extends Controller
         $plan = Plan::findOrFail($id);
 
         //If the plan check comes back with a flag.
-        if(CheckFourYearRules($plan) > 0) {
+        if($this->CheckFourYearRules($plan) > 0) {
           //Don't save the change.
           abort(409);
         }
@@ -497,7 +497,7 @@ class FlowchartsController extends Controller
         $plan = Plan::findOrFail($id);
 
         //If the plan check comes back with a flag.
-        if(CheckFourYearRules($plan) > 0) {
+        if($this->CheckFourYearRules($plan) > 0) {
           //Don't save the change.
           abort(409);
         }
@@ -605,7 +605,7 @@ class FlowchartsController extends Controller
         $plan = Plan::findOrFail($id);
 
         //If the plan check comes back with a flag.
-        if(CheckFourYearRules($plan) > 0) {
+        if($this->CheckFourYearRules($plan) > 0) {
           //Don't save the change.
           abort(409);
         }
@@ -652,7 +652,7 @@ class FlowchartsController extends Controller
         $rules = new VerifyFourYearPlan();
 
         //Check the first one.
-        $firstArr = $rules->CheckCISRequirementsPlan();
+        $firstArr = $rules->CheckCISRequirementsPlan($plan);
         if(count($firstArr) > 0) {
           $missingRequirements = 1;
         }
