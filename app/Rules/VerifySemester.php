@@ -28,29 +28,27 @@ class VerifySemester
     }
 
 //Checks to see if the student has the correct prereqs to take the current semester worth of classes
+//Returns an array with the courses they need to take for a class if needed
     public function CheckPreReqs(Semester $semester, Student $student)
     {
-
+        $array = [];
         $courses = App\Models\Planrequirements:: where('semester_id', $semester->id)->get();
 
         $StudentCompletedCourses = $student->completedcourses;
 
-        foreach ($courses as $course){
+        foreach ($courses as $course) {
             $prerequisites = $course->prerequisites;
-            if ($prerequisites == NULL){
-                return true;
-            }
-            foreach($prerequisites as $prereq) {
-                $coursenumberlookup = App\Models\Course :: where('id', $prereq->prerequisite_for_course_id);
-                if ($StudentCompletedCourses.contains('coursenumber' , $coursenumberlookup->number) ) {
-                    return true;
+
+            foreach ($prerequisites as $prereq) {
+
+                $coursenumberlookup = App\Models\Course:: where('id', $prereq->prerequisite_for_course_id);
+                if (!$StudentCompletedCourses.contains('coursenumber', $coursenumberlookup->number)) {
+                    $array->push($coursenumberlookup);
                 }
-                else{
-                    return false;
-                }
+
             }
+
         }
-
+        return $array;
     }
-
 }
