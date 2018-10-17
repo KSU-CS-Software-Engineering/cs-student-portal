@@ -317,7 +317,7 @@ class FlowchartsController extends Controller
         $plan = Plan::with('semesters')->findOrFail($id);
 
         //If the plan check comes back with a flag.
-        if(CheckFourYearRules($plan) > 0) {
+        if($this->CheckFourYearRules($plan) > 0) {
           //Don't save the change.
           abort(409);
         }
@@ -378,7 +378,7 @@ class FlowchartsController extends Controller
         $plan = Plan::with('semesters')->findOrFail($id);
 
         //If the plan check comes back with a flag.
-        if(CheckFourYearRules($plan) > 0) {
+        if($this->CheckFourYearRules($plan) > 0) {
           //Don't save the change.
           abort(409);
         }
@@ -427,7 +427,7 @@ class FlowchartsController extends Controller
         $plan = Plan::findOrFail($id);
 
         //If the plan check comes back with a flag.
-        if(CheckFourYearRules($plan) > 0) {
+        if($this->CheckFourYearRules($plan) > 0) {
           //Don't save the change.
           abort(409);
         }
@@ -497,7 +497,7 @@ class FlowchartsController extends Controller
         $plan = Plan::findOrFail($id);
 
         //If the plan check comes back with a flag.
-        if(CheckFourYearRules($plan) > 0) {
+        if($this->CheckFourYearRules($plan) > 0) {
           //Don't save the change.
           abort(409);
         }
@@ -605,7 +605,7 @@ class FlowchartsController extends Controller
         $plan = Plan::findOrFail($id);
 
         //If the plan check comes back with a flag.
-        if(CheckFourYearRules($plan) > 0) {
+        if($this->CheckFourYearRules($plan) > 0) {
           //Don't save the change.
           abort(409);
         }
@@ -650,26 +650,24 @@ class FlowchartsController extends Controller
 
         //Set the variables for the rules case
         $rules = new VerifyFourYearPlan();
-        rules.SetRuleVariables($plan);
-        //s
 
         //Check the first one.
-        $firstArr = rules.CheckCISRequirementsPlan();
+        $firstArr = $rules->CheckCISRequirementsPlan($plan);
         if(count($firstArr) > 0) {
           $missingRequirements = 1;
         }
 
         //Check the second one.
         //This handles graduation ability, not validity of the plan, so no flag.
-        $secondArr = rules.CheckGraduationValidityDegreeRequirements();
+        //$secondArr = $rules->CheckGraduationValidityDegreeRequirements();
 
 
         //Check the third one.
         //This handles graduation ability, not validity of the plan, so no flag.
-        $thirdArr = rules.CheckGraduationValidityPlan();
+        //$thirdArr = $rules->CheckGraduationValidityPlan();
 
         //Not sure I need to send the second and third arrays here.
-        sendtoView($firstArr, $secondArr, $thirdArr); //This doesn't actually exist.
+        //sendtoView($firstArr, $secondArr, $thirdArr); //This doesn't actually exist.
     }
 
 }
