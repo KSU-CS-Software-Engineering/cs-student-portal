@@ -62,8 +62,8 @@ $factory->define(Department::class, function (Faker\Generator $faker) {
     ];
 });
 
-$factory->define(Completedclasses::class, function (Fake\Generator $faker) {
+$factory->define(Completedclasses::class, function (Fake\Generator $faker, $params) {
     return [
-
+          
     ];
 });
