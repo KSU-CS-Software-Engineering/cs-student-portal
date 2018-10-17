@@ -34,8 +34,7 @@ class FlowchartsController extends Controller
     /**
      * Responds to requests to GET /courses
      */
-    public function getIndex($id = -1)
-    {
+    public function getIndex($id = -1){
         $user = Auth::user(); //I think this gets the user in question.
 
         if($id < 0){
@@ -316,6 +315,14 @@ class FlowchartsController extends Controller
       }else{
         $user = Auth::user();
         $plan = Plan::with('semesters')->findOrFail($id);
+
+        //If the plan check comes back with a flag.
+        if(CheckFourYearRules($plan) > 0) {
+          //Don't save the change.
+          abort(409);
+        }
+
+
         if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           $semester = Semester::findOrFail($request->input('id'));
           if($semester->plan_id == $id){
@@ -369,6 +376,14 @@ class FlowchartsController extends Controller
       }else{
         $user = Auth::user();
         $plan = Plan::with('semesters')->findOrFail($id);
+
+        //If the plan check comes back with a flag.
+        if(CheckFourYearRules($plan) > 0) {
+          //Don't save the change.
+          abort(409);
+        }
+
+
         if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           $semesters = $plan->semesters;
 
@@ -410,6 +425,13 @@ class FlowchartsController extends Controller
       }else{
         $user = Auth::user();
         $plan = Plan::findOrFail($id);
+
+        //If the plan check comes back with a flag.
+        if(CheckFourYearRules($plan) > 0) {
+          //Don't save the change.
+          abort(409);
+        }
+
         if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           //move requirement to new semester
           $requirement_moved = Planrequirement::findOrFail($request->input('course_id'));
@@ -473,6 +495,14 @@ class FlowchartsController extends Controller
       }else{
         $user = Auth::user();
         $plan = Plan::findOrFail($id);
+
+        //If the plan check comes back with a flag.
+        if(CheckFourYearRules($plan) > 0) {
+          //Don't save the change.
+          abort(409);
+        }
+
+
         if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
 
           if($request->has('planrequirement_id')){
@@ -573,6 +603,14 @@ class FlowchartsController extends Controller
       }else{
         $user = Auth::user();
         $plan = Plan::findOrFail($id);
+
+        //If the plan check comes back with a flag.
+        if(CheckFourYearRules($plan) > 0) {
+          //Don't save the change.
+          abort(409);
+        }
+
+
         if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
 
           if($request->has('planrequirement_id')){
@@ -596,6 +634,41 @@ class FlowchartsController extends Controller
           abort(404);
         }
       }
+    }
+
+
+    private function CheckFourYearRules(Plan $plan) {
+        //I'm not sure this is the best place to check the completed classses
+        //I'm also not sure where this would go better.
+
+        $firstArr = [];
+        $secondArr = [];
+        $thirdArr = [];
+
+        $missingRequirements = 0;
+
+
+        //Set the variables for the rules case
+        $rules = new VerifyFourYearPlan();
+        rules.SetRuleVariables($plan);
+
+        //Check the first one.
+        $firstArr = rules.CheckCISRequirementsPlan();
+        if(count($firstArr) > 0) {
+          $missingRequirements = 1;
+        }
+
+        //Check the second one.
+        //This handles graduation ability, not validity of the plan, so no flag.
+        $secondArr = rules.CheckGraduationValidityDegreeRequirements();
+
+
+        //Check the third one.
+        //This handles graduation ability, not validity of the plan, so no flag.
+        $thirdArr = rules.CheckGraduationValidityPlan();
+
+        //Not sure I need to send the second and third arrays here.
+        sendtoView($firstArr, $secondArr, $thirdArr); //This doesn't actually exist.
     }
 
 }

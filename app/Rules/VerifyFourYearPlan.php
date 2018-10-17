@@ -12,51 +12,37 @@ use App\Models\Degreeprogram;
 use App\Models\Degreerequirement;
 use App\Models\Completedcourse;
 
-//How do we want to test the validity of the 4yr plan?
-  private Plan $plan;
-  private Student = $student;
 
-  public function CheckFourYearPlanRules(Plan $planParam) {
-    //Set the global variables.
-    $plan = $planParam;
-    $student = $planParam->student_id;
+class VerifyFourYearPlan {
 
-    $cisRequirements = CheckCISRequirementsPlan();
-    //Handle the output
-    $ksuGraduationRequirements = CheckGraduationValidityDegreeRequirements();
-    //Handle the output
-    $planGraduationRequirements = CheckGraduationValidityPlan();
-    //Handle the output.
+  //Written and/or Implemented
+  //Check plan for 4yr validity against KState and CS rules. (Degree Requirements) Written, implemented, and tested.
 
-    //Return something to be used.
-
-  }
-
-//We will want to:
-  //Implemented
-  //Check plan for 4yr validity against KState and CS rules. (Degree Requirements)
-  //Check completed classes for graduation ability against KSU and CS Rules
-  //Check completed classes for completion of student's plan.
+  //Check completed classes for graduation ability against KSU and CS Rules. Written, unimplemented, untested.
+  //Check completed classes for completion of student's plan. Written, inimplemented, untested.
 
   //Unimplemented
   //Check Advisor flag.
 
-  //This is untested.
-  public function CheckCISRequirementsPlan() {
+  //This is tested and works as intended.
+  public function CheckCISRequirementsPlan(Plan $plan) {
+    $count = 0;
     //We need to test ot make sure all classes in Requirements are in plan
     //Create array to put the missing classes in.
     $returnarray = [];
     //Get all of the degree requirements in a collection.
-    $degreerequirements = App\Models\Degreerequirement::where('degreeprogram_id', $plan->degreeprogram_id)->get();
+    $degreerequirements = Degreerequirement::where('degreeprogram_id', $plan->degreeprogram_id)->get();
+    //dd($degreerequirements->count());
     //Get all of the planned classes to compare
-    $planrequirements = App\Models\Planrequirement::where('plan_id', $plan->id)->get();
+    $planrequirements = Planrequirement::where('plan_id', $plan->id)->get();
     //Iterate through the degree requirements testing each against the planned classes
     foreach($degreerequirements as $degreerequirement) {
       //If the degree requirement is not in the plan requirements
-      if(!$planrequirements.contains('degreerequirement_id', $degreerequirement->id)) {
+      if($planrequirements.contains('degreerequirement_id', $degreerequirement->id) == FALSE) {
         //Add the missing degree requirement to the array.
-        $returnarray->push($degreerequirement);
+        $returnarray[$count] = $degreerequirement;
       }
+      $count++;
     }
     //Return the array.
     return $returnarray;
@@ -69,8 +55,9 @@ use App\Models\Completedcourse;
   //This is untested.
   //This checks that the user has completed all of the required classes to graduate
   //This does the same thing that the above function does.
-  public function CheckGraduationValidityDegreeRequirements() {
+  public function CheckGraduationValidityDegreeRequirements(Plan $plan) {
     $returnarray = [];
+    $student = App\Models\Student::where('id', $plan->student_id);
 
     $completedcourses = App\Models\Completedcourse::where('student_id', $student->id)->get();
     $degreerequirements = App\Models\Degreerequirement::where('degreeprogram_id', $plan->degreeprogram_id)->get();
@@ -85,8 +72,9 @@ use App\Models\Completedcourse;
     return $returnarray;
   }
 
-  public function CheckGraduationValidityPlan() {
+  public function CheckGraduationValidityPlan(Plan $plan) {
     $returnarray = [];
+    $student = App\Models\Student::where('id', $plan->student_id);
 
     $completedcourses = App\Models\Completedcourse::where('student_id', $student->id)->get();
     $planrequirements = App\Models\Planrequirements::where('plan_id', $plan->id)->get();
@@ -100,4 +88,6 @@ use App\Models\Completedcourse;
     }
     return $returnarray;
   }
+}
+
 ?>
