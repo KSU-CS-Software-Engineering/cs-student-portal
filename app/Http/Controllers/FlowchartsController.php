@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Rules\VerifySemester;
 use Auth;
 use Illuminate\Http\Request;
 
@@ -322,8 +323,11 @@ class FlowchartsController extends Controller
           abort(409);
         }
 
+          CheckSemesterRules($plan->semester, $user->student);
 
-        if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
+
+
+          if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           $semester = Semester::findOrFail($request->input('id'));
           if($semester->plan_id == $id){
             $semester->delete();
@@ -383,8 +387,10 @@ class FlowchartsController extends Controller
           abort(409);
         }
 
+          CheckSemesterRules($plan->semester, $user->student);
 
-        if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
+
+          if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           $semesters = $plan->semesters;
 
           $ordering = collect($request->input('ordering'));
@@ -419,6 +425,8 @@ class FlowchartsController extends Controller
     }
 
     public function postCourseMove(Request $request, $id = -1){
+
+
       if($id < 0){
         //id not found
         abort(404);
@@ -432,6 +440,10 @@ class FlowchartsController extends Controller
           abort(409);
         }
 
+        $semester = Semester::findOrFail($request->input('semester_id'));
+        CheckSemesterRules($semester, $user->student);
+
+
         if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           //move requirement to new semester
           $requirement_moved = Planrequirement::findOrFail($request->input('course_id'));
@@ -440,7 +452,7 @@ class FlowchartsController extends Controller
             abort(404);
           }
 
-          $semester = Semester::findOrFail($request->input('semester_id'));
+
           if($semester->plan_id != $plan->id){
             //can't move course to semester not on the plan;
             abort(404);
@@ -502,8 +514,10 @@ class FlowchartsController extends Controller
           abort(409);
         }
 
+          CheckSemesterRules($plan->semester, $user->student);
 
-        if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
+
+          if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
 
           if($request->has('planrequirement_id')){
             $planrequirement = Planrequirement::findOrFail($request->input('planrequirement_id'));
@@ -610,8 +624,10 @@ class FlowchartsController extends Controller
           abort(409);
         }
 
+          CheckSemesterRules($plan->semester, $user->student);
 
-        if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
+
+          if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
 
           if($request->has('planrequirement_id')){
             $planrequirement = Planrequirement::findOrFail($request->input('planrequirement_id'));
@@ -668,6 +684,31 @@ class FlowchartsController extends Controller
 
         //Not sure I need to send the second and third arrays here.
         //sendtoView($firstArr, $secondArr, $thirdArr); //This doesn't actually exist.
+    }
+
+    public function CheckSemesterRules(Semester $semester, Student $student){
+
+        $prereqs = [];
+        $rules = new VerifySemester();
+
+        //returns true if correct number of hours and false if not
+        //if not correct number of hours displays an alert
+        $correcthours = $rules->CheckHours($student);
+        if ($correcthours == FALSE){
+            $message = "Your credit hours need to be less than 21.";
+            echo "<script type='text/javascript'>alert('$message');</script>";
+
+        }
+
+
+        //returns an array with the missing prereqs or empty if all good
+        $prereqs = $rules->CheckPreReqs($semester, $student);
+        if (count($prereqs) >0){
+            abort(409);
+        }
+
+
+
     }
 
 }

@@ -42,7 +42,7 @@ class VerifySemester
             foreach ($prerequisites as $prereq) {
 
                 $coursenumberlookup = App\Models\Course:: where('id', $prereq->prerequisite_for_course_id);
-                if (!$StudentCompletedCourses.contains('coursenumber', $coursenumberlookup->number)) {
+                if (($StudentCompletedCourses.contains('coursenumber', $coursenumberlookup->number)) == FALSE) {
                     $array->push($coursenumberlookup);
                 }
 
