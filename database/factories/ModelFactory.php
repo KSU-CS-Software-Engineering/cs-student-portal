@@ -4,6 +4,10 @@ use App\Models\User;
 use App\Models\Student;
 use App\Models\Advisor;
 use App\Models\Department;
+use App\Models\Completedcourse;
+use App\Models\Degreerequirement;
+use App\Models\Plan;
+use App\Models\Degreeprogram;
 /*
 |--------------------------------------------------------------------------
 | Model Factories
@@ -62,8 +66,34 @@ $factory->define(Department::class, function (Faker\Generator $faker) {
     ];
 });
 
-$factory->define(Completedclasses::class, function (Fake\Generator $faker, $params) {
+//This is used to test that the proper courses have been completed.
+//It takes $params that is the name of the class. This is then used to compare to Degreerequirement->course_name
+$factory->define(Completedcourse::class, function (Faker\Generator $faker, $params) {
     return [
-          
+        'name' => $params['name'],
+        'student_id' => $params['student_id']
+    ];
+});
+
+$factory->define(Degreerequirement::class, function(Faker\Generator $faker, $params) {
+    return [
+        'degreeprogram_id' => 2,
+        'course_name' => $params['course_name'],
+        'electivelist_id' => $params['electivelist_id'],
+        'semester' => $params['semester'],
+        'ordering' => $params['ordering']
+    ];
+});
+
+$factory->define(Plan::class, function(Faker\Generator $faker) {
+    return [
+        'degreeprogram_id'=> 2,
+        'student_id'=> factory(student::class)->create()->id
+    ];
+});
+
+$factory->define(Degreeprogram::class, function(Faker\Generator $faker) {
+    return [
+        'id' => 2
     ];
 });
