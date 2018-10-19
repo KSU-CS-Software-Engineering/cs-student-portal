@@ -30,32 +30,39 @@ class RulesTest extends TestCase {
     }
 
 
+    //This method looks complicated, but it's a lot of superflous info.
+    //This creates an entire career of completed classes, based on the class_name from the degree requirements.
+    //Some of the degree requirements don't have course_name populated, so it looks at the electivelist_id, and chooses one of the classes to make the class name.
+    //These degree requirements including class names for all of the classes need to be compared to the completed classes, so that's why there's a whole new degreerequirements being create
+    //The plan gets created because it needs to have the correct degreeprogram_id and degreerequirements.
     public function testGraduationValidityDegreeRequirements() {
-        //Again we'll just grab exisitng data for the tests.
+        //Create rules object
         $rules = new VerifyFourYearPlan();
+        //Create a new degree program and plan that these degreerequirements will map to.
         factory(Degreeprogram::class)->create();
-        //$plan = App\Models\Plan::where('id', 1)->get();
         $plan = factory(Plan::class)->create();
-        $count = 0;
-
-        $completedCoursesArray = [];
+        //Grab the degree requirements to copy.
         $degreerequirements = Degreerequirement::where('degreeprogram_id', 1)->get();
+
+        //For all of the degree requirements
         foreach($degreerequirements as $degreerequirement) {
+            //If the degree requirement does not have a coursename (aka an elective)
             if($degreerequirement->course_name == '') {
                   //This just grabs the first class that is listed under that ElectiveCourseId. This is just a placeholder to create proper completedClasses.
                   $electiveListToGetClassNameFrom = Electivelistcourse::where('electivelist_id', $degreerequirement->electivelist_id)->get()[0];
                   //This creates a new CompletedCourse with a name of the course_prefix and course number of the selected
-                  $completedCoursesArray[$count] = factory(Completedcourse::class)->create(['name' => (string)$electiveListToGetClassNameFrom->course_prefix . (string)$electiveListToGetClassNameFrom->course_min_number, 'student_id' => $plan->student_id]);
-                  // Here I think I need to do something similar to the degreerequirements since there's empty courseName's
+                  factory(Completedcourse::class)->create(['name' => (string)$electiveListToGetClassNameFrom->course_prefix . (string)$electiveListToGetClassNameFrom->course_min_number, 'student_id' => $plan->student_id]);
+                  // This creates a new degree requirement using the proper course name (also the semester and ordering are unique keys)
                   factory(Degreerequirement::class)->create(['course_name' => (string)$electiveListToGetClassNameFrom->course_prefix . (string)$electiveListToGetClassNameFrom->course_min_number, 'electivelist_id' => $degreerequirement->electivelist_id, 'semester' => $degreerequirement->semester, 'ordering' => $degreerequirement->ordering]);
             }
             else {
-                  $completedCoursesArray[$count] = factory(Completedcourse::class)->create(['name' => $degreerequirement->course_name, 'student_id' => $plan->student_id]);
+                  //Copy the course name and student id over to the new created course
+                  factory(Completedcourse::class)->create(['name' => $degreerequirement->course_name, 'student_id' => $plan->student_id]);
+                  //Copy the course name and the foreign keys to the new data.
                   factory(Degreerequirement::class)->create(['course_name' => $degreerequirement->course_name, 'electivelist_id' => $degreerequirement->electivelist_id, 'semester' => $degreerequirement->semester, 'ordering' => $degreerequirement->ordering]);
             }
-            $count++;
         }
-        //$plan[0]->degreeprogram_id = 2;
+        //Send the created plan which has the mapped completed classes and degreerequirements etc.
         $this->AssertEmpty($rules->CheckGraduationValidityDegreeRequirements($plan));
 
 
