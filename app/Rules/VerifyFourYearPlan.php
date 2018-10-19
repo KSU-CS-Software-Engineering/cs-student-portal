@@ -38,7 +38,7 @@ class VerifyFourYearPlan {
     //Iterate through the degree requirements testing each against the planned classes
     foreach($degreerequirements as $degreerequirement) {
       //If the degree requirement is not in the plan requirements
-      if($planrequirements.contains('degreerequirement_id', $degreerequirement->id) == FALSE) {
+      if($planrequirements->contains('degreerequirement_id', $degreerequirement->id) == FALSE) {
         //Add the missing degree requirement to the array.
         $returnarray[$count] = $degreerequirement;
       }
@@ -52,20 +52,18 @@ class VerifyFourYearPlan {
 //One will check that it passes KSU & CS requiremtns and the other will cehck
 //That the student has completed their plan.
 
-  //This is untested.
+  //This is tested.
   //This checks that the user has completed all of the required classes to graduate
   //This does the same thing that the above function does.
   public function CheckGraduationValidityDegreeRequirements(Plan $plan) {
     $returnarray = [];
     $count = 0;
     $student = Student::where('id', $plan->student_id)->get()[0];
-    $completedcourses =Completedcourse::where('student_id', $student->id)->get();
+    $completedcourses = Completedcourse::where('student_id', $student->id)->get();
     $degreerequirements = Degreerequirement::where('degreeprogram_id', $plan->degreeprogram_id)->get();
 
     foreach($degreerequirements as $degreerequirement) {
-
-      if($completedcourses.contains('name', $degreerequirement->course_name) == FALSE) {
-
+      if($completedcourses->contains('name', $degreerequirement->course_name) == false) {
         $returnarray[$count] = $degreerequirement;
       }
       $count++;
