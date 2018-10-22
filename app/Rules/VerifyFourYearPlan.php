@@ -78,6 +78,7 @@ class VerifyFourYearPlan {
 
   public function CheckGraduationValidityPlan(Plan $plan) {
     $returnarray = [];
+    $count = 0;
     $student = App\Models\Student::where('id', $plan->student_id);
 
     $completedcourses = App\Models\Completedcourse::where('student_id', $student->id)->get();
@@ -85,9 +86,9 @@ class VerifyFourYearPlan {
 
     foreach($planrequirements as $planrequirement) {
 
-      if(!$completedcourses.contains('name', $planrequirement->course_name)) {
+      if(!$completedcourses->contains('name', $planrequirement->course_name)) {
 
-        $returnarray->push($planrequirement);
+        $returnarray[$count] = $planrequirement;
       }
     }
     return $returnarray;

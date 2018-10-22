@@ -63,10 +63,22 @@ class RulesTest extends TestCase {
             }
         }
         //Send the created plan which has the mapped completed classes and degreerequirements etc.
-        $this->AssertEmpty($rules->CheckGraduationValidityDegreeRequirements($plan));
+        $this->AssertEmpty($rules->CheckGraduationValidityDegreeRequirements($plan)); as the class we want.
+    }
 
+    //This needs to be similar to the function above.
+    //Instead, I want to check completed courses against planrequirements rather than degree requirements
+    public function testGraduationValidityPlanRequirements() {
+        $rules = new VerifyFourYearPlan();
 
-        //Need to fake the completed classes based on the course name of the DegreeRequirements
-        //From there, I can use the electivelist_id to choose a random course that matches the elective Id as the class we want.
+        $plan = factory(Plan::class)->create();
+
+        $planrequirements = Planrequirement::where('plan_id', 1); //Which plan do we want to use to compare?
+
+        foreach($planrequirements as $planrequirement) {
+            if ($planrequirement->course_name == '') {
+                $electiveListToGetClassNameFrom = Electivelistcourse::where('electivelist_id', $planrequirement->electivelist_id)->get();
+            }
+        }
     }
 }

@@ -97,3 +97,12 @@ $factory->define(Degreeprogram::class, function(Faker\Generator $faker) {
         'id' => 2
     ];
 });
+
+$factory->define(Planrequirement::class, function(Faker\Generator $faker, $params) {
+    [
+        'course_name' => $params['course_name'],
+        'electivelist_id' => $params['electivelist_id'],
+        'semester' => $params['semester'],
+        'ordering' => $params['ordering']
+    ];
+});
