@@ -323,7 +323,7 @@ class FlowchartsController extends Controller
           abort(409);
         }
 
-          CheckSemesterRules($plan->semester, $user->student);
+          CheckSemesterRules($plan);
 
 
 
@@ -387,7 +387,7 @@ class FlowchartsController extends Controller
           abort(409);
         }
 
-          CheckSemesterRules($plan->semester, $user->student);
+          CheckSemesterRules($plan);
 
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
@@ -441,7 +441,7 @@ class FlowchartsController extends Controller
         }
 
         $semester = Semester::findOrFail($request->input('semester_id'));
-        CheckSemesterRules($semester, $user->student);
+        CheckSemesterRules($plan);
 
 
         if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
@@ -514,7 +514,7 @@ class FlowchartsController extends Controller
           abort(409);
         }
 
-          CheckSemesterRules($plan->semester, $user->student);
+          CheckSemesterRules($plan);
 
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
@@ -624,7 +624,7 @@ class FlowchartsController extends Controller
           abort(409);
         }
 
-          CheckSemesterRules($plan->semester, $user->student);
+          CheckSemesterRules($plan);
 
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
@@ -653,7 +653,7 @@ class FlowchartsController extends Controller
     }
 
 
-    private function CheckFourYearRules(Plan $plan) {
+    public static function CheckFourYearRules(Plan $plan) {
         //I'm not sure this is the best place to check the completed classses
         //I'm also not sure where this would go better.
 
@@ -686,23 +686,23 @@ class FlowchartsController extends Controller
         //sendtoView($firstArr, $secondArr, $thirdArr); //This doesn't actually exist.
     }
 
-    public function CheckSemesterRules(Semester $semester, Student $student){
+    public static function CheckSemesterRules(Plan $plan){
 
         $prereqs = [];
         $rules = new VerifySemester();
 
         //returns true if correct number of hours and false if not
         //if not correct number of hours displays an alert
-        $correcthours = $rules->CheckHours($student);
+        $correcthours = $rules->CheckHours($plan);
         if ($correcthours == FALSE){
-            $message = "Your credit hours need to be less than 21.";
-            echo "<script type='text/javascript'>alert('$message');</script>";
+            $message = 'Your credit hours need to be less than 21.';
+            echo "<script type='text/javascript'>\$div=document.getElementById('error');\$div.innerHTML='<b>$message</b>'</script>";
 
         }
 
 
         //returns an array with the missing prereqs or empty if all good
-        $prereqs = $rules->CheckPreReqs($semester, $student);
+        $prereqs = $rules->CheckPreReqs($plan);
         if (count($prereqs) >0){
             abort(409);
         }

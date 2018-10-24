@@ -13,28 +13,31 @@ class VerifySemester
 
 //Checks to see if the student has the correct number of hours to be a full time student
 //Hours need to be less than 21 and greater than 0
-    public function CheckHours(Semester $semester)
+    public function CheckHours(Plan $plan)
     {
-        //Gets the semester information and adds all the credit hours into credithours
-        $CreditHours = App\Models\Planrequirements:: where('semester_id', $semester->id)->sum('credits')->get();
+        //Gets the semester information and adds all the credit hours into credithours ->sum('credits')-
+        $semesters = \App\Models\Planrequirement:: where('semester_id', $plan->semesters)->get();
+        foreach($semesters as $semester) {
 
-        if ($CreditHours > 21 || $CreditHours < 1) {
+            $creditHour = $semester->sum('credits');
 
-            return false;
-        } else {
-            return true;
+            if ($creditHour > 21 || $creditHour < 1) {
+                return false;
+            } else {
+                return true;
+            }
         }
 
     }
 
 //Checks to see if the student has the correct prereqs to take the current semester worth of classes
 //Returns an array with the courses they need to take for a class if needed
-    public function CheckPreReqs(Semester $semester, Student $student)
+    public function CheckPreReqs(Plan $plan)
     {
         $array = [];
-        $courses = App\Models\Planrequirements:: where('semester_id', $semester->id)->get();
+        $courses = \App\Models\Planrequirement:: where('semester_id', $plan->semesters)->get();
 
-        $StudentCompletedCourses = $student->completedcourses;
+        $StudentCompletedCourses = $plan->student->completedcourses;
 
         foreach ($courses as $course) {
             $prerequisites = $course->prerequisites;

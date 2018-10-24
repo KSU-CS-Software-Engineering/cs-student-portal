@@ -6,6 +6,7 @@
 
 @include('flowcharts._flowchart', ['plan' => $plan, 'link' => false])
 
+@include ('flowcharts.rulesMessage', ['plan' => $plan] )
 
 <div id="flowchart">
 
