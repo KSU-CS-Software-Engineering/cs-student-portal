@@ -8,6 +8,8 @@ use App\Models\Completedcourse;
 use App\Models\Degreerequirement;
 use App\Models\Plan;
 use App\Models\Degreeprogram;
+use App\Models\Planrequirement;
+use App\Models\Semester;
 /*
 |--------------------------------------------------------------------------
 | Model Factories
@@ -77,7 +79,7 @@ $factory->define(Completedcourse::class, function (Faker\Generator $faker, $para
 
 $factory->define(Degreerequirement::class, function(Faker\Generator $faker, $params) {
     return [
-        'degreeprogram_id' => 2,
+        'degreeprogram_id' => $params['degreeprogram_id'],
         'course_name' => $params['course_name'],
         'electivelist_id' => $params['electivelist_id'],
         'semester' => $params['semester'],
@@ -87,22 +89,32 @@ $factory->define(Degreerequirement::class, function(Faker\Generator $faker, $par
 
 $factory->define(Plan::class, function(Faker\Generator $faker) {
     return [
-        'degreeprogram_id'=> 2,
+        'degreeprogram_id'=> factory(Degreeprogram::class)->create()->id,
         'student_id'=> factory(student::class)->create()->id
     ];
 });
 
 $factory->define(Degreeprogram::class, function(Faker\Generator $faker) {
     return [
-        'id' => 2
+        //'id' => 2
+        'id' => $faker->randomDigit + 100
     ];
 });
 
 $factory->define(Planrequirement::class, function(Faker\Generator $faker, $params) {
-    [
+    return [
+        'plan_id' => $params['plan_id'],
         'course_name' => $params['course_name'],
         'electivelist_id' => $params['electivelist_id'],
-        'semester' => $params['semester'],
+        'semester_id' => $params['semester_id'],
         'ordering' => $params['ordering']
+    ];
+});
+
+$factory->define(Semester::class, function(Faker\Generator $faker, $params) {
+    return [
+        'id' => $params['id'] + 100,
+        'ordering' => $params['ordering'],
+        'plan_id' => $params['plan_id']
     ];
 });

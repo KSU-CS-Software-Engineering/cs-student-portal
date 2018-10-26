@@ -12,6 +12,8 @@ use App\Models\Completedcourse;
 use App\Models\Degreerequirement;
 use App\Models\Electivelistcourse;
 use App\Models\Degreeprogram;
+use App\Models\Planrequirement;
+use App\Models\Semester;
 use App\Rules\VerifyFourYearPlan;
 
 
@@ -39,7 +41,7 @@ class RulesTest extends TestCase {
         //Create rules object
         $rules = new VerifyFourYearPlan();
         //Create a new degree program and plan that these degreerequirements will map to.
-        factory(Degreeprogram::class)->create();
+        //$degreeprogramCreated = factory(Degreeprogram::class)->create();
         $plan = factory(Plan::class)->create();
         //Grab the degree requirements to copy.
         $degreerequirements = Degreerequirement::where('degreeprogram_id', 1)->get();
@@ -53,32 +55,43 @@ class RulesTest extends TestCase {
                   //This creates a new CompletedCourse with a name of the course_prefix and course number of the selected
                   factory(Completedcourse::class)->create(['name' => (string)$electiveListToGetClassNameFrom->course_prefix . (string)$electiveListToGetClassNameFrom->course_min_number, 'student_id' => $plan->student_id]);
                   // This creates a new degree requirement using the proper course name (also the semester and ordering are unique keys)
-                  factory(Degreerequirement::class)->create(['course_name' => (string)$electiveListToGetClassNameFrom->course_prefix . (string)$electiveListToGetClassNameFrom->course_min_number, 'electivelist_id' => $degreerequirement->electivelist_id, 'semester' => $degreerequirement->semester, 'ordering' => $degreerequirement->ordering]);
+                  factory(Degreerequirement::class)->create(['degreeprogram_id' => $plan->degreeprogram_id ,'course_name' => (string)$electiveListToGetClassNameFrom->course_prefix . (string)$electiveListToGetClassNameFrom->course_min_number, 'electivelist_id' => $degreerequirement->electivelist_id, 'semester' => $degreerequirement->semester, 'ordering' => $degreerequirement->ordering]);
             }
             else {
                   //Copy the course name and student id over to the new created course
                   factory(Completedcourse::class)->create(['name' => $degreerequirement->course_name, 'student_id' => $plan->student_id]);
                   //Copy the course name and the foreign keys to the new data.
-                  factory(Degreerequirement::class)->create(['course_name' => $degreerequirement->course_name, 'electivelist_id' => $degreerequirement->electivelist_id, 'semester' => $degreerequirement->semester, 'ordering' => $degreerequirement->ordering]);
+                  factory(Degreerequirement::class)->create(['degreeprogram_id' => $plan->degreeprogram_id ,'course_name' => $degreerequirement->course_name, 'electivelist_id' => $degreerequirement->electivelist_id, 'semester' => $degreerequirement->semester, 'ordering' => $degreerequirement->ordering]);
             }
         }
         //Send the created plan which has the mapped completed classes and degreerequirements etc.
-        $this->AssertEmpty($rules->CheckGraduationValidityDegreeRequirements($plan)); as the class we want.
+        $this->AssertEmpty($rules->CheckGraduationValidityDegreeRequirements($plan)); //as the class we want.
     }
 
     //This needs to be similar to the function above.
     //Instead, I want to check completed courses against planrequirements rather than degree requirements
     public function testGraduationValidityPlanRequirements() {
         $rules = new VerifyFourYearPlan();
-
         $plan = factory(Plan::class)->create();
-
-        $planrequirements = Planrequirement::where('plan_id', 1); //Which plan do we want to use to compare?
-
+        $planrequirements = Planrequirement::where('plan_id', 1)->get();
         foreach($planrequirements as $planrequirement) {
+            if(Semester::where('id', $planrequirement->semester_id + 100)->exists() == false) {
+              factory(Semester::class)->create(['id' => ($planrequirement->semester_id + 100), 'plan_id' => $plan->id, 'ordering' => $planrequirement->semester->ordering]);
+            }
             if ($planrequirement->course_name == '') {
-                $electiveListToGetClassNameFrom = Electivelistcourse::where('electivelist_id', $planrequirement->electivelist_id)->get();
+                $electiveListToGetClassNameFrom = Electivelistcourse::where('electivelist_id', $planrequirement->electivelist_id)->get()[0];
+                $newCompletedCourse = factory(Completedcourse::class)->create(['name' => (string)$electiveListToGetClassNameFrom->course_prefix . (string)$electiveListToGetClassNameFrom->course_min_number, 'student_id' => $plan->student_id]);
+
+                $newPlanRequirement = factory(Planrequirement::class)->create(['ordering' => $planrequirement->ordering, 'semester_id' => ($planrequirement->semester_id + 100),'plan_id'=> $plan->id, 'course_name' => (string)$electiveListToGetClassNameFrom->course_prefix . (string)$electiveListToGetClassNameFrom->course_min_number, 'electivelist_id' => $planrequirement->electivelist_id]);
+            }
+            else {
+              factory(Completedcourse::class)->create(['name' => $planrequirement->course_name, 'student_id' => $plan->student_id]);
+              //Copy the course name and the foreign keys to the new data.
+              factory(Planrequirement::class)->create(['ordering' => $planrequirement->ordering,'semester_id' => ($planrequirement->semester_id + 100),'plan_id' => $plan->id, 'course_name' => $planrequirement->course_name, 'electivelist_id' => $planrequirement->electivelist_id]);
+
             }
         }
+
+        $this->AssertEmpty($rules->CheckGraduationValidityPlan($plan));
     }
 }
