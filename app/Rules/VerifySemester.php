@@ -33,7 +33,7 @@ class VerifySemester
             }
             //If something is inocrrect with the semester add the semester to the array
             if ($creditHours > 21 || $creditHours < 1) {
-              $returnArray->push($semester);
+        //      $returnArray->push($semester);
             }
         }
         return $returnArray;
@@ -45,11 +45,11 @@ class VerifySemester
     {
         $array = [];
         //Get the courses from that semester to be checked.
-        $coursesPlanRequirement = \App\Models\PlanRequirement:: where('semester_id', $plan->start_semester)->get();
+        $coursesPlanRequirements = \App\Models\PlanRequirement:: where('semester_id', $plan->start_semester)->get();
         //Get all of the courses from that semesters as the course object.
         $courseArray  = [];
-        foreach($coursePlanRequirements as $coursesPlanRequirement) {
-          $courseArray->push(App\Models\Course::where('id', $coursesPlanRequirement->course_id));
+        foreach($coursesPlanRequirements as $coursesPlanRequirement) {
+   //       $courseArray->push(App\Models\Course::where('id', $coursesPlanRequirement->course_id));
         }
         //Get all of the completed classes for that user.
         $StudentCompletedCourses = $plan->student->completedcourses;
@@ -64,7 +64,7 @@ class VerifySemester
                 $coursenumberlookup = App\Models\Course:: where('id', $prereq->prerequisite_for_course_id);
 
                 if (($studentCompletedCourse.contains('coursenumber', $coursenumberlookup->number)) == FALSE) {
-                    $array->push($coursenumberlookup);
+      //              $array->push($coursenumberlookup);
                     }
                 }
 
