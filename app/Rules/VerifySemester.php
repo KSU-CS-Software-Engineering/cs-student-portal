@@ -59,9 +59,13 @@ class VerifySemester
             //$prerequisites = Prerequisite::where('prerequisite_for_course_id', $course->course_id);// $course->prerequisites;
             foreach ($prerequisites as $prereq) {
 
+                foreach($studentCompletedCourses as $studentCompletedCourse){
+                //gets the id of the prereq
                 $coursenumberlookup = App\Models\Course:: where('id', $prereq->prerequisite_for_course_id);
-                if (($StudentCompletedCourses.contains('coursenumber', $prereq->prerequisite_course_id)) == FALSE) {
-                    $array->push($course);
+
+                if (($studentCompletedCourse.contains('coursenumber', $coursenumberlookup->number)) == FALSE) {
+                    $array->push($coursenumberlookup);
+                    }
                 }
 
             }

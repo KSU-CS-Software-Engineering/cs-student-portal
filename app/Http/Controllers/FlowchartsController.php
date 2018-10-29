@@ -30,7 +30,7 @@ class FlowchartsController extends Controller
 	{
 		$this->middleware('cas');
 		$this->middleware('update_profile');
-    $this->fractal = new Manager();
+        $this->fractal = new Manager();
 	}
     /**
      * Responds to requests to GET /courses
@@ -318,13 +318,17 @@ class FlowchartsController extends Controller
         $plan = Plan::with('semesters')->findOrFail($id);
 
         //If the plan check comes back with a flag.
-        if($this->CheckFourYearRules($plan) > 0) {
-          //Don't save the change.
-          abort(409);
-        }
+//        if($this->CheckFourYearRules($plan) > 0) {
+//          //Don't save the change.
+//          abort(409);
+//        }
 
-          CheckSemesterRules($plan);
+          CheckCISReqRules($plan);
+          CheckGradPlanRules($plan);
+          CheckGradRequirementsRules($plan);
 
+          CheckHoursRules($plan); 
+          CheckPreReqRules($plan);
 
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
@@ -382,13 +386,17 @@ class FlowchartsController extends Controller
         $plan = Plan::with('semesters')->findOrFail($id);
 
         //If the plan check comes back with a flag.
-        if($this->CheckFourYearRules($plan) > 0) {
-          //Don't save the change.
-          abort(409);
-        }
+//        if($this->CheckFourYearRules($plan) > 0) {
+//          //Don't save the change.
+//          abort(409);
+//        }
 
-          CheckSemesterRules($plan);
+          CheckCISReqRules($plan);
+          CheckGradPlanRules($plan);
+          CheckGradRequirementsRules($plan);
 
+          CheckHoursRules($plan);
+          CheckPreReqRules($plan);
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           $semesters = $plan->semesters;
@@ -435,14 +443,19 @@ class FlowchartsController extends Controller
         $plan = Plan::findOrFail($id);
 
         //If the plan check comes back with a flag.
-        if($this->CheckFourYearRules($plan) > 0) {
-          //Don't save the change.
-          abort(409);
-        }
+//        if($this->CheckFourYearRules($plan) > 0) {
+//          //Don't save the change.
+//          abort(409);
+//        }
+
+        CheckCISReqRules($plan);
+        CheckGradPlanRules($plan);
+        CheckGradRequirementsRules($plan);
 
         $semester = Semester::findOrFail($request->input('semester_id'));
-        CheckSemesterRules($plan);
 
+        CheckHoursRules($plan);
+        CheckPreReqRules($plan);
 
         if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           //move requirement to new semester
@@ -508,14 +521,18 @@ class FlowchartsController extends Controller
         $user = Auth::user();
         $plan = Plan::findOrFail($id);
 
-        //If the plan check comes back with a flag.
-        if($this->CheckFourYearRules($plan) > 0) {
-          //Don't save the change.
-          abort(409);
-        }
+//        //If the plan check comes back with a flag.
+//        if($this->CheckFourYearRules($plan) > 0) {
+//          //Don't save the change.
+//          abort(409);
+//        }
 
-          CheckSemesterRules($plan);
+          CheckCISReqRules($plan);
+          CheckGradPlanRules($plan);
+          CheckGradRequirementsRules($plan);
 
+          CheckHoursRules($plan);
+          CheckPreReqRules($plan);
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
 
@@ -619,12 +636,17 @@ class FlowchartsController extends Controller
         $plan = Plan::findOrFail($id);
 
         //If the plan check comes back with a flag.
-        if($this->CheckFourYearRules($plan) > 0) {
-          //Don't save the change.
-          abort(409);
-        }
+//        if($this->CheckFourYearRules($plan) > 0) {
+//          //Don't save the change.
+//          abort(409);
+//        }
 
-          CheckSemesterRules($plan);
+          CheckCISReqRules($plan);
+          CheckGradPlanRules($plan);
+          CheckGradRequirementsRules($plan);
+
+          CheckHoursRules($plan);
+          CheckPreReqRules($plan);
 
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
@@ -653,62 +675,89 @@ class FlowchartsController extends Controller
     }
 
 
-    public static function CheckFourYearRules(Plan $plan) {
-        //I'm not sure this is the best place to check the completed classses
-        //I'm also not sure where this would go better.
+    public static function CheckCISReqRules(Plan $plan) {
 
-        $firstArr = [];
-        $secondArr = [];
-        $thirdArr = [];
-
-        $missingRequirements = 0;
-
-
+        $firstArrs = [];
         //Set the variables for the rules case
         $rules = new VerifyFourYearPlan();
 
         //Check the first one.
-        $firstArr = $rules->CheckCISRequirementsPlan($plan);
-        if(count($firstArr) > 0) {
-          $missingRequirements = 1;
+        $firstArrs = $rules->CheckCISRequirementsPlan($plan);
+
+
+        if(count($firstArrs) >= 0) {
+
+            foreach ($firstArrs as $firstArr){
+                $coursename = $firstArr["course_name"];
+                echo "<script type='text/javascript'>\$div=document.getElementById('error');\$div.innerHTML+='<b>$coursename</b>'</script>";
+            }
         }
+
+    }
+
+    public static function CheckGradPlanRules(Plan $plan){
 
         //Check the second one.
         //This handles graduation ability, not validity of the plan, so no flag.
-        //$secondArr = $rules->CheckGraduationValidityDegreeRequirements();
+        $planreqs = [];
+        $rules = new VerifyFourYearPlan();
+        $planreqs = $rules->CheckGraduationValidityPlan($plan);
 
+        if(count($planreqs) > 0) {
 
-        //Check the third one.
-        //This handles graduation ability, not validity of the plan, so no flag.
-        //$thirdArr = $rules->CheckGraduationValidityPlan();
-
-        //Not sure I need to send the second and third arrays here.
-        //sendtoView($firstArr, $secondArr, $thirdArr); //This doesn't actually exist.
+            foreach ($planreqs as $planreq){
+                $coursename = $planreq["course_name"];
+                echo "<script type='text/javascript'>\$div=document.getElementById('error');\$div.innerHTML+='<b>$coursename</b>'</script>";
+            }
+        }
     }
 
-    public static function CheckSemesterRules(Plan $plan){
+    public static function CheckGradRequirementsRules(Plan $plan){
 
-        $prereqs = [];
+        //Check the third one.
+        //This handles graduation ability, not validity of the plan, so no fla
+        $array = [];
+        $rules = new VerifyFourYearPlan();
+        $array = $rules->CheckGraduationValidityDegreeRequirements($plan);
+
+    }
+
+
+    public static function CheckHoursRules(Plan $plan)
+    {
         $rules = new VerifySemester();
 
         //returns true if correct number of hours and false if not
         //if not correct number of hours displays an alert
         $correcthours = $rules->CheckHours($plan);
-        if ($correcthours == FALSE){
-            $message = 'Your credit hours need to be less than 21.';
-            echo "<script type='text/javascript'>\$div=document.getElementById('error');\$div.innerHTML='<b>$message</b>'</script>";
+        if ($correcthours == FALSE) {
+            $message = 'Your credit hours need to be less than 21 per semester.';
+            echo "<script type='text/javascript'>\$div=document.getElementById('error');\$div.innerHTML+='<b>$message</b>'</script>";
 
         }
+    }
 
+    public static function CheckPreReqRules(Plan $plan)
+    {
 
+//        $message = "Test";
+//        echo "<script type='text/javascript'>alert('$message');</script>";
+
+        $rules = new VerifySemester();
         //returns an array with the missing prereqs or empty if all good
         $prereqs = $rules->CheckPreReqs($plan);
-        if (count($prereqs) >0){
-            abort(409);
+         
+        //does not work
+        //need to change CheckPreReqs
+        if (count($prereqs) > 0) {
+
+           foreach ($prereqs as $prereq) {
+                $coursenumber = (string)$prereq;
+                echo "<script type='text/javascript'>\$div=document.getElementById('error');\$div.innerHTML+='<b>$coursenumber</b>'</script>";
+
+            }
         }
-
-
-
     }
+
 
 }
