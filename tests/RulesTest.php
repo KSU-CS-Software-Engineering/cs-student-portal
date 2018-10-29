@@ -15,6 +15,7 @@ use App\Models\Degreeprogram;
 use App\Models\Planrequirement;
 use App\Models\Semester;
 use App\Rules\VerifyFourYearPlan;
+use App\Rules\VerifySemester;
 
 
 
@@ -94,4 +95,23 @@ class RulesTest extends TestCase {
 
         $this->AssertEmpty($rules->CheckGraduationValidityPlan($plan));
     }
+
+
+
+
+    public function testSemesterCheckHours() {
+        $plan = Plan::where('id', 1)->get()[0];
+        $rules = new VerifySemester();
+        $this->AssertEmpty($rules->CheckHours($plan));
+    }
+
+    public function testCheckPreReqs() {
+        $plan = Plan::where('id', 2)->get()[0];
+        $rules = new VerifySemester();
+        $this->AssertEmpty($rules->CheckPreReqs($plan));
+    }
+
+
+
+
 }
