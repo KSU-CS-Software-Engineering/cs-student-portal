@@ -21,7 +21,7 @@ class VerifySemester
 
             $creditHour = $semester->sum('credits');
 
-            if ($creditHour > 21 || $creditHour < 1) {
+            if ($creditHour > 21 || $creditHour < 0) {
                 return false;
             } else {
                 return true;
@@ -35,18 +35,25 @@ class VerifySemester
     public function CheckPreReqs(Plan $plan)
     {
         $array = [];
+        //get the courses the student has for next semester
         $courses = \App\Models\Planrequirement:: where('semester_id', $plan->semesters)->get();
+        //gets the coursese the student has already completed
+        $studentCompletedCourses = $plan->student->completedcourses;
 
-        $StudentCompletedCourses = $plan->student->completedcourses;
-
+        //goes through each course for next semester
         foreach ($courses as $course) {
+            //gets the prereqs for each course
             $prerequisites = $course->prerequisites;
-
+            //goes through each prereq
             foreach ($prerequisites as $prereq) {
 
+                foreach($studentCompletedCourses as $studentCompletedCourse){
+                //gets the id of the prereq
                 $coursenumberlookup = App\Models\Course:: where('id', $prereq->prerequisite_for_course_id);
-                if (($StudentCompletedCourses.contains('coursenumber', $coursenumberlookup->number)) == FALSE) {
+
+                if (($studentCompletedCourse.contains('coursenumber', $coursenumberlookup->number)) == FALSE) {
                     $array->push($coursenumberlookup);
+                    }
                 }
 
             }
