@@ -16,6 +16,7 @@ class VerifySemester
 //Hours need to be less than 21 and greater than 0
     public function CheckHours(Plan $plan)
     {
+        $count = 0;
         //This is the array that will be returned with the bad semesters in it.
         $returnArray = [];
         //Get the semesters for the plan
@@ -33,8 +34,9 @@ class VerifySemester
             }
             //If something is inocrrect with the semester add the semester to the array
             if ($creditHours > 21 || $creditHours < 1) {
-              $returnArray->push($semester);
+              $returnArray[$count] = $semester;
             }
+            $count++;
         }
         return $returnArray;
     }
@@ -43,34 +45,97 @@ class VerifySemester
 //Returns an array with the courses they need to take for a class if needed
     public function CheckPreReqs(Plan $plan)
     {
-        $array = [];
-        //Get the courses from that semester to be checked.
-        $coursesPlanRequirement = \App\Models\PlanRequirement:: where('semester_id', $plan->start_semester)->get();
-        //Get all of the courses from that semesters as the course object.
-        $courseArray  = [];
-        foreach($coursePlanRequirements as $coursesPlanRequirement) {
-          $courseArray->push(App\Models\Course::where('id', $coursesPlanRequirement->course_id));
-        }
-        //Get all of the completed classes for that user.
-        $StudentCompletedCourses = $plan->student->completedcourses;
+        $returnArray = [];
+        $previousSemestersArray = [];
+        $courseCount = 0;
+        $count = 0;
 
-        foreach ($courseArray as $course) {
-            //Need to get the prerequisites from that course object.
-            //$prerequisites = Prerequisite::where('prerequisite_for_course_id', $course->course_id);// $course->prerequisites;
-            foreach ($prerequisites as $prereq) {
+        $plannedSemesters = Semester::where('plan_id', $plan->id)->get();
 
-                foreach($studentCompletedCourses as $studentCompletedCourse){
-                //gets the id of the prereq
-                $coursenumberlookup = App\Models\Course:: where('id', $prereq->prerequisite_for_course_id);
-
-                if (($studentCompletedCourse.contains('coursenumber', $coursenumberlookup->number)) == FALSE) {
-                    $array->push($coursenumberlookup);
-                    }
+        foreach($plannedSemesters as $plannedSemester) {
+            $semesterCourses = Planrequirement::where('semester_id', $plannedSemester->id)->get();
+            //Get courses for the semester, get the prereqs for each course, check that the previous semesters or completed classes contain that class
+            $semesterCourseObjectArray = [];
+            foreach($semesterCourses as $semesterCourse) {
+                $semesterCourseObjectArray[$count] = $semesterCourse->course();//Course::where('id', $semesterCourse->course_id)->get();
+                $prerequi = \App\Models\Prerequisite::where('id', 1)->get();
+                dd($prerequi);
+                foreach($semesterCourseObjectArray[$count]->prerequisites()->prerequisite_course_id as $coursePreReq){
+                  dd($coursePreReq);
                 }
+
+
+
+                $semesterCoursePreReqs = $semesterCourseObjectArray[$count]->prerequisites()->prerequisites;
+                dd($semesterCoursePreReqs);
+                $courseCount++;
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+        // //Get the courses from that semester to be checked.
+        // $coursePlanRequirements = PlanRequirement::where('semester_id', $plan->start_semester)->get();
+        // //Get all of the courses from that semesters as the course object.
+        // $courseArray  = [];
+        // foreach($coursePlanRequirements as $coursePlanRequirement) {
+        //   //$courseArray->push(Course::where('id', $coursePlanRequirement->course_id)->get()[0]);
+        // //  dd(Course::where(Course::with('prerequisites')->where('id', $coursePlanRequirement->course_id)->get());
+        //   $courseArray[$courseCount] = Course::with('prerequisites')->where('id', $coursePlanRequirement->course_id)->get();
+        //
+        //   $courseCount++;
+        // }
+        // //Get all of the completed classes for that user.
+        // $StudentCompletedCourses = $plan->student->completedcourses;
+        //
+        // foreach ($courseArray as $course) {
+        //     //Need to get the prerequisites from that course object.
+        //     //$prerequisites = Prerequisite::where('prerequisite_for_course_id', $course->course_id);// $course->prerequisites;
+        //     //dd($courseArray);
+        //     $prerequisitesFromCourse = $course->prerequisites;
+        //     foreach ($prerequisitesFromCourse as $prereq) {
+        //       if ($studentCompletedCourses.contains('name', $prereq->prefix . ' ' . $prereq->number) == FALSE) {
+        //           $array[$count] = $coursenumberlookup;
+        //           //$array->push($coursenumberlookup);
+        //       }
+        //       $count++;
+
+
+
+
+
+
+
+
+
+
+
+
+                // foreach($studentCompletedCourses as $studentCompletedCourse){
+                // //gets the id of the prereq
+                // $coursenumberlookup = Course::where('id', $prereq->prerequisite_for_course_id)->get();
+                //
+                //   if (($studentCompletedCourse.contains('coursenumber', $coursenumberlookup->number)) == FALSE) {
+                //       $array[$count] = $coursenumberlookup;
+                //       //$array->push($coursenumberlookup);
+                //   }
+                //   $count++;
+                // }
+                return $returnArray;
 
             }
 
-        }
-        return $array;
+
+
+
+    private function CheckPreReqsForSemester(Semester $semester){
+
     }
 }
