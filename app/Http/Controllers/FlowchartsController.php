@@ -317,18 +317,12 @@ class FlowchartsController extends Controller
         $user = Auth::user();
         $plan = Plan::with('semesters')->findOrFail($id);
 
-        //If the plan check comes back with a flag.
-//        if($this->CheckFourYearRules($plan) > 0) {
-//          //Don't save the change.
-//          abort(409);
-//        }
+          self::CheckCISReqRules($plan);
+          self::CheckGradPlanRules($plan);
+          self::CheckGradRequirementsRules($plan);
 
-          CheckCISReqRules($plan);
-          CheckGradPlanRules($plan);
-          CheckGradRequirementsRules($plan);
-
-          CheckHoursRules($plan); 
-          CheckPreReqRules($plan);
+          self::CheckHoursRules($plan);
+          self::CheckPreReqRules($plan);
 
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
@@ -385,18 +379,12 @@ class FlowchartsController extends Controller
         $user = Auth::user();
         $plan = Plan::with('semesters')->findOrFail($id);
 
-        //If the plan check comes back with a flag.
-//        if($this->CheckFourYearRules($plan) > 0) {
-//          //Don't save the change.
-//          abort(409);
-//        }
+          self::CheckCISReqRules($plan);
+          self::CheckGradPlanRules($plan);
+          self::CheckGradRequirementsRules($plan);
 
-          CheckCISReqRules($plan);
-          CheckGradPlanRules($plan);
-          CheckGradRequirementsRules($plan);
-
-          CheckHoursRules($plan);
-          CheckPreReqRules($plan);
+          self::CheckHoursRules($plan);
+          self::CheckPreReqRules($plan);
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           $semesters = $plan->semesters;
@@ -442,21 +430,14 @@ class FlowchartsController extends Controller
         $user = Auth::user();
         $plan = Plan::findOrFail($id);
 
-        //If the plan check comes back with a flag.
-//        if($this->CheckFourYearRules($plan) > 0) {
-//          //Don't save the change.
-//          abort(409);
-//        }
+        self::CheckCISReqRules($plan);
+        self::CheckGradPlanRules($plan);
+        self::CheckGradRequirementsRules($plan);
 
-        CheckCISReqRules($plan);
-        CheckGradPlanRules($plan);
-        CheckGradRequirementsRules($plan);
+        self::CheckHoursRules($plan);
+        self::CheckPreReqRules($plan);
 
         $semester = Semester::findOrFail($request->input('semester_id'));
-
-        CheckHoursRules($plan);
-        CheckPreReqRules($plan);
-
         if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           //move requirement to new semester
           $requirement_moved = Planrequirement::findOrFail($request->input('course_id'));
@@ -521,18 +502,12 @@ class FlowchartsController extends Controller
         $user = Auth::user();
         $plan = Plan::findOrFail($id);
 
-//        //If the plan check comes back with a flag.
-//        if($this->CheckFourYearRules($plan) > 0) {
-//          //Don't save the change.
-//          abort(409);
-//        }
+          self::CheckCISReqRules($plan);
+          self::CheckGradPlanRules($plan);
+          self::CheckGradRequirementsRules($plan);
 
-          CheckCISReqRules($plan);
-          CheckGradPlanRules($plan);
-          CheckGradRequirementsRules($plan);
-
-          CheckHoursRules($plan);
-          CheckPreReqRules($plan);
+          self::CheckHoursRules($plan);
+          self::CheckPreReqRules($plan);
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
 
@@ -635,18 +610,12 @@ class FlowchartsController extends Controller
         $user = Auth::user();
         $plan = Plan::findOrFail($id);
 
-        //If the plan check comes back with a flag.
-//        if($this->CheckFourYearRules($plan) > 0) {
-//          //Don't save the change.
-//          abort(409);
-//        }
+          self::CheckCISReqRules($plan);
+          self::CheckGradPlanRules($plan);
+          self::CheckGradRequirementsRules($plan);
 
-          CheckCISReqRules($plan);
-          CheckGradPlanRules($plan);
-          CheckGradRequirementsRules($plan);
-
-          CheckHoursRules($plan);
-          CheckPreReqRules($plan);
+          self::CheckHoursRules($plan);
+          self::CheckPreReqRules($plan);
 
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
@@ -731,9 +700,12 @@ class FlowchartsController extends Controller
         //if not correct number of hours displays an alert
         $correcthours = $rules->CheckHours($plan);
         if ($correcthours == FALSE) {
-            $message = 'Your credit hours need to be less than 21 per semester.';
-            echo "<script type='text/javascript'>\$div=document.getElementById('error');\$div.innerHTML+='<b>$message</b>'</script>";
 
+            foreach ($correcthours as $correcthour) {
+                $hours = $correcthours["name"];
+                echo "<script type='text/javascript'>\$div=document.getElementById('error');\$div.innerHTML+='<b>' +
+                '$hours has inccorect number of hours. It needs to be less than 21</b>'</script>";
+            }
         }
     }
 
