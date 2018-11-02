@@ -73,15 +73,17 @@ class VerifySemester
                     $courseObjGetName = $courseObj->prefix . " " . $courseObj->number;
                     //If the prereq does not appear in the previous semesters or completed courses.
                     if($previousSemestersClasses->contains('course_name', $courseObjGetName) == FALSE && $completedCourses->contains('name', $courseObjGetName) == FALSE) {
-                          $returnArray[$count] = $courseObjGetName . " is a prerequisite for " . $semesterCourse->course_name . "\r\n";
-                          //var_dump($returnArray[$count]);
-                          //$returnArray[$count] = $prereqObj;
+                          if(in_array($courseObjGetName . " is a prerequisite for " . $semesterCourse->course_name, $returnArray) == FALSE) {
+                            $returnArray[$count] = $courseObjGetName . " is a prerequisite for " . $semesterCourse->course_name;
+                          }
                     }
+                      $count++;
                 }
             }
-              $count++;
+
           }
       }
+      //dd($returnArray);
       return $returnArray;
     }
 
