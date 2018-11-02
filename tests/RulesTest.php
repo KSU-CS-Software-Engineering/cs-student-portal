@@ -137,7 +137,7 @@ class RulesTest extends TestCase {
                       //If the prereq does not appear in the previous semesters or completed courses.
                       if($previousSemestersClasses->contains('course_name', $courseObjGetName) == FALSE || $completedCourses->contains('name', $courseObjGetName) == FALSE) {
                           //Create the class so the tests pass.
-                          factory(Completedcourse::class)->create(['name'=> $courseObjGetName, 'student_id'=>$plan->student_id]);
+                          //factory(Completedcourse::class)->create(['name'=> $courseObjGetName, 'student_id'=>$plan->student_id]);
                       }
                   }
 
