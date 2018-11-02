@@ -710,5 +710,13 @@ class FlowchartsController extends Controller
 
     }
 
+    public static function CheckCoursePlacement(Plan $plan){
+
+        
+        $rules = new VerifySemester();
+
+
+    }
+
 
 }
