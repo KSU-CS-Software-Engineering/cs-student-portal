@@ -67,14 +67,23 @@ class FlowchartsController extends Controller
     }
 
     public function getFlowchart($id = -1){
+
+
       if($id < 0){
         //no ID provided - redirect back to index
         return redirect('flowcharts/index');
       }else{
+
+
         $user = Auth::user();
         $plan = Plan::findOrFail($id);
+          $planreqs = self::CheckGradPlanRules($plan);
+          $CISreqs = self::CheckCISReqRules($plan);
+          $hours = self::CheckHoursRules($plan);
+          $prereqs = self::CheckPreReqRules($plan);
+       //   dd($planreqs);
         if($user->is_advisor){
-          return view('flowcharts/flowchart')->with('plan', $plan);
+          return view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs);
         }else{
           if($plan->student_id == $user->student->id){
             return view('flowcharts/flowchart')->with('plan', $plan);
@@ -653,14 +662,8 @@ class FlowchartsController extends Controller
         //Check the first one.
         $firstArrs = $rules->CheckCISRequirementsPlan($plan);
 
+        return $firstArrs;
 
-        if(count($firstArrs) >= 0) {
-
-            foreach ($firstArrs as $firstArr){
-                $coursename = $firstArr["course_name"];
-                echo "<script type='text/javascript'>\$div=document.getElementById('error');\$div.innerHTML+='<b>$coursename</b>'</script>";
-            }
-        }
 
     }
 
@@ -672,13 +675,8 @@ class FlowchartsController extends Controller
         $rules = new VerifyFourYearPlan();
         $planreqs = $rules->CheckGraduationValidityPlan($plan);
 
-        if(count($planreqs) > 0) {
+        return $planreqs;
 
-            foreach ($planreqs as $planreq){
-                $coursename = $planreq["course_name"];
-                echo "<script type='text/javascript'>\$div=document.getElementById('error');\$div.innerHTML+='<b>$coursename</b>'</script>";
-            }
-        }
     }
 
     public static function CheckGradRequirementsRules(Plan $plan){
@@ -699,36 +697,17 @@ class FlowchartsController extends Controller
         //returns true if correct number of hours and false if not
         //if not correct number of hours displays an alert
         $correcthours = $rules->CheckHours($plan);
-        if ($correcthours == FALSE) {
-
-            foreach ($correcthours as $correcthour) {
-                $hours = $correcthours["name"];
-                echo "<script type='text/javascript'>\$div=document.getElementById('error');\$div.innerHTML+='<b>' +
-                '$hours has inccorect number of hours. It needs to be less than 21</b>'</script>";
-            }
-        }
+        return $correcthours;
     }
 
     public static function CheckPreReqRules(Plan $plan)
     {
 
-//        $message = "Test";
-//        echo "<script type='text/javascript'>alert('$message');</script>";
-
         $rules = new VerifySemester();
         //returns an array with the missing prereqs or empty if all good
         $prereqs = $rules->CheckPreReqs($plan);
-         
-        //does not work
-        //need to change CheckPreReqs
-        if (count($prereqs) > 0) {
+        return $prereqs;
 
-           foreach ($prereqs as $prereq) {
-                $coursenumber = (string)$prereq;
-                echo "<script type='text/javascript'>\$div=document.getElementById('error');\$div.innerHTML+='<b>$coursenumber</b>'</script>";
-
-            }
-        }
     }
 
 
