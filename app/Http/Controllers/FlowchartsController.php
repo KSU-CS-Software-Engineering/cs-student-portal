@@ -81,9 +81,10 @@ class FlowchartsController extends Controller
           $CISreqs = self::CheckCISReqRules($plan);
           $hours = self::CheckHoursRules($plan);
           $prereqs = self::CheckPreReqRules($plan);
+          $courseplacement = self::CheckCoursePlacement($plan);
        //   dd($planreqs);
         if($user->is_advisor){
-          return view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs);
+          return view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs)->with('courseplacement',$courseplacement);
         }else{
           if($plan->student_id == $user->student->id){
             return view('flowcharts/flowchart')->with('plan', $plan);
@@ -332,7 +333,7 @@ class FlowchartsController extends Controller
 
           self::CheckHoursRules($plan);
           self::CheckPreReqRules($plan);
-
+          self::CheckCoursePlacement($plan);
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           $semester = Semester::findOrFail($request->input('id'));
@@ -394,6 +395,7 @@ class FlowchartsController extends Controller
 
           self::CheckHoursRules($plan);
           self::CheckPreReqRules($plan);
+          self::CheckCoursePlacement($plan);
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           $semesters = $plan->semesters;
@@ -445,6 +447,7 @@ class FlowchartsController extends Controller
 
         self::CheckHoursRules($plan);
         self::CheckPreReqRules($plan);
+        self::CheckCoursePlacement($plan);
 
         $semester = Semester::findOrFail($request->input('semester_id'));
         if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
@@ -517,6 +520,7 @@ class FlowchartsController extends Controller
 
           self::CheckHoursRules($plan);
           self::CheckPreReqRules($plan);
+          self::CheckCoursePlacement($plan);
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
 
@@ -714,7 +718,8 @@ class FlowchartsController extends Controller
 
         
         $rules = new VerifySemester();
-
+        $courseplacement = $rules->CheckCoursePlacement($plan);
+        return $courseplacement;
 
     }
 
