@@ -156,6 +156,7 @@ class VerifySemester
 
 
 
+    }
 
 
         // //Get the courses from that semester to be checked.
@@ -186,15 +187,6 @@ class VerifySemester
 
 
 
-
-
-
-
-
-
-
-
-
                 // foreach($studentCompletedCourses as $studentCompletedCourse){
                 // //gets the id of the prereq
                 // $coursenumberlookup = Course::where('id', $prereq->prerequisite_for_course_id)->get();
@@ -205,9 +197,6 @@ class VerifySemester
                 //   }
                 //   $count++;
                 // }
-                return $returnArray;
-
-            }
 
 
 
