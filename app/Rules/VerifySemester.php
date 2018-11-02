@@ -85,4 +85,13 @@ class VerifySemester
       return $returnArray;
     }
 
+    public function CheckCoursePlacement(Plan $plan){
+        $returnArray = [];
+
+
+
+
+        return $returnArray;
+    }
+
 }
