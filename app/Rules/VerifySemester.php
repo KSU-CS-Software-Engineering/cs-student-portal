@@ -34,7 +34,7 @@ class VerifySemester
                 $creditHours += $class->credits;
             }
             //If something is inocrrect with the semester add the semester to the array
-            if ($creditHours > 21 || $creditHours < 1) {
+            if ($creditHours > 21) {
               $returnArray[$count] = $semester;
             }
             $count++;
