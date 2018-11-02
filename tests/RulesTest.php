@@ -114,7 +114,7 @@ class RulesTest extends TestCase {
         //Get all of the semesters from the plan to iterate through
         $plannedSemesters = Semester::where('plan_id', $plan->id)->get();
         //Get all of the completedcourses for the student's plan
-        $completedCourses = Completedcourse::where('student_id', $plan->student_id);
+        $completedCourses = Completedcourse::where('student_id', $plan->student_id)->get();
         //Foreach semester in the plan
         foreach($plannedSemesters as $plannedSemester) {
             //Get the courses that are being taken that semester.
@@ -137,7 +137,6 @@ class RulesTest extends TestCase {
                       //If the prereq does not appear in the previous semesters or completed courses.
                       if($previousSemestersClasses->contains('course_name', $courseObjGetName) == FALSE || $completedCourses->contains('name', $courseObjGetName) == FALSE) {
                           //Create the class so the tests pass.
-                          var_dump($courseObjGetName);
                           factory(Completedcourse::class)->create(['name'=> $courseObjGetName, 'student_id'=>$plan->student_id]);
                       }
                   }
@@ -150,44 +149,7 @@ class RulesTest extends TestCase {
         $this->AssertEmpty($rules->CheckPreReqs($plan));
     }
 
-    private function FillPreReqs($plan) {
-      $count = 0;
-      //Get all of the semesters from the plan to iterate through
-      $plannedSemesters = Semester::where('plan_id', $plan->id)->get();
-      //Get all of the completedcourses for the student's plan
-      $completedCourses = Completedcourse::where('student_id', $plan->student_id);
-      //Foreach semester in the plan
-      foreach($plannedSemesters as $plannedSemester) {
-          //Get the courses that are being taken that semester.
-          $semesterCourses = Planrequirement::where('semester_id', $plannedSemester->id)->get();
-          //Get all of the classes that are taken in the semesters before the semester we're iterating on.
-          $previousSemestersClasses = Planrequirement::where('plan_id', $plan->id)->where('semester_id', '<', $plannedSemester->id)->get();
-          //Foreach course being taken that semester.
-          foreach($semesterCourses as $semesterCourse) {
-            //If the Planrequirement object is not mapped to a course object (This is an elective that does not have a course matched with it yet.)
-            if($semesterCourse->course != NULL) {
-                //Get the prereqs for that course.
-                $prereqObjs = \App\Models\Prerequisite::where('prerequisite_for_course_id', $semesterCourse->course->id)->get();
-                //Foreach one of these prereqs
-                foreach($prereqObjs as $prereqObj) {
-                    //In theory there should only be one of these in the database, but it's giving me a collection object like there's multiple  objects.
-                    //Get the course object for that prereq (This is used to get the course name)
-                    $courseObj = Course::where('id', $prereqObj->prerequisite_course_id)->get()[0];
-                    //Concatenate the course Prefix and the course number ot get the name of the course
-                    $courseObjGetName = $courseObj->prefix . $courseObj->number;
-                    //If the prereq does not appear in the previous semesters or completed courses.
-                    if($previousSemestersClasses->contains('course_name', $courseObjGetName) == FALSE || $completedCourses->contains('name', $courseObjName) == FALSE) {
-                        //Create the class so the tests pass.
-                        dd($courseObjGetName);
-                        factory(Completedcourse::class)->create(['name'=> $courseObjGetName, 'student_id'=>$plan->student_id]);
-                    }
-                }
 
-            }
-              $count++;
-          }
-      }
-    }
 
 
 
