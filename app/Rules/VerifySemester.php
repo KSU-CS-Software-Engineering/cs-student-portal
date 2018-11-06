@@ -89,7 +89,17 @@ class VerifySemester
 
     public function CheckCoursePlacement(Plan $plan){
         $returnArray = [];
+        $semesterString = "";
 
+        $planSemesters = Semester::where('$plan_id', $plan->id);
+
+        foreach($planSemesters as $planSemester) {
+            $semesterString = $planSemester->name;
+            $planRequirementsForSemester = Planrequirement::where('plan_id', $plan->id)->where('semester_id', $planSemester->id);
+            foreach($planRequirementsForSemester as $planRequirementForSemester) {
+
+            }
+        }
 
 
 

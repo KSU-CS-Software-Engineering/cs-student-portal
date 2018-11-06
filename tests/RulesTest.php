@@ -110,7 +110,6 @@ class RulesTest extends TestCase {
         $plan = Plan::where('id', 2)->get()[0];
         $rules = new VerifySemester();
 
-        $count = 0;
         //Get all of the semesters from the plan to iterate through
         $plannedSemesters = Semester::where('plan_id', $plan->id)->get();
         //Get all of the completedcourses for the student's plan
@@ -140,9 +139,7 @@ class RulesTest extends TestCase {
                           factory(Completedcourse::class)->create(['name'=> $courseObjGetName, 'student_id'=>$plan->student_id]);
                       }
                   }
-
               }
-                $count++;
             }
         }
 
