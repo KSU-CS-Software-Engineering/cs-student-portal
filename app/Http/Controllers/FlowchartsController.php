@@ -133,6 +133,7 @@ class FlowchartsController extends Controller
         $user = Auth::user();
         $plan = new Plan();
         $data = $request->all();
+
         if($user->is_advisor){
           $student = Student::findOrFail($id);
           $data['student_id'] = $student->id;
@@ -196,6 +197,7 @@ class FlowchartsController extends Controller
       }else{
         $user = Auth::user();
         $plan = Plan::findOrFail($id);
+
         if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           $degreeprograms = Degreeprogram::orderBy('name', 'asc')->get();
           $degreeprogramUnknown = new Degreeprogram();
@@ -222,6 +224,7 @@ class FlowchartsController extends Controller
         $user = Auth::user();
         $plan = Plan::findOrFail($id);
         $data = $request->all();
+
         if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           $data['student_id'] = $plan->student_id;
           if($plan->validate($data)){
