@@ -2,7 +2,6 @@
 
 namespace App\scrapers;
 
-use DOMXPath;
 use IvoPetkov\HTML5DOMDocument;
 
 class KSUDepartmentScraper

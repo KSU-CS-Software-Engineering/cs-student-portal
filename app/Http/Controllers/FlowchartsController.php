@@ -69,8 +69,6 @@ class FlowchartsController extends Controller
 
     public function getFlowchart($id = -1){
 
-        (new KSUCourseScraper())->GetClassTimes();
-
       if($id < 0){
         //no ID provided - redirect back to index
         return redirect('flowcharts/index');
@@ -725,7 +723,7 @@ class FlowchartsController extends Controller
 
     public static function CheckCoursePlacement(Plan $plan){
 
-        
+
         $rules = new VerifySemester();
         $courseplacement = $rules->CheckCoursePlacement($plan);
         return $courseplacement;
