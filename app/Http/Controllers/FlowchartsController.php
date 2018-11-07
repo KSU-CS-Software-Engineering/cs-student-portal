@@ -22,6 +22,7 @@ use App\Models\Planrequirement;
 use App\Models\Degreeprogram;
 //This is my dependency that I've added.
 use App\Rules\VerifyFourYearPlan;
+use App\scrapers\KSUCourseScraper;
 
 class FlowchartsController extends Controller
 {
@@ -68,6 +69,7 @@ class FlowchartsController extends Controller
 
     public function getFlowchart($id = -1){
 
+        (new KSUCourseScraper())->GetClassTimes();
 
       if($id < 0){
         //no ID provided - redirect back to index
@@ -82,7 +84,7 @@ class FlowchartsController extends Controller
           $hours = self::CheckHoursRules($plan);
           $prereqs = self::CheckPreReqRules($plan);
           $courseplacement = self::CheckCoursePlacement($plan);
-       //   dd($planreqs);
+
         if($user->is_advisor){
           return view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs)->with('courseplacement',$courseplacement);
         }else{
@@ -400,6 +402,8 @@ class FlowchartsController extends Controller
           self::CheckPreReqRules($plan);
           self::CheckCoursePlacement($plan);
 
+
+
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           $semesters = $plan->semesters;
 
@@ -451,6 +455,7 @@ class FlowchartsController extends Controller
         self::CheckHoursRules($plan);
         self::CheckPreReqRules($plan);
         self::CheckCoursePlacement($plan);
+
 
         $semester = Semester::findOrFail($request->input('semester_id'));
         if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
@@ -524,6 +529,7 @@ class FlowchartsController extends Controller
           self::CheckHoursRules($plan);
           self::CheckPreReqRules($plan);
           self::CheckCoursePlacement($plan);
+
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
 
