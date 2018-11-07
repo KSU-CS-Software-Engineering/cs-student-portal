@@ -89,15 +89,49 @@ class VerifySemester
 
     public function CheckCoursePlacement(Plan $plan){
         $returnArray = [];
-        $semesterString = "";
-
-        $planSemesters = Semester::where('$plan_id', $plan->id);
-
+        $count = 0;
+        $semesterNameStrings = [];
+        //Get the semesters for that plan
+        $planSemesters = Semester::where('plan_id', $plan->id)->get();
+        //Foreach of those semesters.
         foreach($planSemesters as $planSemester) {
-            $semesterString = $planSemester->name;
-            $planRequirementsForSemester = Planrequirement::where('plan_id', $plan->id)->where('semester_id', $planSemester->id);
+            //Get the name of the semester Spring, Fall, Summer
+            $semesterNameStrings = explode(" ", $planSemester->name);
+            $semesterName = $semesterNameStrings[0];
+            //Get the plan requirements that match the plan Id and semester id.
+            $planRequirementsForSemester = Planrequirement::where('plan_id', $plan->id)->where('semester_id', $planSemester->id)->get();
+            //foreach one of these classes
             foreach($planRequirementsForSemester as $planRequirementForSemester) {
-
+              //if the class has a name
+                if($planRequirementForSemester->course_name != "") {
+                    //Get the course object for that course
+                    $coursePlanRequirementForSemester = Course::where('id', $planRequirementForSemester->course_id)->get()[0];
+                    //Get when the semester is offered.
+                    $courseSemestersOffered = explode(", ", $coursePlanRequirementForSemester->semesters);
+                    //If the class has a special semester value of on sufficient demand, show that.
+                    if(in_array("On sufficient demand", $courseSemestersOffered)) {
+                        $returnArray[$count] = $coursePlanRequirementForSemester->slug . " is offered with sufficient demand. Please consult your advisor for more information";
+                    }
+                    //If the class is only in odd years
+                    if(in_array("odd years", $courseSemestersOffered)) {
+                        $year = (int)$semesterNameStrings[1];
+                        if($year % 2 != 1) {
+                            $returnArray[$count] = $coursePlanRequirementForSemester->slug . " is only offered in odd years";
+                        }
+                    }
+                    //If the class is only in even years
+                    if(in_array("even years", $courseSemestersOffered)) {
+                      $year = (int)$semesterNameStrings[1];
+                      if($year % 2 != 0) {
+                          $returnArray[$count] = $coursePlanRequirementForSemester->slug . " is only offered in even years";
+                      }
+                    }
+                    //If the semester's offerings do not match the current smeester.
+                    if(in_array($semesterName, $courseSemestersOffered) == FALSE) {
+                        $returnArray[$count] = $coursePlanRequirementForSemester->slug . " is not offered in the " . $semesterName;
+                    }
+                }
+                $count++;
             }
         }
 

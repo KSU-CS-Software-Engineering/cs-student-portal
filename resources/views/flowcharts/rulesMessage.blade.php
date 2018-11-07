@@ -19,7 +19,7 @@
         @endif
 
         @if(count($courseplacement) > 0)
-        <p> <strong> Courses not offered in its current semester placement: @foreach ($courseplacement as $course) {{$course}} @endforeach </strong> </p>
+        <p> <strong> Courses not offered in its current semester placement: </strong>@foreach ($courseplacement as $course) <br>{{$course}} @endforeach </p>
         @endif
     </div>
 
