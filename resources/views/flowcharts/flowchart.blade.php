@@ -22,6 +22,7 @@
           <div class="btn-group pull-right">
             <template v-if="semester.courses.length == 0">
               <button type="button" class="delete-sem btn btn-default btn-xs" aria-label="Delete" v-bind:data-id="semester.id" title="Delete Semester" v-on:click.capture="deleteSemester"><i class="fa fa-times"></i></button>
+              <button type="button" class="set-summer btn btn-default btn-xs" aria-label="Summer" v-bind:data-id="semester.id" title="Set Summer" v-on:click.capture="setSummer"><i class="fa fa-pencil"></i></button>
             </template>
             {{--<button type="button" class="edit-sem btn btn-default btn-xs" aria-label="Edit" v-bind:data-id="semester.id" title="Edit Semester" v-on:click.capture="editSemester"><i class="fa fa-pencil"></i></button>--}}
           </div>

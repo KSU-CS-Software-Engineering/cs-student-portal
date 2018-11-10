@@ -70,38 +70,56 @@ class Plan extends Validatable
       }
     }
 
-
-    //
-
     public function fillRequirementsFromDegree(){
+      //Get the degree program associated with the plan
       $degreeprogram = $this->degreeprogram;
+      //Get the highest semester of all of the planrequirements. Where are these plan requirements set?
       $maxSemester = $degreeprogram->requirements->max('semester');
+      //Set this semester variable to the start semester of the plan. This is chosen when creating the flowchar.
       $sem = $this->start_semester;
+      //Same as above except setting thee year
       $year = $this->start_year;
-      //$user = $this->student; that'll get the student.
+      //This is a variable that is sets the ordering for the semesters.
       $order = 0;
+      //Create an array that holds the semesters.
       $semesters = array();
+      //If the sem variable (the start semester of the plan) == 0
       if($sem == 0){
+        //Set the semester to 3. This maps it to be fall, I'm not sure what 0 is. Perhaps it's the default value if start semester is not chosen when creating the plan.
         $sem = 3;
       }
+      //If the semester == 2 (This is a summer smeester I think)
       if($sem == 2){
+        //create a new semester object
         $semester = new Semester();
+        //Set the name of the semester object to be summer + the startyear
         $semester->name = "Summer " . $year;
+        //Set the ordering of this semester to the order + 1. Does the semester ordering start at 0? Or does this change this for a certain reason
         $semester->ordering = $order++;
+        //Set the plan id of this semester to this plan.
         $semester->plan_id = $this->id;
+        //Set the semester to be 3. I assume this is to keep the loop moving?
         $sem = 3;
+        //Save the new semester
         $semester->save();
+        //Insert this summer semester into the end of the semesters array.
         $semesters[$maxSemester + 1] = $semester->id;
       }
+      //For loop to hit all of the semesters.
       for($i = 0; $i <= $maxSemester; $i++){
+        //If the sem == 1 (a sprint semester.)
         if($sem == 1){
+          //Do the same stuff as the summer semester but with Spring in mind.
           $semester = new Semester();
           $semester->name = "Spring " . $year;
           $semester->ordering = $order++;
           $semester->plan_id = $this->id;
+          //Set the semester to be fall, this is so on the next iteration it'll hit the fall one.
           $sem = 3;
           $semester->save();
+          //Here it sets the semester in the correct order in this array. I wonder why this is like this.
           $semesters[$i] = $semester->id;
+          //Do all of the same things as the other two but with fall in mind. Also increase the year since fall is the end of the year.
         }else if ($sem == 3){
           $semester = new Semester();
           $semester->name = "Fall " . $year;
@@ -122,8 +140,81 @@ class Plan extends Validatable
         $planrequirement->plan_id = $this->id;
         $planrequirement->save();
       }
+    }
+
+
+
+    public function SetSummer() {
+      //Will thisgrab the corret semester? Do I need to make this static so I can call it from view? Idk. TBD.
+        $semester = Semester::where('id' = $this->id)
+    }
+
+    //Should be able to call this whenever, since names won't change if they're corect.
+    public function DynamicallyRenameSemesters() {
+        //How do we want to do this?
+        //First we need to get all of the semesters for this plan.
+        //Then we need to place the new semester in its place in the semester array.
+        //From there, do the above function, except for creating a new semester, just change the name. I think the order and stuff is handled elsewhere
+        //This function will simply handle the renaming of the semesters.
+        //Also need to take into consideration summer semesters.
+        //The designation as a summer semester needs to be done before, so it can just access the semester property to create the proper name for it.
+
+        //Get the degree program associated with the plan
+        $degreeprogram = $this->degreeprogram;
+        //Get the highest semester of all of the planrequirements. Where are these plan requirements set?
+        $maxSemester = $degreeprogram->requirements->max('semester');
+        //Set this semester variable to the start semester of the plan. This is chosen when creating the flowchar.
+        $sem = $this->start_semester;
+        //Same as above except setting thee year
+        $year = $this->start_year;
+        //This is a variable that is sets the ordering for the semesters.
+        $order = 0;
+        //Get all of the semesters for this plan.
+        $semesters = Semester::Where('plan_id', $this->id)->orderBy('ordering', 'ASC')->get();
+
+
+
+        foreach($semesters as $semester) {
+            if(strpos($semester->name, 'Summer')) {
+              $semester->name = "Summer " . $year;
+              $sem = 3;
+              $semester->save();
+            }
+            else if($sem == 1) {
+              $semester->name = "Spring " . $year;
+              //$semester->ordering = $order++;
+              //$semester->plan_id = $this->id;
+              //Set the semester to be fall, this is so on the next iteration it'll hit the fall one.
+              $sem = 2;
+              $semester->save();
+              //Here it sets the semester in the correct order in this array. I wonder why this is like this.
+              //$semesters[$i] = $semester->id;
+            }
+            else if($sem == 3) {
+              $semester->name = "Fall " . $year;
+              $sem = 1;
+              $semester->save();
+            }
+            //If the next semester is 2 and the semester name is Summer.
+
+        }
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private function fillSemesters(){
       $maxSemester = $this->requirements->max('semester');
@@ -163,4 +254,12 @@ class Plan extends Validatable
         }
       }
     }
+
+
+
+
+
+
+
+
 }

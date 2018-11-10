@@ -61,6 +61,7 @@ Route::post('flowcharts/semesters/{id}/save', 'FlowchartsController@postSemester
 Route::post('flowcharts/semesters/{id}/delete', 'FlowchartsController@postSemesterDelete');
 Route::post('flowcharts/semesters/{id}/add', 'FlowchartsController@postSemesterAdd');
 Route::post('flowcharts/semesters/{id}/move', 'FlowchartsController@postSemesterMove');
+Route::post('flowcharts/semesters/{id}/setsummer', 'FlowchartsController@postSemesterSetSummer');
 Route::post('flowcharts/data/{id}/move', 'FlowchartsController@postCourseMove');
 Route::post('flowcharts/data/{id}/save', 'FlowchartsController@postCourseSave'); //Maybe semester rules here?
 Route::post('flowcharts/data/{id}/delete', 'FlowchartsController@postCourseDelete');

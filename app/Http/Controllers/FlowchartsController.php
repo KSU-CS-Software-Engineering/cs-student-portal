@@ -142,6 +142,7 @@ class FlowchartsController extends Controller
         }
 
         if($plan->validate($data)){
+          //var_dump($data);
           //Check user classses
           //$userClasses = $user->GetClasses(); return as JSON.
           //Take user class data, check against rules
@@ -367,6 +368,7 @@ class FlowchartsController extends Controller
           $semester->name = "New Semester";
           $semester->ordering = $plan->semesters->max('ordering') + 1;
           $semester->save();
+          $plan->DynamicallyRenameSemesters();
           $resource = new Item($semester, function($semester) {
               return[
                   'id' => $semester->id,
@@ -383,6 +385,43 @@ class FlowchartsController extends Controller
         }
       }
     }
+
+    public function postSemesterSetSummer(Request $request, $id = -1) {
+      if($id < 0) {
+        abort(404);
+      }
+      else {
+          $user = Auth::user();
+          $plan = Plan::with('semesters')->findOrFail($id);
+          if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
+            $semester = Semester::findOrFail($request->input('id'));
+            if($semester->plan_id == $id){
+              $semester->name = "Summer " . $semester->year();
+              $semester->save();
+              return response()->json(trans('messages.item_changed')); //Changed this.Idk what it does.
+            }
+            else{
+              //semester id does not match plan id given
+              abort(404);
+            }
+          }
+          else {
+            abort(404);
+          }
+      }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
     public function postSemesterMove(Request $request, $id = -1){
       if($id < 0){

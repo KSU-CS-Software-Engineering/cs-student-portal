@@ -19,7 +19,7 @@ use App\Rules\VerifyFourYearPlan;
 use App\Rules\VerifySemester;
 
 
-
+//run vendor/bin/phpunit rules/RulesTest.php
 
 class RulesTest extends TestCase {
     use DatabaseTransactions;
