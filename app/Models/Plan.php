@@ -146,10 +146,11 @@ class Plan extends Validatable
 
     public function SetSummer() {
       //Will thisgrab the corret semester? Do I need to make this static so I can call it from view? Idk. TBD.
-        $semester = Semester::where('id' = $this->id)
+        $semester = Semester::where('id', $this->id);
+        $semester->name = 'Summer '; //. $semester-
     }
 
-    //Should be able to call this whenever, since names won't change if they're corect.
+    //Should be able to call this whenever, since names won't change if they're correct.
     public function DynamicallyRenameSemesters() {
         //How do we want to do this?
         //First we need to get all of the semesters for this plan.
@@ -185,7 +186,7 @@ class Plan extends Validatable
               //$semester->ordering = $order++;
               //$semester->plan_id = $this->id;
               //Set the semester to be fall, this is so on the next iteration it'll hit the fall one.
-              $sem = 2;
+              $sem = 3;
               $semester->save();
               //Here it sets the semester in the correct order in this array. I wonder why this is like this.
               //$semesters[$i] = $semester->id;
@@ -194,6 +195,7 @@ class Plan extends Validatable
               $semester->name = "Fall " . $year;
               $sem = 1;
               $semester->save();
+              $year++;
             }
             //If the next semester is 2 and the semester name is Summer.
 

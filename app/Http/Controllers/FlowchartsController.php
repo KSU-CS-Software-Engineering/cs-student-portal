@@ -387,18 +387,33 @@ class FlowchartsController extends Controller
     }
 
     public function postSemesterSetSummer(Request $request, $id = -1) {
+      //What if I change this to be an alert, where the user can press Summer or not.
+      //I think this may work.
       if($id < 0) {
         abort(404);
       }
       else {
           $user = Auth::user();
           $plan = Plan::with('semesters')->findOrFail($id);
+          //$lastSemester = Semester::where('plan_id', $id)->Max('ordering')->get();
+          //$year =
+
+          $planreqs = self::CheckGradPlanRules($plan);
+          $CISreqs = self::CheckCISReqRules($plan);
+          $hours = self::CheckHoursRules($plan);
+          $prereqs = self::CheckPreReqRules($plan);
+          $courseplacement = self::CheckCoursePlacement($plan);
+
+
+
+
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
             $semester = Semester::findOrFail($request->input('id'));
             if($semester->plan_id == $id){
-              $semester->name = "Summer " . $semester->year();
+              $semester->name = "Summer ";// . $semester->year();
               $semester->save();
-              return response()->json(trans('messages.item_changed')); //Changed this.Idk what it does.
+            //  $window.location.reload();
+          return view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs)->with('courseplacement',$courseplacement);
             }
             else{
               //semester id does not match plan id given
@@ -466,7 +481,7 @@ class FlowchartsController extends Controller
               $semester->save();
             }
           }
-
+          $plan->DynamicallyRenameSemesters();
           return response()->json(trans('messages.item_saved'));
         }else{
           //cannot edit a plan if you aren't the student or an advisor
