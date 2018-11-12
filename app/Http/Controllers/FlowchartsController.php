@@ -395,8 +395,17 @@ class FlowchartsController extends Controller
       else {
           $user = Auth::user();
           $plan = Plan::with('semesters')->findOrFail($id);
-          //$lastSemester = Semester::where('plan_id', $id)->Max('ordering')->get();
-          //$year =
+          $semester = Semester::findOrFail($request->input('id'));
+          //$lastSemester = $plan->semesters->max('ordering');
+        //  $plan = Plan::where('id', $semester->plan_id)->get();//Plan::with('semesters')->findOrFail($id);
+
+          $lastSemester = Semester::where('plan_id', $plan->id)->orderby('ordering', 'DESC')->first();
+          //var_dump($lastSemester);
+          $seasonYear = explode(' ', $lastSemester->name);
+          $year = $seasonYear[1];
+          if($seasonYear[0] == "Fall") {
+            $seasonYear[1]++;
+          }
 
           $planreqs = self::CheckGradPlanRules($plan);
           $CISreqs = self::CheckCISReqRules($plan);
@@ -408,9 +417,9 @@ class FlowchartsController extends Controller
 
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
-            $semester = Semester::findOrFail($request->input('id'));
+
             if($semester->plan_id == $id){
-              $semester->name = "Summer ";// . $semester->year();
+              $semester->name = "Summer " . $year;// . $semester->year();
               $semester->save();
             //  $window.location.reload();
           return view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs)->with('courseplacement',$courseplacement);
