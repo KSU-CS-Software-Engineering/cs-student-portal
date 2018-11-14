@@ -22,9 +22,6 @@ class KSUDepartmentScraper
 
             //load the htlm
             $dom->loadHTML($html);
-          //  libxml_clear_errors();
-
-          //  $xpath = new DOMXPath($dom);
             //gets the urls from html
             $addresses = $dom->querySelectorAll('h5 + ul');
 

@@ -331,13 +331,7 @@ class FlowchartsController extends Controller
         $user = Auth::user();
         $plan = Plan::with('semesters')->findOrFail($id);
 
-          self::CheckCISReqRules($plan);
-          self::CheckGradPlanRules($plan);
-          self::CheckGradRequirementsRules($plan);
-
-          self::CheckHoursRules($plan);
-          self::CheckPreReqRules($plan);
-          self::CheckCoursePlacement($plan);
+          $rules = $this->UpdatedView($plan);
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           $semester = Semester::findOrFail($request->input('id'));
@@ -427,17 +421,6 @@ class FlowchartsController extends Controller
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
     public function postSemesterMove(Request $request, $id = -1){
       if($id < 0){
         //id not found
@@ -446,15 +429,7 @@ class FlowchartsController extends Controller
         $user = Auth::user();
         $plan = Plan::with('semesters')->findOrFail($id);
 
-          self::CheckCISReqRules($plan);
-          self::CheckGradPlanRules($plan);
-          self::CheckGradRequirementsRules($plan);
-
-          self::CheckHoursRules($plan);
-          self::CheckPreReqRules($plan);
-          self::CheckCoursePlacement($plan);
-
-
+          $rules = $this->UpdatedView($plan);
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           $semesters = $plan->semesters;
@@ -500,13 +475,7 @@ class FlowchartsController extends Controller
         $user = Auth::user();
         $plan = Plan::findOrFail($id);
 
-        self::CheckCISReqRules($plan);
-        self::CheckGradPlanRules($plan);
-        self::CheckGradRequirementsRules($plan);
-
-        self::CheckHoursRules($plan);
-        self::CheckPreReqRules($plan);
-        self::CheckCoursePlacement($plan);
+          $rules = $this->UpdatedView($plan);
 
 
         $semester = Semester::findOrFail($request->input('semester_id'));
@@ -574,13 +543,7 @@ class FlowchartsController extends Controller
         $user = Auth::user();
         $plan = Plan::findOrFail($id);
 
-          self::CheckCISReqRules($plan);
-          self::CheckGradPlanRules($plan);
-          self::CheckGradRequirementsRules($plan);
-
-          self::CheckHoursRules($plan);
-          self::CheckPreReqRules($plan);
-          self::CheckCoursePlacement($plan);
+          $rules = $this->UpdatedView($plan);
 
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
@@ -684,13 +647,7 @@ class FlowchartsController extends Controller
         $user = Auth::user();
         $plan = Plan::findOrFail($id);
 
-          self::CheckCISReqRules($plan);
-          self::CheckGradPlanRules($plan);
-          self::CheckGradRequirementsRules($plan);
-
-          self::CheckHoursRules($plan);
-          self::CheckPreReqRules($plan);
-
+          $rules = $this->UpdatedView($plan);
 
           if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
 
@@ -781,6 +738,18 @@ class FlowchartsController extends Controller
         $rules = new VerifySemester();
         $courseplacement = $rules->CheckCoursePlacement($plan);
         return $courseplacement;
+
+    }
+
+    public function UpdatedView(Plan $plan){
+
+        $planreqs = self::CheckGradPlanRules($plan);
+        $CISreqs = self::CheckCISReqRules($plan);
+        $hours = self::CheckHoursRules($plan);
+        $prereqs = self::CheckPreReqRules($plan);
+        $courseplacement = self::CheckCoursePlacement($plan);
+
+        return view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs)->with('courseplacement',$courseplacement);
 
     }
 
