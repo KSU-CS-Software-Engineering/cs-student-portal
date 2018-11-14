@@ -147,7 +147,7 @@ class RulesTest extends TestCase {
     }
 
     public function testCheckCoursePlacement() {
-        $plan = Plan::where('id', 1)->get()[0];
+        $plan = Plan::where('id', 70)->get()[0];
         $rules = new VerifySemester();
         $this->AssertEmpty($rules->CheckCoursePlacement($plan));
     }

@@ -396,11 +396,8 @@ class FlowchartsController extends Controller
           $user = Auth::user();
           $plan = Plan::with('semesters')->findOrFail($id);
           $semester = Semester::findOrFail($request->input('id'));
-          //$lastSemester = $plan->semesters->max('ordering');
-        //  $plan = Plan::where('id', $semester->plan_id)->get();//Plan::with('semesters')->findOrFail($id);
 
           $lastSemester = Semester::where('plan_id', $plan->id)->orderby('ordering', 'DESC')->first();
-          //var_dump($lastSemester);
           $seasonYear = explode(' ', $lastSemester->name);
           $year = $seasonYear[1];
           if($seasonYear[0] == "Fall") {
@@ -422,7 +419,7 @@ class FlowchartsController extends Controller
               $semester->name = "Summer " . $year;// . $semester->year();
               $semester->save();
             //  $window.location.reload();
-          return view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs)->with('courseplacement',$courseplacement);
+          return; //view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs)->with('courseplacement',$courseplacement);
             }
             else{
               //semester id does not match plan id given
@@ -434,18 +431,6 @@ class FlowchartsController extends Controller
           }
       }
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
     public function postSemesterMove(Request $request, $id = -1){
       if($id < 0){
@@ -726,7 +711,6 @@ class FlowchartsController extends Controller
       }
     }
 
-
     public static function CheckCISReqRules(Plan $plan) {
 
         $firstArrs = [];
@@ -763,9 +747,7 @@ class FlowchartsController extends Controller
 
     }
 
-
-    public static function CheckHoursRules(Plan $plan)
-    {
+    public static function CheckHoursRules(Plan $plan) {
         $rules = new VerifySemester();
 
         //returns true if correct number of hours and false if not
@@ -774,8 +756,7 @@ class FlowchartsController extends Controller
         return $correcthours;
     }
 
-    public static function CheckPreReqRules(Plan $plan)
-    {
+    public static function CheckPreReqRules(Plan $plan) {
 
         $rules = new VerifySemester();
         //returns an array with the missing prereqs or empty if all good

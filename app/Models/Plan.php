@@ -142,14 +142,6 @@ class Plan extends Validatable
       }
     }
 
-
-
-    public function SetSummer() {
-      //Will thisgrab the corret semester? Do I need to make this static so I can call it from view? Idk. TBD.
-        $semester = Semester::where('id', $this->id);
-        $semester->name = 'Summer '; //. $semester-
-    }
-
     //Should be able to call this whenever, since names won't change if they're correct.
     public function DynamicallyRenameSemesters() {
         //How do we want to do this?
@@ -176,7 +168,7 @@ class Plan extends Validatable
 
 
         foreach($semesters as $semester) {
-            if(strpos($semester->name, 'Summer')) {
+            if(strpos($semester->name, "Summer") !== false) {
               $semester->name = "Summer " . $year;
               $sem = 3;
               $semester->save();
@@ -202,21 +194,6 @@ class Plan extends Validatable
         }
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     private function fillSemesters(){
       $maxSemester = $this->requirements->max('semester');
