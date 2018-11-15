@@ -44,6 +44,12 @@ Route::get('courses/prereqfeed/{id}', 'CoursesController@getPrereqs');
 Route::get('completedcourses/completedcoursefeed/{id}', 'CompletedcoursesController@getCompletedcoursefeed');
 
 /*
+ * Routes for Scheduler controller
+ */
+
+
+
+/*
  * Routes for the FlowchartsController
  */
 //Route::controller('flowcharts', 'FlowchartsController');
