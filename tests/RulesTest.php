@@ -162,5 +162,4 @@ class RulesTest extends TestCase {
 
 
 
-
 }
