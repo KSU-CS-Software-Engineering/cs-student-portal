@@ -11,7 +11,8 @@ use App\Models\Planrequirement;
 use App\Models\Degreeprogram;
 use App\Models\Degreerequirement;
 use App\Models\Completedcourse;
-
+use App\Models\kstate8;
+use App\Models\Course;
 
 class VerifyFourYearPlan {
 
@@ -87,9 +88,46 @@ class VerifyFourYearPlan {
 
         $returnarray[$count] = $planrequirement;
       }
+      $count++; //This was mising but it's gonna need this.
     }
     return $returnarray;
   }
-}
 
-?>
+
+
+
+
+  public function CheckKstate8(Plan $plan) {
+      $returnArray = ['You are missing the Aesthetic Interpretation K-State 8 requirement.', 'You are missing the Empirical and Quantitative Reasoning K-State 8 requirement.',
+      'You are missing the Ethical Reasoning and Responsibility K-State 8 requirement.', 'You are missing the Global Issues and Perspectives K-State 8 requirement.',
+      'You are missing the Historical Perpectives K-State 8 requirement.', 'You are missing the Human Diversity within the U.S. K-State 8 requirement.',
+      'You are missing the Natural and Physical Sciences K-State 8 requirement.', 'You are missing the Social Sciences K-State 8 requirement.'];
+      //Get all of the plan requirements.
+      //Check all of those plan requirements get the courses against the Kstate8 then the areas.
+
+      $count = 0;
+      //Get the plan requirements
+      $planRequirements = Planrequirement::where('plan_id', $plan->id)->get();
+      //Get the course object for all of these classes.
+      foreach($planRequirements as $planRequirement) {
+          if($planRequirement->course_id != NULL) {
+              $courseObject = Course::where('id', $planRequirement->course_id)->first();
+              $courseArea = kstate8::where('course_id', $courseObject->id)->get();
+              if($courseArea != NULL) {
+                foreach($courseArea as $courseAreaSingular) {
+                  //var_dump($courseObject->slug);
+                  //var_dump($courseAreaSingular->area_id);
+                  $returnArray[$courseAreaSingular->area_id - 1] = NULL;
+                }
+              }
+          }
+      }
+      //dd($returnArray);
+      return $returnArray;
+
+
+
+
+
+  }
+}

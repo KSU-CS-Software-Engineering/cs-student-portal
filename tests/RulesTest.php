@@ -101,7 +101,7 @@ class RulesTest extends TestCase {
 
 
     public function testSemesterCheckHours() {
-        $plan = Plan::where('id', 1)->get()[0];
+        $plan = Plan::where('id', 70)->get()[0];
         $rules = new VerifySemester();
         $this->AssertEmpty($rules->CheckHours($plan));
     }
@@ -147,11 +147,17 @@ class RulesTest extends TestCase {
     }
 
     public function testCheckCoursePlacement() {
-        $plan = Plan::where('id', 70)->get()[0];
+        $plan = Plan::where('id', 2)->get()[0];
         $rules = new VerifySemester();
         $this->AssertEmpty($rules->CheckCoursePlacement($plan));
     }
 
+
+    public function testKstate8() {
+        $plan = Plan::where('id', 70)->get()[0];
+        $rules = new VerifyFourYearPlan();
+        $this->AssertContainsOnly('null', $rules->CheckKstate8($plan));
+    }
 
 
 
