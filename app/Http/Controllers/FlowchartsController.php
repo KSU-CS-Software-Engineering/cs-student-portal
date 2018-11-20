@@ -27,6 +27,7 @@ use App\scrapers\KSUCourseScraper;
 class FlowchartsController extends Controller
 {
 
+
   public function __construct()
 	{
 		$this->middleware('cas');
@@ -38,6 +39,7 @@ class FlowchartsController extends Controller
      */
     public function getIndex($id = -1){
         $user = Auth::user(); //I think this gets the user in question.
+
 
         if($id < 0){
           //no particular student requested
@@ -69,13 +71,16 @@ class FlowchartsController extends Controller
 
     public function getFlowchart($id = -1){
 
-      if($id < 0){
+
+        if($id < 0){
         //no ID provided - redirect back to index
         return redirect('flowcharts/index');
       }else{
 
 
-        $user = Auth::user();
+
+
+          $user = Auth::user();
         $plan = Plan::findOrFail($id);
           $planreqs = self::CheckGradPlanRules($plan);
           $CISreqs = self::CheckCISReqRules($plan);

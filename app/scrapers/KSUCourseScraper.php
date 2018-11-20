@@ -29,12 +29,20 @@ class KSUCourseScraper
                 foreach ($headers as $header) {
                     $sections = [];
                     $sibling = $header->nextSibling;
-                    while ($sibling !== null && $sibling->classList->contains("section")) {
-                        array_push($sections, $sibling);
+                    while ($sibling !== null && $sibling->classList->contains('section')) {
+                        $sectionDays = $sibling->firstChild->childNodes[5]->textContent;
+                        $sectionHours = $sibling->firstChild->childNodes[6]->textContent;
+                        if ($sibling->firstChild->childNodes[5]->hasAttribute('colspan')) {
+                            $sectionHours = '';
+                        }
+                        $sections[] = [
+                            'days' => $sectionDays,
+                            'hours' => $sectionHours,
+                        ];
                         $sibling = $sibling->nextSibling;
                     }
                     $returnArray[] = [
-                        'header' => $header,
+                        'courseNumber' => $header->firstChild->getAttribute('id'),
                         'sections' => $sections,
                     ];
                 }
