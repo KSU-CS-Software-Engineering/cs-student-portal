@@ -10,6 +10,7 @@ use App\Models\Semester;
 use App\Models\Student;
 use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
@@ -17,6 +18,8 @@ use League\Fractal\Resource\Item;
 
 class FlowchartsController extends Controller
 {
+
+    private $fractal;
 
     public function __construct()
     {
@@ -223,64 +226,73 @@ class FlowchartsController extends Controller
         }
     }
 
-    public function getFlowchartData($id = -1)
+    public function getFlowchartData(Request $request, $id = -1)
     {
         if ($id < 0) {
             abort(404);
-        } else {
-            $user = Auth::user();
-            $plan = Plan::with('requirements.electivelist')->findOrFail($id);
-            if ($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
-                $resource = new Collection($plan->requirements, function ($requirement) {
-                    return [
-                        'id' => $requirement->id,
-                        'notes' => $requirement->notes,
-                        'semester_id' => $requirement->semester_id,
-                        'ordering' => $requirement->ordering,
-                        'credits' => $requirement->credits,
-                        'name' => empty($requirement->course_name) ? '' : $requirement->course_name,
-                        'electivelist_name' => $requirement->electivelist_id === null ? '' : $requirement->electivelist->name,
-                        'electivelist_abbr' => $requirement->electivelist_id === null ? '' : $requirement->electivelist->abbreviation,
-                        'electivelist_id' => $requirement->electivelist_id === null ? 0 : $requirement->electivelist_id,
-                        'degreerequirement_id' => $requirement->degreerequirement_id == null ? 0 : $requirement->degreerequirement_id,
-                        'course_name' => $requirement->course_id == null ? '' : $requirement->course->fullTitle,
-                        'course_id' => $requirement->course_id == null ? 0 : $requirement->course_id,
-                        'completedcourse_name' => $requirement->completedcourse_id == null ? '' : $requirement->completedcourse->fullTitle,
-                        'completedcourse_id' => $requirement->completedcourse_id == null ? 0 : $requirement->completedcourse_id,
-                        'course_id_lock' => $requirement->course_id_lock,
-                        'completedcourse_id_lock' => $requirement->completedcourse_id_lock,
-                    ];
-                });
-                $this->fractal->setSerializer(new JsonSerializer());
-                return $this->fractal->createData($resource)->toJson();
-            } else {
-                abort(404);
-            }
         }
+        $plan = Plan::findOrFail($id);
+        return $this->getCourses($request, $plan);
     }
 
-    public function getSemesterData($id = -1)
+    public function getCourses(Request $request, Plan $plan) {
+        $user = Auth::user();
+        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
+            abort(404);
+        }
+
+        $requirements = $plan->requirements()->orderBy('ordering')->get();
+        $requirements->load('electivelist');
+        $requirements->load('course');
+        $requirements->load('completedcourse');
+        $resource = new Collection($requirements, function ($requirement) {
+            return [
+                'id' => $requirement->id,
+                'notes' => $requirement->notes,
+                'semester_id' => $requirement->semester_id,
+                'credits' => $requirement->credits,
+                'name' => empty($requirement->course_name) ? '' : $requirement->course_name,
+                'electivelist_name' => $requirement->electivelist_id === null ? '' : $requirement->electivelist->name,
+                'electivelist_abbr' => $requirement->electivelist_id === null ? '' : $requirement->electivelist->abbreviation,
+                'electivelist_id' => $requirement->electivelist_id === null ? 0 : $requirement->electivelist_id,
+                'degreerequirement_id' => $requirement->degreerequirement_id == null ? 0 : $requirement->degreerequirement_id,
+                'course_name' => $requirement->course_id == null ? '' : $requirement->course->fullTitle,
+                'course_id' => $requirement->course_id == null ? 0 : $requirement->course_id,
+                'completedcourse_name' => $requirement->completedcourse_id == null ? '' : $requirement->completedcourse->fullTitle,
+                'completedcourse_id' => $requirement->completedcourse_id == null ? 0 : $requirement->completedcourse_id,
+                'course_id_lock' => $requirement->course_id_lock,
+                'completedcourse_id_lock' => $requirement->completedcourse_id_lock,
+            ];
+        });
+        $this->fractal->setSerializer(new JsonSerializer());
+        return $this->fractal->createData($resource)->toJson();
+    }
+
+    public function getSemesterData(Request $request, $id = -1)
     {
         if ($id < 0) {
             abort(404);
-        } else {
-            $user = Auth::user();
-            $plan = Plan::with('semesters')->findOrFail($id);
-            if ($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
-                $resource = new Collection($plan->semesters, function ($semester) {
-                    return [
-                        'id' => $semester->id,
-                        'name' => $semester->name,
-                        'ordering' => $semester->ordering,
-                        'courses' => array(),
-                    ];
-                });
-                $this->fractal->setSerializer(new JsonSerializer());
-                return $this->fractal->createData($resource)->toJson();
-            } else {
-                abort(404);
-            }
         }
+        $plan = Plan::findOrFail($id);
+        return $this->getSemesters($request, $plan);
+    }
+
+    public function getSemesters(Request $request, Plan $plan) {
+        $user = Auth::user();
+        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
+            abort(404);
+        }
+
+        $semesters = $plan->semesters()->orderBy('ordering')->get();
+        $resource = new Collection($semesters, function ($semester) {
+            return [
+                'id' => $semester->id,
+                'name' => $semester->name,
+                'courses' => [],
+            ];
+        });
+        $this->fractal->setSerializer(new JsonSerializer());
+        return $this->fractal->createData($resource)->toJson();
     }
 
     public function postSemesterSave(Request $request, $id = -1)
@@ -308,28 +320,45 @@ class FlowchartsController extends Controller
         }
     }
 
+    public function renameSemester(Request $request, Plan $plan, Semester $semester) {
+        $user = Auth::user();
+        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
+            //cannot edit a plan if you aren't the student or an advisor
+            abort(404);
+        }
+        if ($semester->plan_id !== $plan->id) {
+            //semester id does not match plan id given
+            abort(404);
+        }
+
+        $semester->name = $request->input('name');
+        $semester->save();
+        return response()->json(trans('messages.item_saved'));
+    }
+
     public function postSemesterDelete(Request $request, $id = -1)
     {
         if ($id < 0) {
             //id not found
             abort(404);
-        } else {
-            $user = Auth::user();
-            $plan = Plan::with('semesters')->findOrFail($id);
-            if ($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
-                $semester = Semester::findOrFail($request->input('id'));
-                if ($semester->plan_id == $id) {
-                    $semester->delete();
-                    return response()->json(trans('messages.item_deleted'));
-                } else {
-                    //semester id does not match plan id given
-                    abort(404);
-                }
-            } else {
-                //cannot edit a plan if you aren't the student or an advisor
-                abort(404);
-            }
         }
+        $plan = Plan::findOrFail($id);
+        $semester = Semester::findOrFail($request->input('id'));
+        return $this->deleteSemester($request, $plan, $semester);
+    }
+
+    public function deleteSemester(Request $request, Plan $plan, Semester $semester)
+    {
+        $user = Auth::user();
+        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
+            abort(404) ;
+        }
+        if ($semester->plan_id !== $plan->id) {
+            abort(404);
+        }
+
+        $semester->delete();
+        return response()->json(trans('messages.item_deleted'));
     }
 
     public function postSemesterAdd(Request $request, $id = -1)
@@ -337,30 +366,32 @@ class FlowchartsController extends Controller
         if ($id < 0) {
             //id not found
             abort(404);
-        } else {
-            $user = Auth::user();
-            $plan = Plan::with('semesters')->findOrFail($id);
-            if ($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
-                $semester = new Semester();
-                $semester->plan_id = $plan->id;
-                $semester->name = "New Semester";
-                $semester->ordering = $plan->semesters->max('ordering') + 1;
-                $semester->save();
-                $resource = new Item($semester, function ($semester) {
-                    return [
-                        'id' => $semester->id,
-                        'name' => $semester->name,
-                        'ordering' => $semester->ordering,
-                        'courses' => array(),
-                    ];
-                });
-                $this->fractal->setSerializer(new JsonSerializer());
-                return $this->fractal->createData($resource)->toJson();
-            } else {
-                //cannot edit a plan if you aren't the student or an advisor
-                abort(404);
-            }
         }
+        $plan = Plan::findOrFail($id);
+        return $this->addSemester($request, $plan);
+    }
+
+    public function addSemester(Request $request, Plan $plan) {
+        $user = Auth::user();
+        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
+            //cannot edit a plan if you aren't the student or an advisor
+            abort(404);
+        }
+
+        $semester = new Semester();
+        $semester->plan_id = $plan->id;
+        $semester->name = "New Semester";
+        $semester->ordering = $plan->semesters->max('ordering') + 1;
+        $semester->save();
+        $resource = new Item($semester, function ($semester) {
+            return [
+                'id' => $semester->id,
+                'name' => $semester->name,
+                'courses' => [],
+            ];
+        });
+        $this->fractal->setSerializer(new JsonSerializer());
+        return $this->fractal->createData($resource)->toJson();
     }
 
     public function postSemesterMove(Request $request, $id = -1)
@@ -368,41 +399,40 @@ class FlowchartsController extends Controller
         if ($id < 0) {
             //id not found
             abort(404);
-        } else {
-            $user = Auth::user();
-            $plan = Plan::with('semesters')->findOrFail($id);
-            if ($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
-                $semesters = $plan->semesters;
-
-                $ordering = collect($request->input('ordering'));
-
-                if ($semesters->count() != $ordering->count()) {
-                    abort(404);
-                }
-
-                $maxOrder = $semesters->max('ordering') + 1;
-
-                foreach ($ordering as $key => $order) {
-                    $semester = $semesters->where('id', $order['id'])->first();
-                    if ($semester->ordering != $key) {
-                        $semester->ordering = $key + $maxOrder;
-                        $semester->save();
-                    }
-                }
-
-                foreach ($semesters as $semester) {
-                    if ($semester->ordering >= $maxOrder) {
-                        $semester->ordering = $semester->ordering - $maxOrder;
-                        $semester->save();
-                    }
-                }
-
-                return response()->json(trans('messages.item_saved'));
-            } else {
-                //cannot edit a plan if you aren't the student or an advisor
-                abort(404);
-            }
         }
+        $plan = Plan::findOrFail($id);
+        return $this->moveSemester($request, $plan);
+    }
+
+    public function moveSemester(Request $request, Plan $plan) {
+        $user = Auth::user();
+        if (!$user->is_advisor && $user->student->id != $plan->student_id) {
+            abort(404);
+        }
+
+        $semesters = $plan->semesters;
+        $orderings = $request->input('ordering');
+
+        if ($semesters->count() !== count($orderings)) {
+            abort(404);
+        }
+
+        $offset = $semesters->max('ordering') + 1;
+
+        DB::beginTransaction();
+        foreach ($orderings as $ordering) {
+            $semester = $semesters->where('id', $ordering['id'])->first();
+            $semester->ordering = $ordering['ordering'] + $offset;
+            $semester->save();
+        }
+        foreach ($orderings as $ordering) {
+            $semester = $semesters->where('id', $ordering['id'])->first();
+            $semester->ordering -= + $offset;
+            $semester->save();
+        }
+        DB::commit();
+
+        return response()->json(trans('messages.item_saved'));
     }
 
     public function postCourseMove(Request $request, $id = -1)
@@ -410,63 +440,68 @@ class FlowchartsController extends Controller
         if ($id < 0) {
             //id not found
             abort(404);
-        } else {
-            $user = Auth::user();
-            $plan = Plan::findOrFail($id);
-            if ($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
-                //move requirement to new semester
-                $requirement_moved = Planrequirement::findOrFail($request->input('course_id'));
-                if ($requirement_moved->plan_id != $plan->id) {
-                    //can't move course not on the plan;
-                    abort(404);
-                }
+        }
 
-                $semester = Semester::findOrFail($request->input('semester_id'));
-                if ($semester->plan_id != $plan->id) {
-                    //can't move course to semester not on the plan;
-                    abort(404);
-                }
+        $plan = Plan::findOrFail($id);
 
-                //move requirement to new semester
-                if ($requirement_moved->semester_id != $semester->id) {
-                    $maxOrder = $semester->requirements->max('ordering') + 1;
-                    $requirement_moved->semester_id = $semester->id;
-                    $requirement_moved->ordering = $maxOrder;
-                    $requirement_moved->save();
-                }
+        return $this->moveCourse($request, $plan);
+    }
 
-                //get all requirements for that semester to reorder
-                $requirements = $semester->fresh()->requirements;
+    public function moveCourse(Request $request, Plan $plan) {
+        $user = Auth::user();
+        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
+            //cannot edit a plan if you aren't the student or an advisor
+            abort(404);
+        }
 
-                $ordering = collect($request->input('ordering'));
+        //move requirement to new semester
+        $requirement_moved = Planrequirement::findOrFail($request->input('course_id'));
+        if ($requirement_moved->plan_id != $plan->id) {
+            //can't move course not on the plan;
+            abort(404);
+        }
 
-                if ($requirements->count() != $ordering->count()) {
-                    abort(404);
-                }
+        $semester = Semester::findOrFail($request->input('semester_id'));
+        if ($semester->plan_id != $plan->id) {
+            //can't move course to semester not on the plan;
+            abort(404);
+        }
 
-                $maxOrder = $requirements->max('ordering') + 1;
+        //move requirement to new semester
+        if ($requirement_moved->semester_id != $semester->id) {
+            $maxOrder = $semester->requirements->max('ordering') + 1;
+            $requirement_moved->semester_id = $semester->id;
+            $requirement_moved->ordering = $maxOrder;
+            $requirement_moved->save();
+        }
 
-                foreach ($ordering as $key => $order) {
-                    $requirement = $requirements->where('id', $order['id'])->first();
-                    if ($requirement->ordering != $key) {
-                        $requirement->ordering = $key + $maxOrder;
-                        $requirement->save();
-                    }
-                }
+        //get all requirements for that semester to reorder
+        $requirements = $semester->fresh()->requirements;
 
-                foreach ($requirements as $requirement) {
-                    if ($requirement->ordering >= $maxOrder) {
-                        $requirement->ordering = $requirement->ordering - $maxOrder;
-                        $requirement->save();
-                    }
-                }
+        $ordering = collect($request->input('ordering'));
 
-                return response()->json(trans('messages.item_saved'));
-            } else {
-                //cannot edit a plan if you aren't the student or an advisor
-                abort(404);
+        if ($requirements->count() != $ordering->count()) {
+            abort(404);
+        }
+
+        $maxOrder = $requirements->max('ordering') + 1;
+
+        foreach ($ordering as $key => $order) {
+            $requirement = $requirements->where('id', $order['id'])->first();
+            if ($requirement->ordering != $key) {
+                $requirement->ordering = $key + $maxOrder;
+                $requirement->save();
             }
         }
+
+        foreach ($requirements as $requirement) {
+            if ($requirement->ordering >= $maxOrder) {
+                $requirement->ordering = $requirement->ordering - $maxOrder;
+                $requirement->save();
+            }
+        }
+
+        return response()->json(trans('messages.item_saved'));
     }
 
     public function postCourseSave(Request $request, $id = -1)
