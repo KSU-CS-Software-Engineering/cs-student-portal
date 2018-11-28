@@ -78,3 +78,10 @@
 .flowchart-key .prereq-icon{
   color: #512888;
 }
+
+.input-group-addon {
+  max-width: 24em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
