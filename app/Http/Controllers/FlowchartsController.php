@@ -81,15 +81,16 @@ class FlowchartsController extends Controller
 
 
           $user = Auth::user();
-        $plan = Plan::findOrFail($id);
+          $plan = Plan::findOrFail($id);
           $planreqs = self::CheckGradPlanRules($plan);
           $CISreqs = self::CheckCISReqRules($plan);
           $hours = self::CheckHoursRules($plan);
           $prereqs = self::CheckPreReqRules($plan);
           $courseplacement = self::CheckCoursePlacement($plan);
+          $kstate = self::CheckKState8($plan); //Should all of these change to be the UpdatedView()?
 
         if($user->is_advisor){
-          return view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs)->with('courseplacement',$courseplacement);
+          return view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs)->with('courseplacement',$courseplacement)->with('kstate',$kstate);
         }else{
           if($plan->student_id == $user->student->id){
             return view('flowcharts/flowchart')->with('plan', $plan);
@@ -747,6 +748,12 @@ class FlowchartsController extends Controller
 
     }
 
+    public static function CheckKState8(Plan $plan) {
+        $rules = new VerifyFourYearPlan();
+        $kstate8 = $rules->CheckKstate8($plan);
+        return $kstate8;
+    }
+
     public function UpdatedView(Plan $plan){
 
         $planreqs = self::CheckGradPlanRules($plan);
@@ -754,8 +761,9 @@ class FlowchartsController extends Controller
         $hours = self::CheckHoursRules($plan);
         $prereqs = self::CheckPreReqRules($plan);
         $courseplacement = self::CheckCoursePlacement($plan);
+        $kstate = self::CheckKState8($plan);
 
-        return view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs)->with('courseplacement',$courseplacement);
+        return view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs)->with('courseplacement',$courseplacement)->with('kstate',$kstate);
 
     }
 

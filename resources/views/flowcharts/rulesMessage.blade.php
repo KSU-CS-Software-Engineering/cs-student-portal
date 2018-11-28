@@ -27,6 +27,10 @@
             <p> <strong> Courses not offered in its current semester placement: </strong>@foreach ($courseplacement as $course) <br> {{$course}} @endforeach </p>
             @endif
 
+            @if(count($kstate) > 0)
+            <p> <strong> K-State 8 Requirements Missing: </strong>@foreach ($kstate as $kstateReq) @if($kstateReq != null) <br> {{$kstateReq}} @endif @endforeach </p>
+            @endif
+
         @endif
     </div>
 
