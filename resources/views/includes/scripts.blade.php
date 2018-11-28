@@ -1,11 +1,14 @@
 @section('scripts')
 
-<script src="{{ mix('/js/manifest.js') }}"></script>
-<script src="{{ mix('/js/vendor.js') }}"></script>
-<script src="{{ mix('/js/app.js') }}"></script>
+<script src="{{ mix('/js/manifest.js') }}" defer="defer"></script>
+<script src="{{ mix('/js/vendor.js') }}" defer="defer"></script>
+<script src="{{ mix('/js/app.js') }}" defer="defer"></script>
 
 <script type="text/javascript">
-  App.init('{{ $controller }}', '{{ $action }}');
+  window.appInit = {
+      controller: "{{ $controller }}",
+      action: "{{ $action }}"
+  };
 </script>
 
 @show
