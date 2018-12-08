@@ -3,10 +3,9 @@
 namespace App\Events;
 
 use App\Models\Groupsession;
-use App\Events\Event;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Queue\SerializesModels;
 
 class GroupsessionRegister extends Event implements ShouldBroadcast
 {
@@ -26,15 +25,15 @@ class GroupsessionRegister extends Event implements ShouldBroadcast
      */
     public function __construct(Groupsession $gs)
     {
-        $this->id = (int)$gs->id;
-        $this->userid = (int)$gs->student->user_id;
-        if(count($gs->advisor)){
-          $this->advisor = $gs->advisor->name;
-        }else{
-          $this->advisor = "";
+        $this->id = (int) $gs->id;
+        $this->userid = (int) $gs->student->user_id;
+        if (count($gs->advisor)) {
+            $this->advisor = $gs->advisor->name;
+        } else {
+            $this->advisor = "";
         }
         $this->name = $gs->student->name;
-        $this->status = (int)$gs->status;
+        $this->status = (int) $gs->status;
         $this->online = 0;
     }
 

@@ -25,8 +25,8 @@
 			<p>
 				<a href="{{ url('flowcharts/' . $plan->student_id)}}" class="btn btn-primary"><i class="fa fa-list"></i> Select a Different Flowchart</a>
 				<button class="btn btn-default" id="reset" title="Refresh Flowchart"><i class="fa fa-refresh"></i></button>
-				<button class="btn btn-success" id="add-sem"><i class="fa fa-plus"></i> Semester</button>
-				<button class="btn btn-info" id="add-course"><i class="fa fa-plus"></i> Requirement</button>
+				<button class="btn btn-success" id="add-sem"><i class="fa fa-plus"></i> Add Semester</button>
+				<button class="btn btn-info" id="add-course"><i class="fa fa-plus"></i> Add Course</button>
 				<a href="{{ url('flowcharts/edit/' . $plan->id)}}" class="btn btn-warning"><i class="fa fa-pencil"></i> Edit Plan</a>
 			</p>
 		</div>

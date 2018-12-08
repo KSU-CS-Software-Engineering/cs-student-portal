@@ -7,7 +7,7 @@
 .flowchart{
   display: grid;
   grid-template-rows: auto;
-  grid-template-columns: repeat(var(--colNum), auto);
+  grid-template-columns: repeat(var(--colNum), 1fr);
 }
 
 .flowchart .sortable-ghost{
@@ -81,4 +81,10 @@
 
 #error {
 
+}
+
+.input-group-addon {
+  max-width: 24em;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

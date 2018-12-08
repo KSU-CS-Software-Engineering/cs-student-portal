@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use DbConfig;
-use Auth;
 
 class GroupsessionDisabled
 {
@@ -17,13 +16,13 @@ class GroupsessionDisabled
      */
     public function handle($request, Closure $next)
     {
-      if(!DbConfig::has('groupsessionenabled')){
-        DbConfig::store('groupsessionenabled', false);
-      }else{
-        if(DbConfig::get('groupsessionenabled') == true){
-          return $next($request);
+        if (!DbConfig::has('groupsessionenabled')) {
+            DbConfig::store('groupsessionenabled', false);
+        } else {
+            if (DbConfig::get('groupsessionenabled') == true) {
+                return $next($request);
+            }
         }
-      }
-      return redirect()->action('GroupsessionController@getIndex');
+        return redirect()->action('GroupsessionController@getIndex');
     }
 }

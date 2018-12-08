@@ -2,24 +2,23 @@
 @import "bootstrap-variables-override";
 
 // Bootstrap-sass
-@import "../../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
-@import "../../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/theme";
+@import "~bootstrap-sass/assets/stylesheets/bootstrap";
+@import "~bootstrap-sass/assets/stylesheets/bootstrap/theme";
 
 // Font Awesome
-@import "../../../node_modules/font-awesome/scss/font-awesome.scss";
-@import "flowchart.scss";
+@import "~font-awesome/scss/font-awesome.scss";
 
 // Editables
-@import "../../../node_modules/summernote/dist/summernote.css";
-@import "../../../node_modules/codemirror/lib/codemirror.css";
-@import "../../../node_modules/codemirror/theme/blackboard.css";
-@import "../../../node_modules/codemirror/theme/monokai.css";
+@import "~summernote/src/less/summernote";
+@import "~codemirror/lib/codemirror";
+@import "~codemirror/theme/blackboard";
+@import "~codemirror/theme/monokai";
 
 // Fullcalendar
-@import "../../../node_modules/fullcalendar/dist/fullcalendar.css";
+@import "~fullcalendar/dist/fullcalendar";
 
 // Datetimepicker
-@import "../../../node_modules/eonasdan-bootstrap-datetimepicker-russfeld/build/css/bootstrap-datetimepicker.css";
+@import "~eonasdan-bootstrap-datetimepicker-russfeld/src/sass/bootstrap-datetimepicker-build";
 
 html {
   position: relative;

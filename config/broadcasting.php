@@ -11,6 +11,8 @@ return [
     | framework when an event needs to be broadcast. You may set this to
     | any of the connections defined in the "connections" array below.
     |
+    | Supported: "pusher", "redis", "log", "null"
+    |
     */
 
     'default' => env('BROADCAST_DRIVER', 'pusher'),
@@ -30,11 +32,12 @@ return [
 
         'pusher' => [
             'driver' => 'pusher',
-            'key' => env('PUSHER_KEY'),
-            'secret' => env('PUSHER_SECRET'),
+            'key' => env('PUSHER_APP_KEY'),
+            'secret' => env('PUSHER_APP_SECRET'),
             'app_id' => env('PUSHER_APP_ID'),
             'options' => [
-              'cluster' => env('PUSHER_CLUSTER')
+                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'encrypted' => true,
             ],
         ],
 

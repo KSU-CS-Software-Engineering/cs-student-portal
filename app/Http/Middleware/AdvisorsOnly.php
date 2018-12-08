@@ -2,9 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
 use Auth;
-use App\Models\User;
+use Closure;
 
 class AdvisorsOnly
 {
@@ -18,12 +17,12 @@ class AdvisorsOnly
     public function handle($request, Closure $next)
     {
         $user = Auth::user();
-        if(!($user->is_advisor)){
-          if($request->ajax()){
-            return response()->json(trans('errors.not_found'), 404);
-          }else{
-            abort(404);
-          }
+        if (!($user->is_advisor)) {
+            if ($request->ajax()) {
+                return response()->json(trans('errors.not_found'), 404);
+            } else {
+                abort(404);
+            }
         }
         return $next($request);
     }

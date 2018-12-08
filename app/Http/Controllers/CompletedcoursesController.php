@@ -2,50 +2,46 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Completedcourse;
 use Auth;
-
+use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
-use App\JsonSerializer;
-
-use App\Models\Completedcourse;
-
-use Illuminate\Http\Request;
 
 class CompletedcoursesController extends Controller
 {
 
-  public function __construct()
-	{
-		$this->middleware('cas');
-    $this->fractal = new Manager();
-	}
-
-  public function getCompletedcoursefeed(Request $request, $id = -1){
-    if($id < 0){
-      abort(404);
+    public function __construct()
+    {
+        $this->middleware('cas');
+        $this->fractal = new Manager();
     }
 
-    $user = Auth::user();
+    public function getCompletedcoursefeed(Request $request, $id = -1)
+    {
+        if ($id < 0) {
+            abort(404);
+        }
 
-    if($user->is_advisor || $user->student_id == $id){
-      $this->validate($request, [
-            'query' => 'required|string',
-        ]);
+        $user = Auth::user();
 
-        $completedcourses = Completedcourse::where('student_id', $id)->filterName($request->input('query'))->get();
+        if ($user->is_advisor || $user->student_id == $id) {
+            $this->validate($request, [
+                'query' => 'required|string',
+            ]);
 
-        $resource = new Collection($completedcourses, function($course) {
-              return[
-                  'value' => $course->fullTitle,
-                  'data' => $course->id,
-              ];
-        });
+            $completedcourses = Completedcourse::where('student_id', $id)->filterName($request->input('query'))->get();
 
-      return $this->fractal->createData($resource)->toJson();
+            $resource = new Collection($completedcourses, function ($course) {
+                return [
+                    'value' => $course->fullTitle,
+                    'data' => $course->id,
+                ];
+            });
 
-    }else{
-      abort(404);
+            return $this->fractal->createData($resource)->toJson();
+        } else {
+            abort(404);
+        }
     }
-  }
 }

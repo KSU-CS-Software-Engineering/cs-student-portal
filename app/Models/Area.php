@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Area extends Model
 {
-    public function courses(){
-    	return $this->belongsToMany('App\Models\Course', 'kstate8', 'area_id', 'course_id');
+    public function courses()
+    {
+        return $this->belongsToMany('App\Models\Course', 'kstate8', 'area_id', 'course_id');
     }
 
     protected $dates = ['created_at', 'updated_at'];

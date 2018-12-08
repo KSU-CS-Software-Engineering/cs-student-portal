@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\ServiceProvider;
 
 class BroadcastServiceProvider extends ServiceProvider
 {
@@ -19,8 +19,8 @@ class BroadcastServiceProvider extends ServiceProvider
         /*
          * Authenticate the user's personal channel...
          */
-       Broadcast::channel('presence', function ($user) {
-         return ['id' => $user->id];
-       });
+        Broadcast::channel('presence', function ($user) {
+            return ['id' => $user->id];
+        });
     }
 }
