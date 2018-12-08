@@ -16,6 +16,7 @@ exports.init = function(){
       editSemester: editSemester,
       saveSemester: saveSemester,
       deleteSemester: deleteSemester,
+      setSummer: setSummer,
       dropSemester: dropSemester,
       dropCourse: dropCourse,
       editCourse: editCourse,
@@ -142,6 +143,22 @@ var deleteSemester = function(event){
         site.displayMessage("AJAX Error", "danger");
       });
   }
+}
+
+var setSummer = function(event) {
+
+    var id = $('#id').val();
+    var semid = $(event.currentTarget).data('id');
+    var data = {
+      id: semid,
+    };
+    window.axios.post('/flowcharts/semesters/' + id + '/setsummer', data).catch(function(error){
+      site.displayMessage(error, "Danger");
+    });
+    //Call refresh here.
+
+
+
 }
 
 var addSemester = function(){

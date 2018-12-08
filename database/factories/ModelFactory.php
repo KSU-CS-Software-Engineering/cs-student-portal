@@ -4,6 +4,12 @@ use App\Models\User;
 use App\Models\Student;
 use App\Models\Advisor;
 use App\Models\Department;
+use App\Models\Completedcourse;
+use App\Models\Degreerequirement;
+use App\Models\Plan;
+use App\Models\Degreeprogram;
+use App\Models\Planrequirement;
+use App\Models\Semester;
 /*
 |--------------------------------------------------------------------------
 | Model Factories
@@ -59,5 +65,56 @@ $factory->define(Department::class, function (Faker\Generator $faker) {
         'phone' => $faker->phoneNumber,
         'email' => $faker->email,
         'office' => $faker->secondaryAddress,
+    ];
+});
+
+//This is used to test that the proper courses have been completed.
+//It takes $params that is the name of the class. This is then used to compare to Degreerequirement->course_name
+$factory->define(Completedcourse::class, function (Faker\Generator $faker, $params) {
+    return [
+        'name' => $params['name'],
+        'student_id' => $params['student_id']
+    ];
+});
+
+$factory->define(Degreerequirement::class, function(Faker\Generator $faker, $params) {
+    return [
+        'degreeprogram_id' => $params['degreeprogram_id'],
+        'course_name' => $params['course_name'],
+        'electivelist_id' => $params['electivelist_id'],
+        'semester' => $params['semester'],
+        'ordering' => $params['ordering']
+    ];
+});
+
+$factory->define(Plan::class, function(Faker\Generator $faker) {
+    return [
+        'degreeprogram_id'=> factory(Degreeprogram::class)->create()->id,
+        'student_id'=> factory(student::class)->create()->id
+    ];
+});
+
+$factory->define(Degreeprogram::class, function(Faker\Generator $faker) {
+    return [
+        //'id' => 2
+        'id' => $faker->randomDigit + 100
+    ];
+});
+
+$factory->define(Planrequirement::class, function(Faker\Generator $faker, $params) {
+    return [
+        'plan_id' => $params['plan_id'],
+        'course_name' => $params['course_name'],
+        'electivelist_id' => $params['electivelist_id'],
+        'semester_id' => $params['semester_id'],
+        'ordering' => $params['ordering']
+    ];
+});
+
+$factory->define(Semester::class, function(Faker\Generator $faker, $params) {
+    return [
+        'id' => $params['id'] + 100,
+        'ordering' => $params['ordering'],
+        'plan_id' => $params['plan_id']
     ];
 });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Rules\VerifySemester;
 use Auth;
 use Illuminate\Http\Request;
 
@@ -19,22 +20,26 @@ use App\Models\Plan;
 use App\Models\Semester;
 use App\Models\Planrequirement;
 use App\Models\Degreeprogram;
+//This is my dependency that I've added.
+use App\Rules\VerifyFourYearPlan;
+use App\scrapers\KSUCourseScraper;
 
 class FlowchartsController extends Controller
 {
+
 
   public function __construct()
 	{
 		$this->middleware('cas');
 		$this->middleware('update_profile');
-    $this->fractal = new Manager();
+        $this->fractal = new Manager();
 	}
     /**
      * Responds to requests to GET /courses
      */
-    public function getIndex($id = -1)
-    {
-        $user = Auth::user();
+    public function getIndex($id = -1){
+        $user = Auth::user(); //I think this gets the user in question.
+
 
         if($id < 0){
           //no particular student requested
@@ -65,14 +70,27 @@ class FlowchartsController extends Controller
     }
 
     public function getFlowchart($id = -1){
-      if($id < 0){
+
+
+        if($id < 0){
         //no ID provided - redirect back to index
         return redirect('flowcharts/index');
       }else{
-        $user = Auth::user();
-        $plan = Plan::findOrFail($id);
+
+
+
+
+          $user = Auth::user();
+          $plan = Plan::findOrFail($id);
+          $planreqs = self::CheckGradPlanRules($plan);
+          $CISreqs = self::CheckCISReqRules($plan);
+          $hours = self::CheckHoursRules($plan);
+          $prereqs = self::CheckPreReqRules($plan);
+          $courseplacement = self::CheckCoursePlacement($plan);
+          $kstate = self::CheckKState8($plan); //Should all of these change to be the UpdatedView()?
+
         if($user->is_advisor){
-          return view('flowcharts/flowchart')->with('plan', $plan);
+          return view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs)->with('courseplacement',$courseplacement)->with('kstate',$kstate);
         }else{
           if($plan->student_id == $user->student->id){
             return view('flowcharts/flowchart')->with('plan', $plan);
@@ -111,12 +129,17 @@ class FlowchartsController extends Controller
     }
 
     public function saveNewFlowchart($id = -1, Request $request){
+      //Rules processing here.
+      //getUserCourses();from completed courses.
+      //CheckRules():
+      //Send the output of CheckRules to here.
       if($id < 0){
         abort(404);
       }else{
         $user = Auth::user();
         $plan = new Plan();
         $data = $request->all();
+
         if($user->is_advisor){
           $student = Student::findOrFail($id);
           $data['student_id'] = $student->id;
@@ -125,9 +148,16 @@ class FlowchartsController extends Controller
         }
 
         if($plan->validate($data)){
+          //var_dump($data);
+          //Check user classses
+          //$userClasses = $user->GetClasses(); return as JSON.
+          //Take user class data, check against rules
+          //$userRulesResults = $plan->checkRules($userClasses); TAKE JSON, FORCE THROUGH RULES
+          //Have the plan know whether or not degree requirements are met.
           $plan->fill($data);
           $plan->save();
           $plan->fillRequirementsFromDegree();
+          //Check taken against requirements.
           $request->session()->put('message', trans('messages.item_saved'));
           $request->session()->put('type', 'success');
           return response()->json(url('flowcharts/view/' . $plan->id));
@@ -174,6 +204,7 @@ class FlowchartsController extends Controller
       }else{
         $user = Auth::user();
         $plan = Plan::findOrFail($id);
+
         if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           $degreeprograms = Degreeprogram::orderBy('name', 'asc')->get();
           $degreeprogramUnknown = new Degreeprogram();
@@ -200,11 +231,12 @@ class FlowchartsController extends Controller
         $user = Auth::user();
         $plan = Plan::findOrFail($id);
         $data = $request->all();
+
         if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           $data['student_id'] = $plan->student_id;
           if($plan->validate($data)){
             $plan->fill($data);
-            $plan->save();
+            $plan->save(); //This writes to the DB. do the rules checking before this.
             return response()->json(trans('messages.item_saved'));
           }else{
             return response()->json($plan->errors(), 422);
@@ -304,7 +336,10 @@ class FlowchartsController extends Controller
       }else{
         $user = Auth::user();
         $plan = Plan::with('semesters')->findOrFail($id);
-        if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
+
+          $rules = $this->UpdatedView($plan);
+
+          if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           $semester = Semester::findOrFail($request->input('id'));
           if($semester->plan_id == $id){
             $semester->delete();
@@ -333,6 +368,7 @@ class FlowchartsController extends Controller
           $semester->name = "New Semester";
           $semester->ordering = $plan->semesters->max('ordering') + 1;
           $semester->save();
+          $plan->DynamicallyRenameSemesters();
           $resource = new Item($semester, function($semester) {
               return[
                   'id' => $semester->id,
@@ -350,6 +386,52 @@ class FlowchartsController extends Controller
       }
     }
 
+    public function postSemesterSetSummer(Request $request, $id = -1) {
+      //What if I change this to be an alert, where the user can press Summer or not.
+      //I think this may work.
+      if($id < 0) {
+        abort(404);
+      }
+      else {
+          $user = Auth::user();
+          $plan = Plan::with('semesters')->findOrFail($id);
+          $semester = Semester::findOrFail($request->input('id'));
+
+          $lastSemester = Semester::where('plan_id', $plan->id)->orderby('ordering', 'DESC')->first();
+          $seasonYear = explode(' ', $lastSemester->name);
+          $year = $seasonYear[1];
+          if($seasonYear[0] == "Fall") {
+            $seasonYear[1]++;
+          }
+
+          $planreqs = self::CheckGradPlanRules($plan);
+          $CISreqs = self::CheckCISReqRules($plan);
+          $hours = self::CheckHoursRules($plan);
+          $prereqs = self::CheckPreReqRules($plan);
+          $courseplacement = self::CheckCoursePlacement($plan);
+
+
+
+
+          if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
+
+            if($semester->plan_id == $id){
+              $semester->name = "Summer " . $year;// . $semester->year();
+              $semester->save();
+            //  $window.location.reload();
+          return; //view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs)->with('courseplacement',$courseplacement);
+            }
+            else{
+              //semester id does not match plan id given
+              abort(404);
+            }
+          }
+          else {
+            abort(404);
+          }
+      }
+    }
+
     public function postSemesterMove(Request $request, $id = -1){
       if($id < 0){
         //id not found
@@ -357,7 +439,10 @@ class FlowchartsController extends Controller
       }else{
         $user = Auth::user();
         $plan = Plan::with('semesters')->findOrFail($id);
-        if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
+
+          $rules = $this->UpdatedView($plan);
+
+          if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           $semesters = $plan->semesters;
 
           $ordering = collect($request->input('ordering'));
@@ -382,7 +467,7 @@ class FlowchartsController extends Controller
               $semester->save();
             }
           }
-
+          $plan->DynamicallyRenameSemesters();
           return response()->json(trans('messages.item_saved'));
         }else{
           //cannot edit a plan if you aren't the student or an advisor
@@ -392,12 +477,19 @@ class FlowchartsController extends Controller
     }
 
     public function postCourseMove(Request $request, $id = -1){
+
+
       if($id < 0){
         //id not found
         abort(404);
       }else{
         $user = Auth::user();
         $plan = Plan::findOrFail($id);
+
+          $rules = $this->UpdatedView($plan);
+
+
+        $semester = Semester::findOrFail($request->input('semester_id'));
         if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
           //move requirement to new semester
           $requirement_moved = Planrequirement::findOrFail($request->input('course_id'));
@@ -406,7 +498,7 @@ class FlowchartsController extends Controller
             abort(404);
           }
 
-          $semester = Semester::findOrFail($request->input('semester_id'));
+
           if($semester->plan_id != $plan->id){
             //can't move course to semester not on the plan;
             abort(404);
@@ -461,7 +553,11 @@ class FlowchartsController extends Controller
       }else{
         $user = Auth::user();
         $plan = Plan::findOrFail($id);
-        if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
+
+          $rules = $this->UpdatedView($plan);
+
+
+          if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
 
           if($request->has('planrequirement_id')){
             $planrequirement = Planrequirement::findOrFail($request->input('planrequirement_id'));
@@ -561,7 +657,10 @@ class FlowchartsController extends Controller
       }else{
         $user = Auth::user();
         $plan = Plan::findOrFail($id);
-        if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
+
+          $rules = $this->UpdatedView($plan);
+
+          if($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)){
 
           if($request->has('planrequirement_id')){
             $planrequirement = Planrequirement::findOrFail($request->input('planrequirement_id'));
@@ -585,5 +684,88 @@ class FlowchartsController extends Controller
         }
       }
     }
+
+    public static function CheckCISReqRules(Plan $plan) {
+
+        $firstArrs = [];
+        //Set the variables for the rules case
+        $rules = new VerifyFourYearPlan();
+
+        //Check the first one.
+        $firstArrs = $rules->CheckCISRequirementsPlan($plan);
+
+        return $firstArrs;
+
+
+    }
+
+    public static function CheckGradPlanRules(Plan $plan){
+
+        //Check the second one.
+        //This handles graduation ability, not validity of the plan, so no flag.
+        $planreqs = [];
+        $rules = new VerifyFourYearPlan();
+        $planreqs = $rules->CheckGraduationValidityPlan($plan);
+
+        return $planreqs;
+
+    }
+
+    public static function CheckGradRequirementsRules(Plan $plan){
+
+        //Check the third one.
+        //This handles graduation ability, not validity of the plan, so no fla
+        $array = [];
+        $rules = new VerifyFourYearPlan();
+        $array = $rules->CheckGraduationValidityDegreeRequirements($plan);
+
+    }
+
+    public static function CheckHoursRules(Plan $plan) {
+        $rules = new VerifySemester();
+
+        //returns true if correct number of hours and false if not
+        //if not correct number of hours displays an alert
+        $correcthours = $rules->CheckHours($plan);
+        return $correcthours;
+    }
+
+    public static function CheckPreReqRules(Plan $plan) {
+
+        $rules = new VerifySemester();
+        //returns an array with the missing prereqs or empty if all good
+        $prereqs = $rules->CheckPreReqs($plan);
+        return $prereqs;
+
+    }
+
+    public static function CheckCoursePlacement(Plan $plan){
+
+
+        $rules = new VerifySemester();
+        $courseplacement = $rules->CheckCoursePlacement($plan);
+        return $courseplacement;
+
+    }
+
+    public static function CheckKState8(Plan $plan) {
+        $rules = new VerifyFourYearPlan();
+        $kstate8 = $rules->CheckKstate8($plan);
+        return $kstate8;
+    }
+
+    public function UpdatedView(Plan $plan){
+
+        $planreqs = self::CheckGradPlanRules($plan);
+        $CISreqs = self::CheckCISReqRules($plan);
+        $hours = self::CheckHoursRules($plan);
+        $prereqs = self::CheckPreReqRules($plan);
+        $courseplacement = self::CheckCoursePlacement($plan);
+        $kstate = self::CheckKState8($plan);
+
+        return view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs)->with('courseplacement',$courseplacement)->with('kstate',$kstate);
+
+    }
+
 
 }

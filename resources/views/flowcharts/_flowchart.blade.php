@@ -8,7 +8,8 @@
   			<h3><a href="{{ url('flowcharts/view/' . $plan->id)}}">{{ $plan->name }}</a><br><small>{{ $plan->degreeprogram->name }}</small></h3>
   		</div>
 			<b>Description: </b>{{ $plan->description }}<br>
-			<b>Starts: </b>{{ $plan->starttext }}<br></p>
+			<b>Starts: </b>{{ $plan->starttext }}<br>
+			<b>Test: </b></p>
 		</div>
 	@else
 		<div class="col-md-8">
@@ -19,7 +20,8 @@
   			<h3>{{ $plan->student->name }} - {{ $plan->name }} <br><small>{{ $plan->degreeprogram->name }}</small></h3>
   		</div>
 			<b>Description: </b>{{ $plan->description }}<br>
-			<b>Starts: </b>{{ $plan->starttext }}<br></p>
+			<b>Starts: </b>{{ $plan->starttext }}<br>
+			<b>Test: </b></p>
 			<p>
 				<a href="{{ url('flowcharts/' . $plan->student_id)}}" class="btn btn-primary"><i class="fa fa-list"></i> Select a Different Flowchart</a>
 				<button class="btn btn-default" id="reset" title="Refresh Flowchart"><i class="fa fa-refresh"></i></button>
