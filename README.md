@@ -1,7 +1,9 @@
 # CS Student Portal
 Advising and Flowchart System for K-State Engineering
 
-See [DEVELOPING.md](./DEVELOPING.md) for instructions on configuring the development environment
+See [DEVELOPING.md](./DEVELOPING.md) for instructions on configuring the development environment.
+
+For code style guide see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 # CIS 642/643 team project
 
