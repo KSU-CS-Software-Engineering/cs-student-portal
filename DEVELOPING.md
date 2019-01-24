@@ -82,6 +82,8 @@ This section will walk you through setting up the required database for the CS S
 
 4. Run `php artisan key:generate` to generate a new random APP_KEY
 5. Run `php artisan migrate --seed` to migrate and seed the database tables
+6. Run `php artisan deploy:post` to fill other data to the tables
+
 
 ### Web server configuration
 
@@ -107,9 +109,20 @@ Then, follow the instructions below for your web server.
 4. Restart the web server `sudo systemctl restart nginx`
 
 
+## IDE
+
+The recommended IDE is PHP Storm, but also code editors like VS Code or Atom can be used.
+
+For better PHP Storm auto-completion run the following three commands in the project root
+
+    php artisan ide-helper:generate
+    php artisan ide-helper:model
+    php artisan ide-helper:meta
+
+
 ## Unit Testing
 
-Some very minor unit tests are available. To run the, execute `./vendor/bin/phpunit` in the main directory. Currently Laravel 5.1 only supports an older version of phpunit, so using the one in the vendor folder is best
+Some very minor unit tests are available. To run the tests, execute `./vendor/bin/phpunit` in the main directory.
 
 
 ## Deployment
