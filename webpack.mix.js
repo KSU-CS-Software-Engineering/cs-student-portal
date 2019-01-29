@@ -64,6 +64,10 @@ mix.js('resources/assets/js/app.js', 'public/js')
         'vuedraggable'
     ]);
 
+mix.js('resources/assets/js/pages/scheduler.js', 'public/js');
+
+mix.sass('resources/assets/sass/schedule.scss', 'public/css');
+
 mix.copy('node_modules/ion-sound/sounds/door_bell*', 'public/sounds');
 
 if (mix.inProduction()) {
