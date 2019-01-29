@@ -72,8 +72,8 @@ This section will walk you through setting up the required database for the CS S
        --end
 
     to create user and database for the CS Student Portal
-3. Copy `.env.example` to `.env`
-4. Modify the settings in `.env` as needed
+3. Create a copy of file `.env.example` named `.env`
+4. Modify the settings in `.env` file as needed
     1. Database settings
         
            DB_DATABASE=cssp
