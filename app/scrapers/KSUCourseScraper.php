@@ -30,6 +30,8 @@ class KSUCourseScraper
                     $sections = [];
                     $sibling = $header->nextSibling;
                     while ($sibling !== null && $sibling->classList->contains('section')) {
+                        $sectionSection = $sibling->firstChild->childNodes[0]->textContent;
+                        $sectionType = $sibling->firstChild->childNodes[1]->textContent;
                         $sectionDays = $sibling->firstChild->childNodes[5]->textContent;
                         $sectionHours = $sibling->firstChild->childNodes[6]->textContent;
                         if ($sibling->firstChild->childNodes[5]->hasAttribute('colspan')) {
