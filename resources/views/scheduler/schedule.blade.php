@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div id ="Schedule">
+<div>
 
 
 
@@ -14,6 +14,13 @@
 </div>
 
 
+
+<div>
+
+
+
+
+</div>
 
 
 

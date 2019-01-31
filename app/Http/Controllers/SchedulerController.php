@@ -10,18 +10,18 @@ class SchedulerController extends Controller
 
     public function getData()
     {
-
-        $scraper = new KSUCourseScraper();
-        $courseInfos = $scraper->GetClassTimes();
-
-        $course = [];
-
-        foreach ($courseInfos as $courseInfo) {
-
-        }
-
-
-        return view('scheduler.schedule')->with('course', $course);
+//
+//        $scraper = new KSUCourseScraper();
+//        $courseInfos = $scraper->GetClassTimes();
+//
+//        $course = [];
+//
+//        foreach ($courseInfos as $courseInfo) {
+//
+//        }
+//
+//
+//
     }
 
 
@@ -29,6 +29,8 @@ class SchedulerController extends Controller
     {
 
 
+
+        return view('scheduler.schedule');
     }
 
  }
