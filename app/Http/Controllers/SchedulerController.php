@@ -27,13 +27,7 @@ class SchedulerController extends Controller
 
     public function show()
     {
-
-
-
         return view('scheduler.schedule');
     }
 
  }
-
-
-

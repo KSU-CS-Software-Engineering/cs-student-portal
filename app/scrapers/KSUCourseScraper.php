@@ -18,7 +18,7 @@ class KSUCourseScraper
         $count = 0;
 
         foreach($addresses as $address) {
-
+            //This should be changed to be dynamic..
             $semester = 'spring2019';
             $url = $this->BASE_URL . $semester . '/' . $address->getAttribute('href');
             $dom->loadHTMLFile($url);
