@@ -125,6 +125,15 @@ class Planrequirement extends Validatable
         return true;
     }
 
+    public function validateEdit(array $data, array $params)
+    {
+        if ($this->degreerequirement()->exists()) {
+            return $this->defaultEditValidate($data, $params);
+        } else {
+            return $this->customEditValidate($data, $params);
+        }
+    }
+
     public function validateElectiveCourse()
     {
         if ($this->electivelist_id != null) {

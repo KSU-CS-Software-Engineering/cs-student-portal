@@ -43,10 +43,4 @@ export function init() {
     document.getElementById("add-sem").addEventListener("click", () => eventDispatcher.$emit("addSemester"));
     document.getElementById("add-course").addEventListener("click", () => eventDispatcher.$emit("createCourse"));
 
-    site.ajaxautocomplete("electivelist_id", "/electivelists/electivelistfeed");
-
-    // site.ajaxautocompletelock("course_id", "/courses/coursefeed");
-
-    let student_id = document.getElementById("student_id").value;
-    // site.ajaxautocompletelock("completedcourse_id", `/completedcourses/completedcoursefeed/${student_id}`);
 }
