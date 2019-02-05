@@ -69,7 +69,6 @@ Route::post('flowcharts/semesters/{id}/delete', 'FlowchartsController@postSemest
 Route::post('flowcharts/semesters/{id}/add', 'FlowchartsController@postSemesterAdd');
 Route::post('flowcharts/semesters/{id}/move', 'FlowchartsController@postSemesterMove');
 Route::post('flowcharts/semesters/{id}/setsummer', 'FlowchartsController@postSemesterSetSummer');
-Route::post('flowcharts/data/{id}/move', 'FlowchartsController@postCourseMove');
 Route::post('flowcharts/data/{id}/save', 'FlowchartsController@postCourseSave');
 Route::post('flowcharts/data/{id}/delete', 'FlowchartsController@postCourseDelete');
 
@@ -79,6 +78,7 @@ Route::patch('flowcharts/{plan}/semesters', 'FlowchartsController@moveSemester')
 Route::patch('flowcharts/{plan}/semesters/{semester}', 'FlowchartsController@renameSemester');
 Route::delete('flowcharts/{plan}/semesters/{semester}', 'FlowchartsController@deleteSemester');
 Route::get('flowcharts/{plan}/courses', 'FlowchartsController@getCourses');
+Route::patch('flowcharts/{plan}/requirements/{requirement}', 'FlowchartsController@moveRequirement');
 
 /*
  * Routes for the AdvisingController

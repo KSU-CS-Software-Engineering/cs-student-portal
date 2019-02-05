@@ -512,73 +512,41 @@ class FlowchartsController extends Controller
         return response()->json(trans('messages.item_saved'));
     }
 
-    public function postCourseMove(Request $request, $id = -1)
+    public function moveRequirement(Request $request, Plan $plan, Planrequirement $requirement)
     {
-        if ($id < 0) {
-            //id not found
-            abort(404);
-        }
-
-        $plan = Plan::findOrFail($id);
-
-        return $this->moveCourse($request, $plan);
-    }
-
-    public function moveCourse(Request $request, Plan $plan) {
         $user = Auth::user();
         if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
             //cannot edit a plan if you aren't the student or an advisor
             abort(404);
         }
 
-        $rules = $this->UpdatedView($plan);
-
         //move requirement to new semester
-        $requirement_moved = Planrequirement::findOrFail($request->input('course_id'));
-        if ($requirement_moved->plan_id != $plan->id) {
+        if ($requirement->plan_id !== $plan->id) {
             //can't move course not on the plan;
             abort(404);
         }
 
-        $semester = Semester::findOrFail($request->input('semester_id'));
-        if ($semester->plan_id != $plan->id) {
+        $semester = Semester::findOrFail($request->input('semesterId'));
+        if ($semester->plan_id !== $plan->id) {
             //can't move course to semester not on the plan;
             abort(404);
         }
 
         //move requirement to new semester
-        if ($requirement_moved->semester_id != $semester->id) {
-            $maxOrder = $semester->requirements->max('ordering') + 1;
-            $requirement_moved->semester_id = $semester->id;
-            $requirement_moved->ordering = $maxOrder;
-            $requirement_moved->save();
+        if ($requirement->semester_id !== $semester->id) {
+            $oldSemester = $requirement->semester;
+            $maxOrder = $semester->requirements->count();
+            $requirement->semester_id = $semester->id;
+            $requirement->ordering = $maxOrder;
+            $requirement->save();
+            $oldSemester->repairRequirementsOrder();
         }
 
-        //get all requirements for that semester to reorder
-        $requirements = $semester->fresh()->requirements;
+        $newOrder = collect($request->input('order'));
 
-        $ordering = collect($request->input('ordering'));
+        $semester->reorderRequirements($newOrder);
 
-        if ($requirements->count() != $ordering->count()) {
-            abort(404);
-        }
-
-        $maxOrder = $requirements->max('ordering') + 1;
-
-        foreach ($ordering as $key => $order) {
-            $requirement = $requirements->where('id', $order['id'])->first();
-            if ($requirement->ordering != $key) {
-                $requirement->ordering = $key + $maxOrder;
-                $requirement->save();
-            }
-        }
-
-        foreach ($requirements as $requirement) {
-            if ($requirement->ordering >= $maxOrder) {
-                $requirement->ordering = $requirement->ordering - $maxOrder;
-                $requirement->save();
-            }
-        }
+        $rules = $this->UpdatedView($plan);
 
         return response()->json(trans('messages.item_saved'));
     }
