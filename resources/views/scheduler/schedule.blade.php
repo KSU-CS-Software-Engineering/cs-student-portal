@@ -4,27 +4,7 @@
 
 @section('content')
 
-<div>
-
-
-
-
-
-
-</div>
-
-
-
-<div>
-
-
-
-
-</div>
-
-
-
-
+    <div id="schedule" class="schedule"> </div>
 
 @endsection
 

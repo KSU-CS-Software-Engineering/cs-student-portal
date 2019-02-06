@@ -238,6 +238,13 @@ let App = {
             }
         },
 
+        SchedulerController: {
+            show: function () {
+                var schedule = require("./pages/scheduler");
+                schedule.init();
+            }
+        }
+
     },
 
     //Function that is called by the page at load. Defined in resources/views/includes/scripts.blade.php
