@@ -14,6 +14,7 @@ class CourseSection extends Model {
     //Class Faculty
     //Course - I think that I want to try to get this to match up with exisiting Course objects.
                 //This would allow for more functionality down the road.
+    //Schedule_id
     public function course() {
         return $this->belongsTo('App\Models\Course');
     }

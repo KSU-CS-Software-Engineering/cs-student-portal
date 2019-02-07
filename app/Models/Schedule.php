@@ -9,6 +9,9 @@ class Schedule extends Model {
     //SemesterId
     //StudentId?
 
+    
+
+
     //This will allow for the Schedule to access the scheduled class, and the semester that it is scheduled for.
     //Would we need to have a StudentId?. I guess it would depend on how the rest of this is implemented.
     //If there are ways to ensure that only the correct schedules are shown then it will be fine.
