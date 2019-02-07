@@ -28,6 +28,7 @@
 				<button class="btn btn-success" id="add-sem"><i class="fa fa-plus"></i> Add Semester</button>
 				<button class="btn btn-info" id="add-course"><i class="fa fa-plus"></i> Add Course</button>
 				<a href="{{ url('flowcharts/edit/' . $plan->id)}}" class="btn btn-warning"><i class="fa fa-pencil"></i> Edit Plan</a>
+				<a href="{{url('schedule')  }}" class="btn btn-primary" > Go to Scheduler</a> {{--npm run watch for editing--}}
 			</p>
 		</div>
 	@endif
