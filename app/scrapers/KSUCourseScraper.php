@@ -31,6 +31,7 @@ class KSUCourseScraper
                 //Each one of these $headers represent a class while the inner loop represents the different sections
                 foreach ($headers as $header) {
                     $sections = [];
+                    var_dump($header->childNodes);
                     $courseSlug = $header->firstChild->getAttribute('id');
                     $sibling = $header->nextSibling;
                     //Find the matching course object. Throw an exception if it can't be found since we always want one.
@@ -53,12 +54,12 @@ class KSUCourseScraper
                         // $sectionInstructor = str_replace("&nbsp;", '', $sibling->firstChild->childNodes[9]->textContent);
 
                         if(in_array($courseSlug, $badlyFormattedClasses)) {
-                          echo "here";
-                          break;
+                          echo "here\n";
+                          //break;
                         }
 
                         else {
-                          echo "here2";
+                          echo "here2\n";
                           var_dump($courseSlug);
                           var_dump($sibling->firstChild->childNodes[0]->textContent);
                           var_dump($sibling->firstChild->childNodes[1]->textContent);
@@ -85,8 +86,9 @@ class KSUCourseScraper
                               'instructor' => $sectionInstructor,//$sibling->firstChild->childNodes[9]->textContent, //The course instructor
                               'course' => $course
                           ];
-                          $sibling = $sibling->nextSibling;
+
                         }
+                        $sibling = $sibling->nextSibling;
                     }
                 }
             }
