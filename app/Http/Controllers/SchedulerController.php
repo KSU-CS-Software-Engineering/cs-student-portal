@@ -6,10 +6,9 @@ use App\scrapers\KSUCourseScraper;
 
 class SchedulerController extends Controller
 {
-
-
     public function getData()
     {
+      //
 //
 //        $scraper = new KSUCourseScraper();
 //        $courseInfos = $scraper->GetClassTimes();
@@ -27,13 +26,7 @@ class SchedulerController extends Controller
 
     public function show()
     {
-
-
-
         return view('scheduler.schedule');
     }
 
  }
-
-
-
