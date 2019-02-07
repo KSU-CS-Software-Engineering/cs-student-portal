@@ -23,7 +23,7 @@ class KSUCourseScraper
             //This should be changed to be dynamic in some way, it will need to be changed often.
             $semester = 'spring2019';
             $url = $this->BASE_URL . $semester . '/' . $address->getAttribute('href');
-            $dom->loadHTMLFile($url);
+            $dom->loadHTMLFile($url, HTML5DOMDocument::ALLOW_DUPLICATE_IDS);
 
             if (!empty($dom)) {
 
@@ -31,11 +31,12 @@ class KSUCourseScraper
                 //Each one of these $headers represent a class while the inner loop represents the different sections
                 foreach ($headers as $header) {
                     $sections = [];
-                    var_dump($header->childNodes);
+
                     $courseSlug = $header->firstChild->getAttribute('id');
                     $sibling = $header->nextSibling;
                     //Find the matching course object. Throw an exception if it can't be found since we always want one.
                     $course = Course::where('slug', $courseSlug)->first();
+                    var_dump($header->firstChild->childNodes[0]->textContent);
 
                     //This part loops through all of the classes for that particular area.
                     //These siblings and childNodes are the indivdual elements in the table.
@@ -44,7 +45,6 @@ class KSUCourseScraper
                         if ($sibling->firstChild->childNodes[5]->hasAttribute('colspan')) {
                             $sectionHours = ''; //What does this do?
                         }
-
                         // $sectionSection = str_replace("&nbsp;", '', $sibling->firstChild->childNodes[0]->textContent);
                         // $sectionType = str_replace("&nbsp;", '', $sibling->firstChild->childNodes[1]->textContent);
                         // $sectionUnits = str_replace("&nbsp;", '', $sibling->firstChild->childNodes[3]->textContent);
@@ -55,7 +55,7 @@ class KSUCourseScraper
 
                         if(in_array($courseSlug, $badlyFormattedClasses)) {
                           echo "here\n";
-                          //break;
+                          break;
                         }
 
                         else {
