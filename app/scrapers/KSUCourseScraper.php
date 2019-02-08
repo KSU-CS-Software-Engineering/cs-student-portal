@@ -24,6 +24,7 @@ class KSUCourseScraper
             $semester = 'spring2019';
             $url = $this->BASE_URL . $semester . '/' . $address->getAttribute('href');
             $dom->loadHTMLFile($url, HTML5DOMDocument::ALLOW_DUPLICATE_IDS);
+            //$dom->loadHTMLFile($url);
 
             if (!empty($dom)) {
 
