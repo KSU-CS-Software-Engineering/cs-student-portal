@@ -15,7 +15,7 @@
         "php": ">=7.0.0",
         "doctrine/dbal": "^2.5",
         "felixkiss/uniquewith-validator": "^3.1",
-        "ivopetkov/html5-dom-document-php": "dev-master",
+        "ivopetkov/html5-dom-document-php": "dev-master#5228fbbb5b763192ff03745178738053ee941a45",
         "laravel/framework": "5.4.*",
         "laravel/tinker": "~1.0",
         "league/fractal": "^0.12.0",
