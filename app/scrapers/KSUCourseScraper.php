@@ -5,14 +5,15 @@ namespace App\scrapers;
 use App\scrapers\KSUDepartmentScraper;
 use IvoPetkov\HTML5DOMDocument;
 use App\Models\Course;
+use IvoPetkov\HTML5DOMElement;
 
 class KSUCourseScraper
 {
     private $BASE_URL = 'https://courses.k-state.edu/';
+    private $NBSP5 = 'html5-dom-document-internal-entity1-nbsp-end';
 
     public function GetClassTimes()
     {
-        $badlyFormattedClasses = array("AGEC460", "AGEC713", "AGEC750", "AGEC770", "ASI561", "ASI561");
         $scraper = new KSUDepartmentScraper();
         $addresses = $scraper->GetAddresses();
         $dom = new HTML5DOMDocument();
@@ -31,65 +32,62 @@ class KSUCourseScraper
                 $headers = $dom->querySelectorAll('tbody.course-header');
                 //Each one of these $headers represent a class while the inner loop represents the different sections
                 foreach ($headers as $header) {
-                    $sections = [];
-
                     $courseSlug = $header->firstChild->getAttribute('id');
                     $sibling = $header->nextSibling;
+                    while (!($sibling instanceof HTML5DOMElement) && $sibling !== null) {
+                        $sibling = $sibling->nextSibling;
+                    }
                     //Find the matching course object. Throw an exception if it can't be found since we always want one.
                     $course = Course::where('slug', $courseSlug)->first();
-                    var_dump($header->firstChild->childNodes[0]->textContent);
 
                     //This part loops through all of the classes for that particular area.
                     //These siblings and childNodes are the indivdual elements in the table.
                     //The variable names match the name of the section on the site.
                     while ($sibling !== null && $sibling->classList->contains('section')) {
-                        if ($sibling->firstChild->childNodes[5]->hasAttribute('colspan')) {
-                            $sectionHours = ''; //What does this do?
+                        $sectionRow = $sibling->firstChild;
+                        $offset = 0;
+                        $daysEl = $sibling->firstChild->childNodes[5];
+                        if ($daysEl->hasAttribute('colspan')) {
+                            $offset = intval($daysEl->getAttribute('colspan')) - 1;
                         }
-                        // $sectionSection = str_replace("&nbsp;", '', $sibling->firstChild->childNodes[0]->textContent);
-                        // $sectionType = str_replace("&nbsp;", '', $sibling->firstChild->childNodes[1]->textContent);
-                        // $sectionUnits = str_replace("&nbsp;", '', $sibling->firstChild->childNodes[3]->textContent);
-                        // $sectionDays = str_replace("&nbsp;", '', $sibling->firstChild->childNodes[5]->textContent);
-                        // $sectionHours = str_replace("&nbsp;", '', $sibling->firstChild->childNodes[6]->textContent);
-                        // $sectionFacility = str_replace("&nbsp;", '', $sibling->firstChild->childNodes[7]->textContent);
-                        // $sectionInstructor = str_replace("&nbsp;", '', $sibling->firstChild->childNodes[9]->textContent);
-
-                        if(in_array($courseSlug, $badlyFormattedClasses)) {
-                          echo "here\n";
-                          break;
+                        $sectionSection = $sectionRow->childNodes[0]->textContent;
+                        $sectionType = $sectionRow->childNodes[1]->textContent;
+                        // $sectionNumber = $sectionRow->childNodes[2]->textContent;
+                        $sectionUnits = $sectionRow->childNodes[3]->textContent;
+                        // $sectionBasis = $sectionRow->childNodes[4]->textContent;
+                        $sectionDays = str_replace($this->NBSP5, ' ', $sectionRow->childNodes[5]->textContent);
+                        if ($offset == 1) {
+                            $sectionHours = null;
+                            $sectionFacility = $sectionRow->childNodes[7 - $offset]->textContent;
+                        } elseif ($offset == 2) {
+                            $sectionHours = null;
+                            $sectionFacility = null;
+                        } else {
+                            $sectionHours = str_replace($this->NBSP5, ' ', $sectionRow->childNodes[6]->textContent);
+                            $sectionFacility = $sectionRow->childNodes[7]->textContent;
                         }
+                        $sectionInstructor = $sectionRow->childNodes[9 - (int) $offset]->textContent;
+                        $courseId = $course == null ? null : $course->id;
 
-                        else {
-                          echo "here2\n";
-                          var_dump($courseSlug);
-                          var_dump($sibling->firstChild->childNodes[0]->textContent);
-                          var_dump($sibling->firstChild->childNodes[1]->textContent);
-                          var_dump($sibling->firstChild->childNodes[3]->textContent);
-                          var_dump($sibling->firstChild->childNodes[5]->textContent);
-                          var_dump($sibling->firstChild->childNodes[6]->textContent);
-                          var_dump($sibling->firstChild->childNodes[7]->textContent);
-                          var_dump($sibling->firstChild->childNodes[9]->textContent);
-                          $sectionSection = str_replace("&nbsp;", '', $sibling->firstChild->childNodes[0]->textContent);
-                          $sectionType = str_replace("&nbsp;", '', $sibling->firstChild->childNodes[1]->textContent);
-                          $sectionUnits = str_replace("&nbsp;", '', $sibling->firstChild->childNodes[3]->textContent);
-                          $sectionDays = str_replace("&nbsp;", '', $sibling->firstChild->childNodes[5]->textContent);
-                          $sectionHours = str_replace("&nbsp;", '', $sibling->firstChild->childNodes[6]->textContent);
-                          $sectionFacility = str_replace("&nbsp;", '', $sibling->firstChild->childNodes[7]->textContent);
-                          $sectionInstructor = str_replace("&nbsp;", '', $sibling->firstChild->childNodes[9]->textContent);
-                          $returnArray[] = [
-                              'course_number' => $courseSlug,
-                              'section' => $sectionSection,//$sibling->firstChild->childNodes[0]->textContent, //This may be slightly unclear. This is the section label as in A, B, C to distinguish the different sections in the class.
-                              'type' => $sectionType,//$sibling->firstChild->childNodes[1]->textContent, //This is means recitation, lecture etc. Not 100% sure of the format yet.
-                              'units' => $sectionUnits,//$sibling->firstChild->childNodes[3]->textContent, //This is the amount of credits it's worth
-                              'days' => $sectionDays,//$sibling->firstChild->childNodes[5]->textContent, //These are the days M,T,W,Th,F
-                              'hours' => $sectionHours,//$sibling->firstChild->childNodes[6]->textContent, //Hours of the class 12:30-1:20
-                              'facility' => $sectionFacility,//$sibling->firstChild->childNodes[7]->textContent, //This is the room
-                              'instructor' => $sectionInstructor,//$sibling->firstChild->childNodes[9]->textContent, //The course instructor
-                              'course' => $course
-                          ];
+                        $returnArray[] = [
+                            'courseNumber' => $courseSlug,
+                            'section' => $sectionSection,//$sibling->firstChild->childNodes[0]->textContent, //This may be slightly unclear. This is the section label as in A, B, C to distinguish the different sections in the class.
+                            // 'sectionNumber' => $sectionNumber,
+                            'type' => $sectionType,//$sibling->firstChild->childNodes[1]->textContent, //This is means recitation, lecture etc. Not 100% sure of the format yet.
+                            'units' => $sectionUnits,//$sibling->firstChild->childNodes[3]->textContent, //This is the amount of credits it's worth
+                            // 'basis' => $sectionBasis,
+                            'days' => $sectionDays,//$sibling->firstChild->childNodes[5]->textContent, //These are the days M,T,W,Th,F
+                            'hours' => $sectionHours,//$sibling->firstChild->childNodes[6]->textContent, //Hours of the class 12:30-1:20
+                            'facility' => $sectionFacility,//$sibling->firstChild->childNodes[7]->textContent, //This is the room
+                            'instructor' => $sectionInstructor,//$sibling->firstChild->childNodes[9]->textContent, //The course instructor
+                            'courseId' => $courseId,
+                        ];
 
-                        }
+                        // }
                         $sibling = $sibling->nextSibling;
+                        while (!($sibling instanceof HTML5DOMElement) && $sibling !== null) {
+                            $sibling = $sibling->nextSibling;
+                        }
                     }
                 }
             }
