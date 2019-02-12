@@ -22,7 +22,9 @@
 
     export default {
         name: "FormAutofill",
-        components: {FormAutofillLock},
+        components: {
+            FormAutofillLock
+        },
         props: {
             field: {required: true},
             label: {required: true},

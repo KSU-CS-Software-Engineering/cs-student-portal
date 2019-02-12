@@ -56,7 +56,6 @@
         components: {
             FormText,
             FormAutofill,
-            FormAutofillLock,
         },
         data() {
             return {
