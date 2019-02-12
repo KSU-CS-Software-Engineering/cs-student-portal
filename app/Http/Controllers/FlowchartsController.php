@@ -415,10 +415,12 @@ class FlowchartsController extends Controller
         $semester->name = "New Semester";
         $semester->ordering = $plan->semesters->max('ordering') + 1;
         $semester->save();
+        $plan->DynamicallyRenameSemesters();
         $resource = new Item($semester, function ($semester) {
             return [
                 'id' => $semester->id,
                 'name' => $semester->name,
+                'ordering' => $semester->ordering,
                 'courses' => [],
             ];
         });

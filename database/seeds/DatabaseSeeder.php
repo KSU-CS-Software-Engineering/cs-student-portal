@@ -13,7 +13,8 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         Model::unguard();
-
+        //Here call fill CLassScheduleTable
+        //$this->call(ScheduledClassTableSeeder::class);
         $this->call(UserTableSeeder::class);
         $this->call(AreasTableSeeder::class);
         $this->call(PrefixesTableSeeder::class);

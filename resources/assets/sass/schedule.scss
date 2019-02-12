@@ -1,0 +1,80 @@
+$clock-width: 50px;
+$schedule-day-h-padding: 0.5em;
+
+#schedule {
+  display: flex;
+  flex-direction: column;
+  margin: 24px 16px;
+  padding: 8px;
+  background-color: rgba(151, 160, 179, 0.05);
+}
+
+.schedule-header {
+  display: flex;
+  flex-direction: column;
+}
+
+.schedule-body {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  height: 800px;
+}
+
+.schedule-day-names {
+  display: flex;
+  flex-direction: row;
+  margin-left: $clock-width;
+}
+
+.schedule-clock {
+  display: flex;
+  flex-direction: column;
+  width: $clock-width;
+  height: 100%;
+}
+
+.schedule-courses {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  margin-left: $clock-width;
+}
+
+.schedule-day-name {
+  display: flex;
+  width: 20%;
+  justify-content: center;
+}
+
+.schedule-day {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 20%;
+  padding: 0 $schedule-day-h-padding;
+}
+
+.schedule-course {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  padding: $schedule-day-h-padding $schedule-day-h-padding;
+  background-color: #512888;
+  color: white;
+  margin: auto;
+  width: calc(100% - 2 * #{$schedule-day-h-padding});
+}
+
+.schedule-course:hover {
+  height: auto !important;
+}
+
+.schedule-hourLine {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  width: 100%;
+  color: #aaaaaa;
+}

@@ -48,6 +48,8 @@ Route::get('completedcourses/completedcoursefeed/{id}', 'CompletedcoursesControl
  * Routes for Scheduler controller
  */
 
+Route::get('schedule', 'SchedulerController@show');
+
 
 
 /*
