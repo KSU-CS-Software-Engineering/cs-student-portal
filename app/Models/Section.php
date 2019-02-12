@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CourseSection extends Model {
+class Section extends Model {
     //Class sections
     //Class type
     //Class name/slugline
