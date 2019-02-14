@@ -19,6 +19,7 @@
 
 <script>
     import FormAutofillLock from "./FormAutofillLock";
+    import "devbridge-autocomplete";
 
     export default {
         name: "FormAutofill",
