@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Collection;
+
 class Semester extends Validatable
 {
     protected $dates = ['created_at', 'updated_at'];
@@ -35,6 +37,42 @@ class Semester extends Validatable
     public function requirements()
     {
         return $this->hasMany('App\Models\Planrequirement');
+    }
+
+    public function repairRequirementsOrder()
+    {
+        $requirements = $this->fresh()->requirements->sortBy('ordering');
+
+        if ($requirements->last()->ordering + 1 === $requirements->count()) {
+            return;
+        }
+
+        foreach ($requirements as $order => $requirement) {
+            $requirement->ordering = $order;
+            $requirement->save();
+        }
+    }
+
+    public function reorderRequirements(Collection $newOrder)
+    {
+        //get all requirements for that semester to reorder
+        $requirements = $this->fresh()->requirements;
+
+        if ($requirements->count() !== $newOrder->count()) {
+            abort(404);
+        }
+
+        $offset = $requirements->count();
+
+        foreach ($newOrder as $key => $order) {
+            $requirement = $requirements->where('id', $order['id'])->first();
+            $requirement->ordering = $key + $offset;
+            $requirement->save();
+        }
+        foreach ($requirements as $requirement) {
+            $requirement->ordering -= $offset;
+            $requirement->save();
+        }
     }
 
 }

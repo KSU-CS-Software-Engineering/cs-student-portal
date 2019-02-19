@@ -18,7 +18,7 @@
                     </div>
                 </div>
             </div>
-            <draggable class="list-group" v-model="courses" :options="{group: 'courses', animation: 150}" @add="addCourse" @remove="removeCourse">
+            <draggable class="list-group" v-model="courses" :options="{group: 'courses', animation: 150}" @add="addCourse" @end="endDragging">
                 <flowchart-course v-for="course in courses" :key="course.id" :course-props="course" />
             </draggable>
         </div>
@@ -53,7 +53,7 @@
             deleteSemester: deleteSemester,
             setSummer: setSummer,
             addCourse: addCourse,
-            removeCourse: removeCourse,
+            endDragging: endDragging,
         },
     }
 
@@ -95,11 +95,36 @@
         //Call refresh here.
     }
 
-    function addCourse() {
+    function addCourse(event) {
+        let planId = document.getElementById("id").value;
 
+        let requirementId = this.courses[event.newIndex].id;
+
+        let data = {
+            requirementId: requirementId,
+            semesterId: this.id,
+            order: [],
+        };
+
+        for (let i = 0; i < this.courses.length; i++) {
+            data.order.push({
+                id: this.courses[i].id,
+                order: i,
+            });
+        }
+
+        axios.patch(`/flowcharts/${planId}/requirements/${requirementId}`, data)
+            .then((response) => {
+                // site.displayMessage(response.data, "success");
+            })
+            .catch((error) => {
+                site.displayMessage("AJAX Error", "danger");
+            });
     }
 
-    function removeCourse() {
-
+    function endDragging(event) {
+        if (event.from === event.to) {
+            this.addCourse(event);
+        }
     }
 </script>
