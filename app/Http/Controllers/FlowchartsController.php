@@ -72,33 +72,30 @@ class FlowchartsController extends Controller
         if ($id < 0) {
             //no ID provided - redirect back to index
             return redirect('flowcharts/index');
-        } else {
-            $user = Auth::user();
-            $plan = Plan::findOrFail($id);
-            $planreqs = self::CheckGradPlanRules($plan);
-            $CISreqs = self::CheckCISReqRules($plan);
-            $hours = self::CheckHoursRules($plan);
-            $prereqs = self::CheckPreReqRules($plan);
-            $courseplacement = self::CheckCoursePlacement($plan);
-            $kstate = self::CheckKState8($plan); //Should all of these change to be the UpdatedView()?
-
-            if ($user->is_advisor) {
-                return view('flowcharts/flowchart')
-                    ->with('plan', $plan)
-                    ->with('planreqs',$planreqs)
-                    ->with('CISreqs', $CISreqs)
-                    ->with('hours',$hours)
-                    ->with('prereqs',$prereqs)
-                    ->with('courseplacement',$courseplacement)
-                    ->with('kstate',$kstate);
-            } else {
-                if ($plan->student_id == $user->student->id) {
-                    return view('flowcharts/flowchart')->with('plan', $plan);
-                } else {
-                    abort(404);
-                }
-            }
         }
+
+        $user = Auth::user();
+        $plan = Plan::findOrFail($id);
+
+        if (!$user->is_advisor && $plan->student_id !== $user->student->id) {
+            abort(403);
+        }
+
+        $planreqs = self::CheckGradPlanRules($plan);
+        $CISreqs = self::CheckCISReqRules($plan);
+        $hours = self::CheckHoursRules($plan);
+        $prereqs = self::CheckPreReqRules($plan);
+        $courseplacement = self::CheckCoursePlacement($plan);
+        $kstate = self::CheckKState8($plan); // Should all of these change to be the UpdatedView()?
+
+        return view('flowcharts/flowchart')
+            ->with('plan', $plan)
+            ->with('planreqs',$planreqs)
+            ->with('CISreqs', $CISreqs)
+            ->with('hours',$hours)
+            ->with('prereqs',$prereqs)
+            ->with('courseplacement',$courseplacement)
+            ->with('kstate',$kstate);
     }
 
     public function newFlowchart($id = -1)
