@@ -1,7 +1,7 @@
 <template>
     <div class="schedule-course" :style="style">
         <p class="course-name">{{ course.name }}</p>
-        <p class="course-time">{{ formatTime(course.begin) }} - {{ formatTime(course.end) }}</p>
+        <p class="course-time">{{ layoutMethods.formatTime(course.begin) }} - {{ layoutMethods.formatTime(course.end) }}</p>
         <p class="course-location">{{ course.location }}</p>
     </div>
 </template>
@@ -18,16 +18,12 @@
             height: {
                 type: Number,
                 required: true
-            }
+            },
+            layoutMethods: {}
         },
         computed: {
             style: function () {
                 return `top: ${this.offset * 100}%; height: ${this.height * 100}%;`;
-            }
-        },
-        methods: {
-            formatTime: function (time) {
-                return `${Math.floor(time / 60)}:${time % 60}`;
             }
         }
     }
