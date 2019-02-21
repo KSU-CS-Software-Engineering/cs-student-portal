@@ -3,7 +3,7 @@
         <input type="hidden" :id="field" :value="value">
         <label class="control-label" :for="field">{{ label }}</label>
         <div class="input-group" aria-describedby="studentidhelp">
-            <div :id="addonId" class="input-group-addon" v-if="value !== null">Selected: ({{ value }}) {{ valueText }}</div>
+            <div :id="addonId" class="input-group-addon" v-if="value !== null">Selected: ({{ value }}) {{ valueText }})</div>
             <input type="text" class="form-control" :id="inputId" :aria-describedby="helpId" :disabled=disabled
                 :placeholder="placeholder" v-model="inputData">
             <form-autofill-lock v-if="withLock" :field="field" :locked="locked" @switchLock="switchLock" />
@@ -32,6 +32,7 @@
             valueText: null,
             disabled: false,
             placeholder: null,
+            electivelist_id: null,
             autocompleteUrl: null,
             withLock: false,
             locked: false,
@@ -54,12 +55,15 @@
         },
         mounted() {
             this.autocompleteInit();
+            console.log(this.autocompleteUrl);
+            console.log(this.electivelist_id);
         }
     }
 
     function autocompleteInit() {
+      //let self = this;
         $(`#${this.inputId}`).autocomplete({
-            serviceUrl: this.autocompleteUrl,
+            serviceUrl: this.autocompleteUrl + "?electivelist_id=" + this.electivelist_id,
             ajaxSettings: {
                 dataType: "json",
             },

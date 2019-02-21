@@ -9,7 +9,7 @@ class Schedule extends Model {
     //SemesterId
     //StudentId?
 
-    
+
 
 
     //This will allow for the Schedule to access the scheduled class, and the semester that it is scheduled for.
@@ -17,6 +17,10 @@ class Schedule extends Model {
     //If there are ways to ensure that only the correct schedules are shown then it will be fine.
     public function coursesections() {
         return $this->hasMany('App\Models\CourseSection');
+    }
+
+    public function semester() {
+      return $this->belongsTo('App\Models\Semester');
     }
 
 
