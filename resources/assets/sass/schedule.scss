@@ -1,12 +1,26 @@
 $clock-width: 50px;
 $schedule-day-h-padding: 0.5em;
 
+#schedule-root {
+  display: flex;
+  flex-direction: row;
+}
+
 #schedule {
   display: flex;
   flex-direction: column;
+  width: 80%;
   margin: 24px 16px;
   padding: 8px;
   background-color: rgba(151, 160, 179, 0.05);
+}
+
+#class-finder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 20%;
+  margin: 24px 16px;
 }
 
 .schedule-header {
@@ -44,7 +58,7 @@ $schedule-day-h-padding: 0.5em;
 
 .schedule-day-name {
   display: flex;
-  width: 20%;
+  width: calc(100%/7);
   justify-content: center;
 }
 
@@ -52,7 +66,7 @@ $schedule-day-h-padding: 0.5em;
   display: flex;
   flex-direction: column;
   position: relative;
-  width: 20%;
+  width: calc(100%/7);
   padding: 0 $schedule-day-h-padding;
 }
 
