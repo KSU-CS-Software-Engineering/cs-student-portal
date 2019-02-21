@@ -60,8 +60,8 @@ class CoursesController extends Controller
     public function getCoursefeed(Request $request)
     {
         $this->validate($request, [
-            'electivelist_name' => 'required|string',
             'query' => 'required|string',
+            'electiveListId' => 'integer',
         ]);
 
         $courses = Course::filterName($request->input('query'))->get();

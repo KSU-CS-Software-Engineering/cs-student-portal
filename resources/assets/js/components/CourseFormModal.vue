@@ -19,9 +19,9 @@
                         <form-text field="credits" label="Credits" v-model="course.credits" :disabled=!custom />
 
                         <form-text field="notes" label="Notes" v-model="course.notes" />
-                        <p>{{course.electivelist_id}}</p>
+
                         <form-autofill :with-lock="true" field="course_id" label="Catalog Match:" :value-text="course.course_name"
-                            placeholder="Enter Course" :locked=course.course_id_lock v-model="course.course_id" :electivelist_id="course.electivelist_id"
+                            placeholder="Enter Course" :locked=course.course_id_lock v-model="course.course_id" :elective-list-id="course.electivelist_id"
                             :autocomplete-url="coursesUrl" @selected="courseSelected" @switchLock=switchLockCourse />
 
                         <form-autofill :with-lock="true" field="completedcourse_id" label="Completed Course Match:"

@@ -33,10 +33,10 @@
             valueText: null,
             disabled: false,
             placeholder: null,
-            electivelist_id: null,
             autocompleteUrl: null,
             withLock: false,
             locked: false,
+            electiveListId: null,
         },
         data() {
             return {
@@ -56,17 +56,21 @@
         },
         mounted() {
             this.autocompleteInit();
-            console.log(this.autocompleteUrl);
-            console.log(this.electivelist_id);
         }
     }
 
     function autocompleteInit() {
-      //let self = this;
         $(`#${this.inputId}`).autocomplete({
-            serviceUrl: this.autocompleteUrl + "?electivelist_id=" + this.electivelist_id,
+            serviceUrl: this.autocompleteUrl,
             ajaxSettings: {
                 dataType: "json",
+            },
+            onSearchStart: (query) => {
+                if (this.electiveListId) {
+                    query.electiveListId = this.electiveListId;
+                } else {
+                    delete query.electiveListId;
+                }
             },
             minChars: 3,
             autoSelectFirst: true,
