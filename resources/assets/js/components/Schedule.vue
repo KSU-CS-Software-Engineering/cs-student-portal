@@ -103,7 +103,23 @@
                         }
                     ]
                 },
-                dummyAllClasses: [
+                allClasses: [
+                    // {
+                    //     name: course_name,
+                    //     times: [
+                    //         {
+                    //
+                    //             days: ,
+                    //             begin: ,
+                    //             end: ,
+                    //             location: ,
+                    //             teacher: ,
+                    //
+                    //         }
+                    //     ]
+                    //
+                    //
+                    // },
                     {
                         name: "CIS 643",
                         times: [
@@ -152,6 +168,8 @@
                         ]
                     }
                 ],
+
+
                 selectedCourse: null,
                 selectedCourses: [],
                 scheduleBegin: 7 * 60 + 30,
@@ -186,7 +204,7 @@
                 }
             },
             availableClasses: function () {
-                return this.dummyAllClasses;
+                return this.allClasses;
             }
         },
         methods: {
@@ -203,8 +221,36 @@
             },
             formatTime: function (time) {
                 return `${Math.floor(time / 60)}:${('0' + time % 60).slice(-2)}`;
-            }
+            },
+
+            getAllCourses: getAllCourses,
         }
+    }
+
+    //get course time info into allClasses array
+    function getAllCourses(){
+        axios.get(`/flowcharts/${this.id}/semesters`)
+            .then((response) => {
+                let coursesTimes = response.data;
+                for(let i =0; i < coursesTimes.length; i++){
+                    let courseTimes = coursesTimes[i];
+                    if(coursesTimes.hours !== ""){
+                        let hasTimes = [];
+                        hasTimes.push(courseTimes);
+                        return hasTimes;
+                    }
+
+
+
+
+                }
+
+
+
+            })
+            .catch((error) => {
+                site.handleError("get data", "", error);
+            });
     }
 </script>
 

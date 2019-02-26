@@ -122,4 +122,6 @@
             'fa-arrow-circle-left': post,
         };
     }
+
+
 </script>

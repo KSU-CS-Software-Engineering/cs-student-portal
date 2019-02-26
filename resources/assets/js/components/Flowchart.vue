@@ -39,6 +39,7 @@
         }
     }
 
+
     function loadSemesters() {
         axios.get(`/flowcharts/${this.id}/semesters`)
             .then((response) => {

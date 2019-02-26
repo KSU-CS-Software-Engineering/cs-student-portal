@@ -6,8 +6,11 @@ use App\Helpers\JsonSerializer;
 use App\Models\Degreeprogram;
 use App\Models\Plan;
 use App\Models\Planrequirement;
+use App\Models\Section;
 use App\Models\Semester;
 use App\Models\Student;
+use App\Models\Electivelistcourse;
+use App\Models\Course;
 use App\Rules\VerifySemester;
 use Auth;
 use Illuminate\Http\Request;
@@ -75,6 +78,7 @@ class FlowchartsController extends Controller
         } else {
             $user = Auth::user();
             $plan = Plan::findOrFail($id);
+            self::getRelatedSections($plan);
             $planreqs = self::CheckGradPlanRules($plan);
             $CISreqs = self::CheckCISReqRules($plan);
             $hours = self::CheckHoursRules($plan);
@@ -240,6 +244,7 @@ class FlowchartsController extends Controller
         } else {
             $user = Auth::user();
             $plan = Plan::findOrFail($id);
+            self::getRelatedSections($plan);
             $data = $request->all();
             if ($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
                 $data['student_id'] = $plan->student_id;
@@ -333,6 +338,7 @@ class FlowchartsController extends Controller
         } else {
             $user = Auth::user();
             $plan = Plan::with('semesters')->findOrFail($id);
+            self::getRelatedSections($plan);
             if ($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
                 $semester = Semester::findOrFail($request->input('id'));
                 if ($semester->plan_id == $id) {
@@ -447,6 +453,7 @@ class FlowchartsController extends Controller
                 $seasonYear[1]++;
             }
 
+            self::getRelatedSections($plan);
             $planreqs = self::CheckGradPlanRules($plan);
             $CISreqs = self::CheckCISReqRules($plan);
             $hours = self::CheckHoursRules($plan);
@@ -729,6 +736,69 @@ class FlowchartsController extends Controller
 
         return view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs)->with('courseplacement',$courseplacement)->with('kstate',$kstate);
 
+    }
+
+    //return like getSemester
+    public function getRelatedSections(Plan $plan){
+
+        $courses = [];
+        $elective_id = [];
+        //$electiveListCourse = new Electivelistcourse();
+        $currentSemester = $plan->semesters[0];
+        $classesForSemester = Planrequirement::where('plan_id', $plan->id)->where('semester_id', $currentSemester->id)->get();
+
+        /*adds all class id's to courses array
+        if no class id, get elective list id */
+        foreach($classesForSemester as $class){
+            if($class->course_id == NULL){
+                array_push($elective_id, $class->electivelist_id);
+            }
+            else{
+                array_push($courses, $class->course_id);
+            }
+        }
+
+        if(count($elective_id) > 1) {
+            //goes through every elective student has in the semester
+            foreach ($elective_id as $id) {
+
+                $electiveCourses = Electivelistcourse::where('electivelist_id',$id)->get();
+
+                foreach($electiveCourses as $electiveCourse) {
+
+                    array_push($courses, $electiveCourse);
+                }
+            }
+        }
+        else{
+            //only add for the one elective
+            $electiveCourses = Electivelistcourse::where('electivelist_id', $elective_id);
+            foreach ($electiveCourses as $electiveCourse){
+                array_push($courses, $electiveCourse);
+            }
+        }
+
+
+        $betterArray = [];
+        $returnArray = [];
+
+        /*takes courses student had and elective courses in semester
+          gets the times they are offered*/
+        foreach($courses as $course){
+            if(is_int($course)){
+                array_push($returnArray, Section::where('course_id', $course)->get());
+                //dd($returnArray);
+            }
+            else{
+               // array_push($betterArray, $course->);
+
+               // $courseTimes = Section::where('course_number',$course-> )->get();
+
+            }
+        }
+
+        //dd($returnArray);
+        return $returnArray;
     }
 
 

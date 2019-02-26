@@ -26,7 +26,10 @@
                 return `top: ${this.offset * 100}%; height: ${this.height * 100}%;`;
             }
         }
+
     }
+
+
 </script>
 
 <style scoped>
