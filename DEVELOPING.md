@@ -156,7 +156,7 @@ Then, follow the instructions below for your web server.
     ```
 3. Add `127.0.0.1  cs-student-portal.example` as a new line to `/etc/hosts` file
     ```sh
-    echo '127.0.0.1  cs-student-portal.example' | sudo tee /etc/hosts
+    echo '127.0.0.1  cs-student-portal.example' | sudo tee -a /etc/hosts
     ```
 4. Enable the apache `rewrite` module:
     ```sh
@@ -180,7 +180,7 @@ Then, follow the instructions below for your web server.
     ```
 3. Add `127.0.0.1  cs-student-portal.example` as a new line to `/etc/hosts` file
     ```sh
-    echo '127.0.0.1  cs-student-portal.example' | sudo tee /etc/hosts
+    echo '127.0.0.1  cs-student-portal.example' | sudo tee -a /etc/hosts
     ```
 4. Restart the web server
     ```sh
