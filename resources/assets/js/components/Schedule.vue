@@ -234,13 +234,6 @@
                 let coursesTimes = response.data;
                 for(let i =0; i < coursesTimes.length; i++){
                     let courseTimes = coursesTimes[i];
-                    if(coursesTimes.hours !== ""){
-                        let hasTimes = [];
-                        hasTimes.push(courseTimes);
-                        return hasTimes;
-                    }
-
-
 
 
                 }
