@@ -44,6 +44,7 @@
     import ScheduleDay from "./ScheduleDay";
     import ScheduleHourLine from "./ScheduleHourLine";
     import ScheduleAddedCourse from "./ScheduleAddedCourse";
+    import axios from "axios";
 
     export default {
         name: "Schedule",
@@ -224,14 +225,19 @@
             },
 
             getAllCourses: getAllCourses,
+        },
+
+        created() {
+            this.getAllCourses();
         }
     }
 
     //get course time info into allClasses array
     function getAllCourses(){
-        axios.get(`/flowcharts/${this.id}/semesters`)
+        axios.get(`/flowcharts/${this.id}/sections`)
             .then((response) => {
                 let coursesTimes = response.data;
+                console.log(coursesTimes);
                 for(let i =0; i < coursesTimes.length; i++){
                     let courseTimes = coursesTimes[i];
 

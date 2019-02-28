@@ -1,7 +1,7 @@
 <template>
     <div class="added-course-root">
         <div @click="toggleExpand" class="added-course-title">
-            <h5>{{ course.name }}</h5>
+            <h5><b>{{ course.name }}</b></h5>
             <i class="fa expand-btn" :class="{ 'fa-angle-up' : isExpanded, 'fa-angle-down' : !isExpanded }"></i>
         </div>
         <table v-show="isExpanded" class="added-course-time">
@@ -81,19 +81,30 @@
         flex-direction: row;
         flex-wrap: wrap;
         border: 2px solid white;
-        padding-left: 15px;
+        margin-left: 15px;
+        padding-left: 0.2rem;
+        background-color: rgba(151, 160, 179, 0.05);
+    }
+
+    tr:first-child {
+        background-color: transparent;
+    }
+
+    tr:nth-child(even) {
+        background-color: rgba(151, 160, 179, 0.36);
     }
 
     td, th {
         flex: 1 1 150px;
     }
 
-    td {
-        background-color: rgba(151, 160, 179, 0.05);
-    }
-
     td:first-child {
         position: relative;
+        padding-top: 0.2rem;
+    }
+
+    td:last-child {
+        padding-bottom: 0.2rem;
     }
 
     .added-course-title {
