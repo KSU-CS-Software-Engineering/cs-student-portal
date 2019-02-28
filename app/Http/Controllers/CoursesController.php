@@ -61,6 +61,7 @@ class CoursesController extends Controller
     {
         $this->validate($request, [
             'query' => 'required|string',
+            'electiveListId' => 'integer',
         ]);
 
         $courses = Course::filterName($request->input('query'))->get();

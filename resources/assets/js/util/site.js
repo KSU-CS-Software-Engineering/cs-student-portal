@@ -107,6 +107,7 @@ exports.ajaxautocomplete = function (id, url) {
             dataType: "json"
         },
         minChars: 3,
+        params: id,
         autoSelectFirst: true,
         onSelect: function (suggestion) {
             let elem = document.getElementById(id);

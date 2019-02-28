@@ -21,7 +21,7 @@
                         <form-text field="notes" label="Notes" v-model="course.notes" />
 
                         <form-autofill :with-lock="true" field="course_id" label="Catalog Match:" :value-text="course.course_name"
-                            placeholder="Enter Course" :locked=course.course_id_lock v-model="course.course_id"
+                            placeholder="Enter Course" :locked=course.course_id_lock v-model="course.course_id" :elective-list-id="course.electivelist_id"
                             :autocomplete-url="coursesUrl" @selected="courseSelected" @switchLock=switchLockCourse />
 
                         <form-autofill :with-lock="true" field="completedcourse_id" label="Completed Course Match:"

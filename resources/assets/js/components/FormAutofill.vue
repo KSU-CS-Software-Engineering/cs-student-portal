@@ -3,7 +3,7 @@
         <input type="hidden" :id="field" :value="value">
         <label class="control-label" :for="field">{{ label }}</label>
         <div class="input-group" aria-describedby="studentidhelp">
-            <div :id="addonId" class="input-group-addon" v-if="value !== null">Selected: ({{ value }}) {{ valueText }}</div>
+            <div :id="addonId" class="input-group-addon" v-if="value !== null">Selected: ({{ value }}) {{ valueText }})</div>
             <input type="text" class="form-control" :id="inputId" :aria-describedby="helpId" :disabled=disabled
                 :placeholder="placeholder" v-model="inputData">
             <form-autofill-lock v-if="withLock" :field="field" :locked="locked" @switchLock="switchLock" />
@@ -19,6 +19,7 @@
 
 <script>
     import FormAutofillLock from "./FormAutofillLock";
+    import "devbridge-autocomplete";
 
     export default {
         name: "FormAutofill",
@@ -35,6 +36,7 @@
             autocompleteUrl: null,
             withLock: false,
             locked: false,
+            electiveListId: null,
         },
         data() {
             return {
@@ -62,6 +64,13 @@
             serviceUrl: this.autocompleteUrl,
             ajaxSettings: {
                 dataType: "json",
+            },
+            onSearchStart: (query) => {
+                if (this.electiveListId) {
+                    query.electiveListId = this.electiveListId;
+                } else {
+                    delete query.electiveListId;
+                }
             },
             minChars: 3,
             autoSelectFirst: true,
