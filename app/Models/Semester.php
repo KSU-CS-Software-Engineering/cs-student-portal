@@ -29,6 +29,8 @@ class Semester extends Validatable
 
     protected $fillable = ['name', 'ordering', 'plan_id'];
 
+
+
     public function plan()
     {
         return $this->belongsTo('App\Models\Plan')->withTrashed();
@@ -37,6 +39,11 @@ class Semester extends Validatable
     public function requirements()
     {
         return $this->hasMany('App\Models\Planrequirement');
+    }
+
+    public function sections()
+    {
+        return $this->requirements()->with('course.sections')->get();
     }
 
     public function repairRequirementsOrder()

@@ -234,7 +234,7 @@
 
     //get course time info into allClasses array
     function getAllCourses(){
-        axios.get(`/flowcharts/${this.id}/sections`)
+        axios.get(`/scheduler/${this.semesterId}/sections`)
             .then((response) => {
                 let coursesTimes = response.data;
                 console.log(coursesTimes);

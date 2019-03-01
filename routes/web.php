@@ -83,7 +83,7 @@ Route::put('flowcharts/{plan}/requirements/{requirement}', 'FlowchartsController
 Route::patch('flowcharts/{plan}/requirements/{requirement}', 'FlowchartsController@moveRequirement');
 Route::delete('flowcharts/{plan}/requirements/{requirement}', 'FlowchartsController@deleteRequirement');
 
-Route::get('flowcharts/{semester}/sections', 'FlowchartsController@getRelatedSections');
+Route::get('scheduler/{semester}/sections', 'SchedulerController@getRelatedSections');
 
 /*
  * Routes for the AdvisingController
