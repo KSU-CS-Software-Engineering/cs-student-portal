@@ -81,21 +81,8 @@ class FlowchartsController extends Controller
             abort(403);
         }
 
-        $planreqs = self::CheckGradPlanRules($plan);
-        $CISreqs = self::CheckCISReqRules($plan);
-        $hours = self::CheckHoursRules($plan);
-        $prereqs = self::CheckPreReqRules($plan);
-        $courseplacement = self::CheckCoursePlacement($plan);
-        $kstate = self::CheckKState8($plan); // Should all of these change to be the UpdatedView()?
-
         return view('flowcharts/flowchart')
-            ->with('plan', $plan)
-            ->with('planreqs',$planreqs)
-            ->with('CISreqs', $CISreqs)
-            ->with('hours',$hours)
-            ->with('prereqs',$prereqs)
-            ->with('courseplacement',$courseplacement)
-            ->with('kstate',$kstate);
+            ->with('plan', $plan);
     }
 
     public function newFlowchart($id = -1)
@@ -444,20 +431,12 @@ class FlowchartsController extends Controller
                 $seasonYear[1]++;
             }
 
-            $planreqs = self::CheckGradPlanRules($plan);
-            $CISreqs = self::CheckCISReqRules($plan);
-            $hours = self::CheckHoursRules($plan);
-            $prereqs = self::CheckPreReqRules($plan);
-            $courseplacement = self::CheckCoursePlacement($plan);
-
-
             if ($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
 
                 if ($semester->plan_id == $id) {
                     $semester->name = "Summer " . $year;// . $semester->year();
                     $semester->save();
-                    //  $window.location.reload();
-                    return; //view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs)->with('courseplacement',$courseplacement);
+                    return;
                 } else {
                     //semester id does not match plan id given
                     abort(404);
@@ -466,7 +445,7 @@ class FlowchartsController extends Controller
               abort(404);
             }
         }
-      }
+    }
 
     public function postSemesterMove(Request $request, $id = -1)
     {
@@ -544,8 +523,6 @@ class FlowchartsController extends Controller
         $newOrder = collect($request->input('order'));
 
         $semester->reorderRequirements($newOrder);
-
-        $rules = $this->UpdatedView($plan);
 
         return response()->json(trans('messages.item_saved'));
     }
@@ -646,6 +623,11 @@ class FlowchartsController extends Controller
         return $request->all();
     }
 
+    public function errors(Plan $plan)
+    {
+        return $plan->getErrors();
+    }
+
     public static function CheckCISReqRules(Plan $plan) {
 
         $firstArrs = [];
@@ -713,19 +695,6 @@ class FlowchartsController extends Controller
         $rules = new VerifyFourYearPlan();
         $kstate8 = $rules->CheckKstate8($plan);
         return $kstate8;
-    }
-
-    public function UpdatedView(Plan $plan){
-
-        $planreqs = self::CheckGradPlanRules($plan);
-        $CISreqs = self::CheckCISReqRules($plan);
-        $hours = self::CheckHoursRules($plan);
-        $prereqs = self::CheckPreReqRules($plan);
-        $courseplacement = self::CheckCoursePlacement($plan);
-        $kstate = self::CheckKState8($plan);
-
-        return view('flowcharts/flowchart')->with('plan', $plan)->with('planreqs',$planreqs)->with('CISreqs', $CISreqs)->with('hours',$hours)->with('prereqs',$prereqs)->with('courseplacement',$courseplacement)->with('kstate',$kstate);
-
     }
 
 

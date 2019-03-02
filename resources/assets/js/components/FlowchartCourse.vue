@@ -74,6 +74,9 @@
                 this.selectedPrereqs = selectedPrereqs;
                 this.selectedFollowers = selectedFollowers;
             });
+            eventDispatcher.$on("flowchartUpdated", () => {
+                this.course = this.courseProps;
+            })
         },
     }
 
