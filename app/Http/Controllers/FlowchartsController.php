@@ -72,21 +72,17 @@ class FlowchartsController extends Controller
         if ($id < 0) {
             //no ID provided - redirect back to index
             return redirect('flowcharts/index');
-        } else {
-            $user = Auth::user();
-            $plan = Plan::findOrFail($id);
-
-            if ($user->is_advisor) {
-                return view('flowcharts/flowchart')
-                    ->with('plan', $plan);
-            } else {
-                if ($plan->student_id == $user->student->id) {
-                    return view('flowcharts/flowchart')->with('plan', $plan);
-                } else {
-                    abort(404);
-                }
-            }
         }
+
+        $user = Auth::user();
+        $plan = Plan::findOrFail($id);
+
+        if (!$user->is_advisor && $plan->student_id !== $user->student->id) {
+            abort(403);
+        }
+
+        return view('flowcharts/flowchart')
+            ->with('plan', $plan);
     }
 
     public function newFlowchart($id = -1)
