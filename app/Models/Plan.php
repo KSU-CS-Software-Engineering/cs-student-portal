@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Controllers\FlowchartsController;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Plan extends Validatable
@@ -210,5 +211,34 @@ class Plan extends Validatable
                 $semester->save();
             }
         }
+    }
+
+    public function getErrors() {
+        return [
+            // [
+            //     'title' => 'Not finished courses',
+            //     'errors' => FlowchartsController::CheckGradPlanRules($this),
+            // ],
+            [
+                'title' => 'Courses missing',
+                'errors' => FlowchartsController::CheckCISReqRules($this),
+            ],
+            [
+                'title' => '',
+                'errors' => FlowchartsController::CheckHoursRules($this),
+            ],
+            [
+                'title' => 'Prerequisities missing',
+                'errors' => FlowchartsController::CheckPreReqRules($this),
+            ],
+            [
+                'title' => 'Courses not offered in its current semester placement',
+                'errors' => FlowchartsController::CheckCoursePlacement($this),
+            ],
+            [
+                'title' => 'K-State 8 Requirements Missing',
+                'errors' => FlowchartsController::CheckKState8($this),
+            ],
+        ];
     }
 }

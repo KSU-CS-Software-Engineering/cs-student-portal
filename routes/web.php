@@ -82,6 +82,7 @@ Route::post('flowcharts/{plan}/requirements', 'FlowchartsController@addRequireme
 Route::put('flowcharts/{plan}/requirements/{requirement}', 'FlowchartsController@updateRequirement');
 Route::patch('flowcharts/{plan}/requirements/{requirement}', 'FlowchartsController@moveRequirement');
 Route::delete('flowcharts/{plan}/requirements/{requirement}', 'FlowchartsController@deleteRequirement');
+Route::get('flowcharts/{plan}/errors', 'FlowchartsController@errors');
 
 Route::get('scheduler/{semester}/sections', 'SchedulerController@getRelatedSections');
 

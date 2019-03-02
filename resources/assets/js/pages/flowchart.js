@@ -1,15 +1,17 @@
 import Vue from "vue";
 import Flowchart from "../components/Flowchart";
 import CourseFormModal from "../components/CourseFormModal";
+import FlowchartErrors from "../components/FlowchartErrors";
 import axios from "axios";
 import site from "../util/site";
+import { eventDispatcher } from "../util/vueEventDispatcher";
 
 export function init() {
 
     window.axios = axios;
     window.site = site;
 
-    window.eventDispatcher = new Vue();
+    window.eventDispatcher = eventDispatcher;
 
     let app = new Vue({
         el: "#flowchart",
@@ -39,7 +41,15 @@ export function init() {
         },
     });
 
-    document.getElementById("reset").addEventListener("click", () => eventDispatcher.$emit("reloadFlowchart"));
+    let errors = new Vue({
+        el: "#flowchart-errors",
+        template: "<flowchart-errors />",
+        components: {
+            FlowchartErrors,
+        },
+    });
+
+    document.getElementById("reset").addEventListener("click", () => eventDispatcher.$emit("updateFlowchart"));
     document.getElementById("add-sem").addEventListener("click", () => eventDispatcher.$emit("addSemester"));
     document.getElementById("add-course").addEventListener("click", () => eventDispatcher.$emit("createCourse"));
 
