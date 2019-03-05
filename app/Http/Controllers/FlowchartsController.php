@@ -8,6 +8,7 @@ use App\Models\Plan;
 use App\Models\Planrequirement;
 use App\Models\Semester;
 use App\Models\Student;
+use Carbon\Carbon;
 use App\Rules\VerifySemester;
 use Auth;
 use Illuminate\Http\Request;
@@ -26,12 +27,36 @@ class FlowchartsController extends Controller
 
     private $fractal;
 
+    //public $currentSemester;
+
     public function __construct()
     {
         $this->middleware('cas');
         $this->middleware('update_profile');
         $this->fractal = new Manager();
     }
+
+
+    public function currentSemester() {
+      $returner = "";
+      $carbon = new Carbon();
+      Carbon::today('America/Chicago');
+      //August to December is Fall semester
+      if($carbon->month >= 8 && $carbon <= 12) {
+        $returner = "Fall" + $carbon->year;
+      }
+      //Spring semester
+      else if ($carbon->month >= 1 && $carbon->month <= 5) {
+        $returner = "Spring" + $carbon->year;
+      }
+      //None of these then it must be Summer
+      else {
+        $returner = "Summer" + $carbon->year;
+      }
+      dd($returner);
+      return $returner;
+    }
+
 
     /**
      * Responds to requests to GET /courses
@@ -73,6 +98,7 @@ class FlowchartsController extends Controller
             //no ID provided - redirect back to index
             return redirect('flowcharts/index');
         } else {
+          self::currentSemester();
             $user = Auth::user();
             $plan = Plan::findOrFail($id);
             $planreqs = self::CheckGradPlanRules($plan);

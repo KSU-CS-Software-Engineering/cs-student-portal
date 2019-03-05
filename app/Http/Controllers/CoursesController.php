@@ -64,7 +64,27 @@ class CoursesController extends Controller
             'electiveListId' => 'integer',
         ]);
 
-        $courses = Course::filterName($request->input('query'))->get();
+        $courseSlugs = array();
+        //Get the list of electivelistcourses, this will then be used to grab the matching course objects.
+        $electiveListModels = ElectiveListCourses::where('electivelist_id', $electiveListId)->get();
+        //For each of the returned elective list
+        foreach($electiveListModel as $electiveListModels) {
+          //If electiveliostModel does not have a course_max_number, that means it only has the min_number so it's ajust a single class
+          if($electiveListModel->course_max_number != null) {
+            //When it has a the max, that means we want to iterate through the difference between max and min
+            for($i = 0; $i < ($electiveListModel->course_max_number - $electiveListModel->course_min_number); $i++) {
+              $currentCourseNumber = $electiveListModel->course_min_number + 1;
+              $courseSlugs[] = $electiveListModel->course_prefix + $currentCourseNumber;
+            }
+          }
+          $courseSlugs[] = $electiveListModel->course_prefix + $electiveListModel->course_min_number;
+        }
+        dd($courseSlugs);
+        $courses = Course::whereIn('slug', $courseSlugs);
+        //$courses = Course::filterName($request->input('query'))->get();
+        //Need to go to the electivelistcourses and fgrab the slug, and then go through courses and grab the slugs and then compare.
+        //$courses = Course::where('elective_list_id')->course
+
 
         $resource = new Collection($courses, function ($course) {
             return [

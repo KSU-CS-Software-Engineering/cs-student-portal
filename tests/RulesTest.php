@@ -1,5 +1,5 @@
 <?php
-
+namespace Tests;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -17,9 +17,7 @@ use App\Models\Planrequirement;
 use App\Models\Semester;
 use App\Rules\VerifyFourYearPlan;
 use App\Rules\VerifySemester;
-
-
-//run vendor/bin/phpunit rules/RulesTest.php
+//run vendor/bin/phpunit tests/RulesTest.php
 
 class RulesTest extends TestCase {
     use DatabaseTransactions;
