@@ -6,10 +6,10 @@
 @import "~bootstrap-sass/assets/stylesheets/bootstrap/theme";
 
 // Font Awesome
-@import "~font-awesome/scss/font-awesome.scss";
+@import "~font-awesome/scss/font-awesome";
 
 // Editables
-@import "~summernote/src/less/summernote";
+@import "~summernote/dist/summernote";
 @import "~codemirror/lib/codemirror";
 @import "~codemirror/theme/blackboard";
 @import "~codemirror/theme/monokai";
