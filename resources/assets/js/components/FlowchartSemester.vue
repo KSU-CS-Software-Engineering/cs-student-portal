@@ -1,21 +1,11 @@
 <template>
-    <div class="semester" :key="id">
+    <div class="semester">
         <div class="panel panel-default">
-            <div class="panel-heading clearfix move" v-if="!nameIsEdited">
+            <div class="panel-heading clearfix move">
                 <h4 class="panel-title pull-left">{{ name }}</h4>
                 <div class="btn-group pull-right">
                     <button type="button" title="Delete Semester" class="delete-sem btn btn-default btn-xs" aria-label="Delete" v-if="courses.length === 0" @!click="deleteSemester"><i class="fa fa-times"></i></button>
-                    <!--<button type="button" title="Edit Semester" class="edit-sem btn btn-default btn-xs" aria-label="Edit" @!click="editSemesterName"><i class="fa fa-pencil"></i></button>-->
                     <button type="button" title="Set Summer" class="set-summer btn btn-default btn-xs" aria-label="Summer" @!click="setSummer"><i class="fa fa-pencil"></i></button>
-                </div>
-            </div>
-
-            <div class="panel-heading clearfix" v-if="nameIsEdited">
-                <div class="input-group no-drag">
-                    <input type="text" class="form-control input-sm" title="Semester name" v-model="name" :id="'sem-text-' + id" @keyup.enter="saveSemesterName">
-                    <div class="input-group-btn">
-                        <button type="button" title="Save Semester" class="save-sem btn btn-success btn-sm" aria-label="Save" @!click="saveSemesterName"><i class="fa fa-check"></i></button>
-                    </div>
                 </div>
             </div>
             <draggable class="list-group" v-model="courses" :options="{group: 'courses', animation: 150}" @add="addCourse" @end="endDragging">
@@ -41,39 +31,29 @@
         ],
         data() {
             return {
-                nameIsEdited: false,
                 id: this.semesterProps.id,
                 name: this.semesterProps.name,
                 courses: this.semesterProps.courses,
             };
         },
         methods: {
-            editSemesterName: editSemesterName,
-            saveSemesterName: saveSemesterName,
+            propsToData: propsToData,
+            // editSemesterName: editSemesterName,
+            // saveSemesterName: saveSemesterName,
             deleteSemester: deleteSemester,
             setSummer: setSummer,
             addCourse: addCourse,
             endDragging: endDragging,
         },
+        created() {
+            eventDispatcher.$on("flowchartUpdated", this.propsToData);
+        }
     }
 
-    function editSemesterName() {
-        this.nameIsEdited = true;
-    }
-
-    function saveSemesterName() {
-        let id = document.getElementById("id").value;
-        let data = {
-            name: this.name,
-        };
-        axios.patch("/flowcharts/" + id + "/semesters/" + this.id, data)
-            .then((response) => {
-                this.nameIsEdited = false;
-                //site.displayMessage(response.data, "success");
-            })
-            .catch((error) => {
-                site.displayMessage("AJAX Error", "danger");
-            })
+    function propsToData() {
+        this.id = this.semesterProps.id;
+        this.name = this.semesterProps.name;
+        this.courses = this.semesterProps.courses;
     }
 
     function deleteSemester(event) {
@@ -89,10 +69,12 @@
             id: this.id,
         };
         axios.post(`/flowcharts/semesters/${id}/setsummer`, data)
+            .then((response) => {
+                eventDispatcher.$emit("updateFlowchart");
+            })
             .catch((error) => {
                 site.displayMessage(error, "Danger");
             });
-        //Call refresh here.
     }
 
     function addCourse(event) {
@@ -116,6 +98,7 @@
         axios.patch(`/flowcharts/${planId}/requirements/${requirementId}`, data)
             .then((response) => {
                 // site.displayMessage(response.data, "success");
+                eventDispatcher.$emit("flowchartModified");
             })
             .catch((error) => {
                 site.displayMessage("AJAX Error", "danger");

@@ -35,9 +35,10 @@
             this.loadSemesters();
             this.loadCourses();
             eventDispatcher.$on("addSemester", this.addSemester);
-            eventDispatcher.$on("reloadFlowchart", this.refresh)
+            eventDispatcher.$on("updateFlowchart", this.refresh)
         }
     }
+
 
     function loadSemesters() {
         axios.get(`/flowcharts/${this.id}/semesters`)
@@ -61,6 +62,7 @@
                     });
                     semester.courses = semester.courses || [];
                     semester.courses.push(course);
+                    eventDispatcher.$emit("flowchartUpdated");
                 }
             })
             .catch((error) => {
@@ -84,6 +86,7 @@
                 console.log("Flowchart.vue: dropSemester: success");
                 console.log(response);
                 //site.displayMessage(response.data, "success");
+                eventDispatcher.$emit("flowchartModified");
             })
             .catch((error) => {
                 console.log("Flowchart.vue: dropSemester: error");

@@ -74,6 +74,9 @@
                 this.selectedPrereqs = selectedPrereqs;
                 this.selectedFollowers = selectedFollowers;
             });
+            eventDispatcher.$on("flowchartUpdated", () => {
+                this.course = this.courseProps;
+            })
         },
     }
 
@@ -122,4 +125,6 @@
             'fa-arrow-circle-left': post,
         };
     }
+
+
 </script>

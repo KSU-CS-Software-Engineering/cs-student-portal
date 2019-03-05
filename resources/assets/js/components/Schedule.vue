@@ -44,6 +44,7 @@
     import ScheduleDay from "./ScheduleDay";
     import ScheduleHourLine from "./ScheduleHourLine";
     import ScheduleAddedCourse from "./ScheduleAddedCourse";
+    import axios from "axios";
 
     export default {
         name: "Schedule",
@@ -103,7 +104,23 @@
                         }
                     ]
                 },
-                dummyAllClasses: [
+                allClasses: [
+                    // {
+                    //     name: course_name,
+                    //     times: [
+                    //         {
+                    //
+                    //             days: ,
+                    //             begin: ,
+                    //             end: ,
+                    //             location: ,
+                    //             teacher: ,
+                    //
+                    //         }
+                    //     ]
+                    //
+                    //
+                    // },
                     {
                         name: "CIS 643",
                         times: [
@@ -152,11 +169,15 @@
                         ]
                     }
                 ],
+
+
                 selectedCourse: null,
                 selectedCourses: [],
                 scheduleBegin: 7 * 60 + 30,
                 scheduleEnd: 21 * 60 + 30,
                 showOwnClasses: true,
+                //placeholder
+                semesterId: 1,
             }
         },
         computed: {
@@ -186,7 +207,7 @@
                 }
             },
             availableClasses: function () {
-                return this.dummyAllClasses;
+                return this.allClasses;
             }
         },
         methods: {
@@ -203,8 +224,30 @@
             },
             formatTime: function (time) {
                 return `${Math.floor(time / 60)}:${('0' + time % 60).slice(-2)}`;
-            }
+            },
+
+            getAllCourses: getAllCourses,
+        },
+
+        created() {
+            this.getAllCourses();
         }
+    }
+
+    //need to assign semesterId to current semester
+    //gets semester course times
+    function getAllCourses(){
+        axios.get(`/scheduler/${this.semesterId}/sections`)
+            .then((response) => {
+                let coursesTimes = response.data;
+                console.log("test");
+                console.log(coursesTimes);
+
+
+            })
+            .catch((error) => {
+                site.handleError("get data", "", error);
+            });
     }
 </script>
 

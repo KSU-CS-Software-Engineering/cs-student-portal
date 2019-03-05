@@ -79,16 +79,14 @@ class VerifyFourYearPlan {
 
   public function CheckGraduationValidityPlan(Plan $plan) {
     $returnarray = [];
-    $count = 0;
     $student = Student::where('id', $plan->student_id)->get()[0];
     $completedcourses = Completedcourse::where('student_id', $student->id)->get();
     $planrequirements = Planrequirement::where('plan_id', $plan->id)->get();
     foreach($planrequirements as $planrequirement) {
       if($completedcourses->contains('name', $planrequirement->course_name) == false) {
 
-        $returnarray[$count] = $planrequirement;
+        $returnarray[] = $planrequirement;
       }
-      $count++; //This was mising but it's gonna need this.
     }
     return $returnarray;
   }
