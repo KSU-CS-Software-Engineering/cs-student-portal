@@ -176,6 +176,8 @@
                 scheduleBegin: 7 * 60 + 30,
                 scheduleEnd: 21 * 60 + 30,
                 showOwnClasses: true,
+                //placeholder
+                semesterId: 1,
             }
         },
         computed: {
@@ -232,18 +234,14 @@
         }
     }
 
-    //get course time info into allClasses array
+    //need to assign semesterId to current semester
+    //gets semester course times
     function getAllCourses(){
         axios.get(`/scheduler/${this.semesterId}/sections`)
             .then((response) => {
                 let coursesTimes = response.data;
+                console.log("test");
                 console.log(coursesTimes);
-                for(let i =0; i < coursesTimes.length; i++){
-                    let courseTimes = coursesTimes[i];
-
-
-                }
-
 
 
             })
