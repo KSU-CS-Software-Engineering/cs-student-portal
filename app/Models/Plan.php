@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use App\Http\Controllers\FlowchartsController;
+use App\Rules\VerifyFourYearPlan;
+use App\Rules\VerifySemester;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Plan extends Validatable
@@ -217,28 +218,92 @@ class Plan extends Validatable
         return [
             // [
             //     'title' => 'Not finished courses',
-            //     'errors' => FlowchartsController::CheckGradPlanRules($this),
+            //     'errors' => $this->CheckGradPlanRules(),
             // ],
             [
                 'title' => 'Courses missing',
-                'errors' => FlowchartsController::CheckCISReqRules($this),
+                'errors' => $this->CheckCISReqRules(),
             ],
             [
                 'title' => '',
-                'errors' => FlowchartsController::CheckHoursRules($this),
+                'errors' => $this->CheckHoursRules(),
             ],
             [
                 'title' => 'Prerequisities missing',
-                'errors' => FlowchartsController::CheckPreReqRules($this),
+                'errors' => $this->CheckPreReqRules(),
             ],
             [
                 'title' => 'Courses not offered in its current semester placement',
-                'errors' => FlowchartsController::CheckCoursePlacement($this),
+                'errors' => $this->CheckCoursePlacement(),
             ],
             [
                 'title' => 'K-State 8 Requirements Missing',
-                'errors' => FlowchartsController::CheckKState8($this),
+                'errors' => $this->CheckKState8(),
             ],
         ];
+    }
+
+    public function CheckCISReqRules()
+    {
+        $firstArrs = [];
+        //Set the variables for the rules case
+        $rules = new VerifyFourYearPlan();
+
+        //Check the first one.
+        $firstArrs = $rules->CheckCISRequirementsPlan($this);
+
+        return $firstArrs;
+    }
+
+    public function CheckGradPlanRules()
+    {
+        //Check the second one.
+        //This handles graduation ability, not validity of the plan, so no flag.
+        $planreqs = [];
+        $rules = new VerifyFourYearPlan();
+        $planreqs = $rules->CheckGraduationValidityPlan($this);
+
+        return $planreqs;
+    }
+
+    public function CheckGradRequirementsRules()
+    {
+        //Check the third one.
+        //This handles graduation ability, not validity of the plan, so no fla
+        $array = [];
+        $rules = new VerifyFourYearPlan();
+        $array = $rules->CheckGraduationValidityDegreeRequirements($this);
+    }
+
+    public function CheckHoursRules()
+    {
+        $rules = new VerifySemester();
+
+        //returns true if correct number of hours and false if not
+        //if not correct number of hours displays an alert
+        $correcthours = $rules->CheckHours($this);
+        return $correcthours;
+    }
+
+    public function CheckPreReqRules()
+    {
+        $rules = new VerifySemester();
+        //returns an array with the missing prereqs or empty if all good
+        $prereqs = $rules->CheckPreReqs($this);
+        return $prereqs;
+    }
+
+    public function CheckCoursePlacement()
+    {
+        $rules = new VerifySemester();
+        $courseplacement = $rules->CheckCoursePlacement($this);
+        return $courseplacement;
+    }
+
+    public function CheckKState8()
+    {
+        $rules = new VerifyFourYearPlan();
+        $kstate8 = $rules->CheckKstate8($this);
+        return $kstate8;
     }
 }

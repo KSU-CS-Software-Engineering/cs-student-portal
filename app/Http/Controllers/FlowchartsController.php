@@ -2,24 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\JsonSerializer;
 use App\Models\Degreeprogram;
 use App\Models\Plan;
-use App\Models\Planrequirement;
-use App\Models\Semester;
 use App\Models\Student;
-use App\Rules\VerifySemester;
 use Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\MessageBag;
 use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
-
-//This is my dependency that I've added.
-use App\Rules\VerifyFourYearPlan;
-use App\scrapers\KSUCourseScraper;
 
 class FlowchartsController extends Controller
 {
@@ -244,75 +232,5 @@ class FlowchartsController extends Controller
     {
         return $plan->getErrors();
     }
-
-    public static function CheckCISReqRules(Plan $plan) {
-
-        $firstArrs = [];
-        //Set the variables for the rules case
-        $rules = new VerifyFourYearPlan();
-
-        //Check the first one.
-        $firstArrs = $rules->CheckCISRequirementsPlan($plan);
-
-        return $firstArrs;
-
-
-    }
-
-    public static function CheckGradPlanRules(Plan $plan){
-
-        //Check the second one.
-        //This handles graduation ability, not validity of the plan, so no flag.
-        $planreqs = [];
-        $rules = new VerifyFourYearPlan();
-        $planreqs = $rules->CheckGraduationValidityPlan($plan);
-
-        return $planreqs;
-
-    }
-
-    public static function CheckGradRequirementsRules(Plan $plan){
-
-        //Check the third one.
-        //This handles graduation ability, not validity of the plan, so no fla
-        $array = [];
-        $rules = new VerifyFourYearPlan();
-        $array = $rules->CheckGraduationValidityDegreeRequirements($plan);
-
-    }
-
-    public static function CheckHoursRules(Plan $plan) {
-        $rules = new VerifySemester();
-
-        //returns true if correct number of hours and false if not
-        //if not correct number of hours displays an alert
-        $correcthours = $rules->CheckHours($plan);
-        return $correcthours;
-    }
-
-    public static function CheckPreReqRules(Plan $plan) {
-
-        $rules = new VerifySemester();
-        //returns an array with the missing prereqs or empty if all good
-        $prereqs = $rules->CheckPreReqs($plan);
-        return $prereqs;
-
-    }
-
-    public static function CheckCoursePlacement(Plan $plan){
-
-
-        $rules = new VerifySemester();
-        $courseplacement = $rules->CheckCoursePlacement($plan);
-        return $courseplacement;
-
-    }
-
-    public static function CheckKState8(Plan $plan) {
-        $rules = new VerifyFourYearPlan();
-        $kstate8 = $rules->CheckKstate8($plan);
-        return $kstate8;
-    }
-
 
 }
