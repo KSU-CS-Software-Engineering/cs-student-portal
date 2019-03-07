@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\JsonSerializer;
 use App\Models\Advisor;
 use App\Models\Blackout;
 use App\Models\Blackoutevent;
@@ -13,9 +12,7 @@ use Carbon\Carbon;
 use DateInterval;
 use DateTime;
 use Illuminate\Http\Request;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
+use Illuminate\Support\Collection;
 
 class AdvisingController extends Controller
 {
@@ -24,7 +21,6 @@ class AdvisingController extends Controller
     {
         $this->middleware('cas');
         $this->middleware('update_profile');
-        $this->fractal = new Manager();
     }
 
     /**
@@ -120,9 +116,10 @@ class AdvisingController extends Controller
             ->where('end', '<=', new DateTime($end))
             ->get();
 
-        $resource = new Collection($meetings, function ($meeting) use ($sid, $advisor) {
+        $resource = new Collection();
+        foreach ($meetings as $meeting) {
             if ($advisor) {
-                return [
+                $resource->push([
                     'id' => $meeting->id,
                     'start' => $meeting->start->toDateTimeString(),
                     'end' => $meeting->end->toDateTimeString(),
@@ -133,9 +130,9 @@ class AdvisingController extends Controller
                     'status' => $meeting->status,
                     'studentname' => $meeting->student->name,
                     'student_id' => $meeting->student->id,
-                ];
+                ]);
             } else {
-                return [
+                $resource->push([
                     'id' => $meeting->id,
                     'start' => $meeting->start->toDateTimeString(),
                     'end' => $meeting->end->toDateTimeString(),
@@ -143,13 +140,11 @@ class AdvisingController extends Controller
                     'title' => ($sid == $meeting->student_id) ? $meeting->title : 'Advising',
                     'desc' => ($sid == $meeting->student_id) ? $meeting->description : '',
                     'status' => ($sid == $meeting->student_id) ? $meeting->status : '',
-                ];
+                ]);
             }
-        });
+        }
 
-        $this->fractal->setSerializer(new JsonSerializer());
-
-        return $this->fractal->createData($resource)->toJson();
+        return response()->json($resource);
     }
 
     public function getBlackoutfeed(Request $request)
@@ -183,9 +178,10 @@ class AdvisingController extends Controller
             $meetings->prepend($meeting);
         }
 
-        $resource = new Collection($meetings, function ($meeting) use ($user) {
+        $resource = new Collection();
+        foreach ($meetings as $meeting) {
             if ($user->is_advisor) {
-                return [
+                $resource->push([
                     'id' => $meeting->id,
                     'start' => $meeting->start->toDateTimeString(),
                     'end' => $meeting->end->toDateTimeString(),
@@ -193,21 +189,19 @@ class AdvisingController extends Controller
                     'title' => $meeting->title,
                     'blackout_id' => $meeting->blackout_id,
                     'repeat' => $meeting->repeat
-                ];
+                ]);
             } else {
-                return [
+                $resource->push([
                     'id' => $meeting->id,
                     'start' => $meeting->start->toDateTimeString(),
                     'end' => $meeting->end->toDateTimeString(),
                     'type' => 'b',
                     'title' => $meeting->title
-                ];
+                ]);
             }
-        });
+        }
 
-        $this->fractal->setSerializer(new JsonSerializer());
-
-        return $this->fractal->createData($resource)->toJson();
+        return response()->json($resource);
     }
 
     public function getBlackout(Request $request)
@@ -227,22 +221,18 @@ class AdvisingController extends Controller
             }
         }
 
-        $resource = new Item($blackout, function ($blackout) {
-            return [
-                'id' => $blackout->id,
-                'start' => $blackout->start->toDateTimeString(),
-                'end' => $blackout->end->toDateTimeString(),
-                'title' => $blackout->title,
-                'repeat_type' => $blackout->repeat_type,
-                'repeat_every' => $blackout->repeat_every,
-                'repeat_detail' => $blackout->repeat_detail,
-                'repeat_until' => $blackout->repeat_until->toDateTimeString()
-            ];
-        });
+        $resource = [
+            'id' => $blackout->id,
+            'start' => $blackout->start->toDateTimeString(),
+            'end' => $blackout->end->toDateTimeString(),
+            'title' => $blackout->title,
+            'repeat_type' => $blackout->repeat_type,
+            'repeat_every' => $blackout->repeat_every,
+            'repeat_detail' => $blackout->repeat_detail,
+            'repeat_until' => $blackout->repeat_until->toDateTimeString()
+        ];
 
-        $this->fractal->setSerializer(new JsonSerializer());
-
-        return $this->fractal->createData($resource)->toJson();
+        return response()->json($resource);
     }
 
     public function getMeeting(Request $request)
@@ -264,23 +254,19 @@ class AdvisingController extends Controller
             return response()->json("Students cannot request individual meetings", 500);
         }
 
-        $resource = new Item($meeting, function ($meeting) {
-            return [
-                'id' => $meeting->id,
-                'start' => $meeting->start->toDateTimeString(),
-                'end' => $meeting->end->toDateTimeString(),
-                'type' => 'm',
-                'title' => $meeting->title,
-                'desc' => $meeting->description,
-                'studentname' => $meeting->student->name,
-                'student_id' => $meeting->student->id,
-                'status' => $meeting->status,
-            ];
-        });
+        $resource = [
+            'id' => $meeting->id,
+            'start' => $meeting->start->toDateTimeString(),
+            'end' => $meeting->end->toDateTimeString(),
+            'type' => 'm',
+            'title' => $meeting->title,
+            'desc' => $meeting->description,
+            'studentname' => $meeting->student->name,
+            'student_id' => $meeting->student->id,
+            'status' => $meeting->status,
+        ];
 
-        $this->fractal->setSerializer(new JsonSerializer());
-
-        return $this->fractal->createData($resource)->toJson();
+        return response()->json($resource);
     }
 
     public function getConflicts(Request $request)
@@ -292,18 +278,17 @@ class AdvisingController extends Controller
             $meetings = Meeting::where('advisor_id', $id)->where('conflict', true)->get();
 
             if (!$meetings->isEmpty()) {
-                $resource = new Collection($meetings, function ($meeting) use ($user) {
-                    return [
+                $resource = new Collection();
+                foreach ($meetings as $meeting) {
+                    $resource->push([
                         'id' => $meeting->id,
                         'start' => $meeting->start->toDateTimeString(),
                         'end' => $meeting->end->toDateTimeString(),
                         'title' => $meeting->title,
-                    ];
-                });
+                    ]);
+                }
 
-                $this->fractal->setSerializer(new JsonSerializer());
-
-                return $this->fractal->createData($resource)->toJson();
+                return response()->json($resource);
             } else {
                 return response()->json("No conflicts", 204);
             }

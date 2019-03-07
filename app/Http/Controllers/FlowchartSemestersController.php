@@ -2,26 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\JsonSerializer;
 use App\Models\Plan;
 use App\Models\Semester;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
 
 class FlowchartSemestersController extends Controller
 {
-
-    private $fractal;
 
     public function __construct()
     {
         $this->middleware('cas');
         $this->middleware('update_profile');
-        $this->fractal = new Manager();
     }
 
     public function getSemesters(Request $request, Plan $plan)
@@ -32,15 +26,16 @@ class FlowchartSemestersController extends Controller
         }
 
         $semesters = $plan->semesters()->orderBy('ordering')->get();
-        $resource = new Collection($semesters, function ($semester) {
-            return [
+        $resource = new Collection();
+        foreach ($semesters as $semester) {
+            $resource->push([
                 'id' => $semester->id,
                 'name' => $semester->name,
                 'courses' => [],
-            ];
-        });
-        $this->fractal->setSerializer(new JsonSerializer());
-        return $this->fractal->createData($resource)->toJson();
+            ]);
+        }
+
+        return response()->json($resource);
     }
 
     public function renameSemester(Request $request, Plan $plan, Semester $semester)
@@ -88,16 +83,14 @@ class FlowchartSemestersController extends Controller
         $semester->ordering = $plan->semesters->max('ordering') + 1;
         $semester->save();
         $plan->DynamicallyRenameSemesters();
-        $resource = new Item($semester, function ($semester) {
-            return [
-                'id' => $semester->id,
-                'name' => $semester->name,
-                'ordering' => $semester->ordering,
-                'courses' => [],
-            ];
-        });
-        $this->fractal->setSerializer(new JsonSerializer());
-        return $this->fractal->createData($resource)->toJson();
+        $resource = [
+            'id' => $semester->id,
+            'name' => $semester->name,
+            'ordering' => $semester->ordering,
+            'courses' => [],
+        ];
+
+        return response()->json($resource);
     }
 
     public function postSemesterSetSummer(Request $request, $id = -1)

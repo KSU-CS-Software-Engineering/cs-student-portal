@@ -2,26 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\JsonSerializer;
 use App\Models\Plan;
 use App\Models\Planrequirement;
 use App\Models\Semester;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\MessageBag;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
 
 class FlowchartRequirementsController extends Controller
 {
-
-    private $fractal;
 
     public function __construct()
     {
         $this->middleware('cas');
         $this->middleware('update_profile');
-        $this->fractal = new Manager();
     }
 
     public function getCourses(Request $request, Plan $plan)
@@ -35,8 +30,9 @@ class FlowchartRequirementsController extends Controller
         $requirements->load('electivelist');
         $requirements->load('course');
         $requirements->load('completedcourse');
-        $resource = new Collection($requirements, function (Planrequirement $requirement) {
-            return [
+        $resource = new Collection();
+        foreach ($requirements as $requirement) {
+            $resource->push([
                 'id' => $requirement->id,
                 'notes' => $requirement->notes,
                 'semester_id' => $requirement->semester_id,
@@ -54,10 +50,10 @@ class FlowchartRequirementsController extends Controller
                 'completedcourse_id' => $requirement->completedcourse_id,
                 'course_id_lock' => $requirement->course_id_lock === 1 ? true : false,
                 'completedcourse_id_lock' => $requirement->completedcourse_id_lock === 1 ? true : false,
-            ];
-        });
-        $this->fractal->setSerializer(new JsonSerializer());
-        return $this->fractal->createData($resource)->toJson();
+            ]);
+        }
+
+        return response()->json($resource);
     }
 
     public function moveRequirement(Request $request, Plan $plan, Planrequirement $requirement)

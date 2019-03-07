@@ -7,8 +7,7 @@ use App\Models\Student;
 use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
+use Illuminate\Support\Collection;
 
 class ProfilesController extends Controller
 {
@@ -16,7 +15,6 @@ class ProfilesController extends Controller
     public function __construct()
     {
         $this->middleware('cas');
-        $this->fractal = new Manager();
     }
 
     /**
@@ -72,14 +70,15 @@ class ProfilesController extends Controller
 
             $students = Student::filterName($request->input('query'))->get();
 
-            $resource = new Collection($students, function ($student) {
-                return [
+            $resource = new Collection();
+            foreach ($students as $student) {
+                $resource->push([
                     'value' => $student->name,
                     'data' => $student->id,
-                ];
-            });
+                ]);
+            }
 
-            return $this->fractal->createData($resource)->toJson();
+            return response()->jsonApi($resource);
         } else {
             return response()->json(trans('errors.advisors_only'), 403);
         }

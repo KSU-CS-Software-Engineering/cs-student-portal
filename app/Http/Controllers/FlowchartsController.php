@@ -7,18 +7,14 @@ use App\Models\Plan;
 use App\Models\Student;
 use Auth;
 use Illuminate\Http\Request;
-use League\Fractal\Manager;
 
 class FlowchartsController extends Controller
 {
-
-    private $fractal;
 
     public function __construct()
     {
         $this->middleware('cas');
         $this->middleware('update_profile');
-        $this->fractal = new Manager();
     }
 
     /**

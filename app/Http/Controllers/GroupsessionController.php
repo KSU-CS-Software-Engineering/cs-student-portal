@@ -4,13 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Events\GroupsessionEnd;
 use App\Events\GroupsessionRegister;
-use App\Helpers\JsonSerializer;
 use App\Models\Groupsession;
 use Auth;
 use DbConfig;
 use Illuminate\Http\Request;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
+use Illuminate\Support\Collection;
 
 class GroupsessionController extends Controller
 {
@@ -20,7 +18,6 @@ class GroupsessionController extends Controller
         $this->middleware('cas');
         $this->middleware('update_profile');
         $this->middleware('groupsessiondisabled', ['except' => ['getEnable', 'getIndex']]);
-        $this->fractal = new Manager();
     }
 
     /**
@@ -58,30 +55,30 @@ class GroupsessionController extends Controller
     {
         $groupsessions = Groupsession::where('status', '<', 3)->orderBy('status', 'desc')->orderBy('id', 'asc')->get();
 
-        $resource = new Collection($groupsessions, function ($gs) {
+        $resource = new Collection();
+        foreach ($groupsessions as $gs) {
             if (count($gs->advisor)) {
-                return [
+                $resource->push([
                     'id' => (int) $gs->id,
                     'userid' => (int) $gs->student->user_id,
                     'name' => $gs->student->name,
                     'advisor' => $gs->advisor->name,
                     'status' => (int) $gs->status,
                     'online' => 0,
-                ];
+                ]);
             } else {
-                return [
+                $resource->push([
                     'id' => (int) $gs->id,
                     'userid' => (int) $gs->student->user_id,
                     'name' => $gs->student->name,
                     'advisor' => "",
                     'status' => (int) $gs->status,
                     'online' => 0,
-                ];
+                ]);
             }
-        });
+        }
 
-        $this->fractal->setSerializer(new JsonSerializer());
-        return $this->fractal->createData($resource)->toJson();
+        return response()->json($resource);
     }
 
     public function postRegister()
