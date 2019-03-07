@@ -371,8 +371,6 @@ class FlowchartsController extends Controller
             abort(404);
         }
 
-        $rules = $this->UpdatedView($plan);
-
         $semester->delete();
         return response()->json(trans('messages.item_deleted'));
     }
@@ -463,7 +461,6 @@ class FlowchartsController extends Controller
             abort(404);
         }
 
-        $rules = $this->UpdatedView($plan);
         $semesters = $plan->semesters;
         $orderings = $request->input('ordering');
 
