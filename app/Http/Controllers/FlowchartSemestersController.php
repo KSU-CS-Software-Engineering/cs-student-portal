@@ -24,15 +24,6 @@ class FlowchartSemestersController extends Controller
         $this->fractal = new Manager();
     }
 
-    public function getSemesterData(Request $request, $id = -1)
-    {
-        if ($id < 0) {
-            abort(404);
-        }
-        $plan = Plan::findOrFail($id);
-        return $this->getSemesters($request, $plan);
-    }
-
     public function getSemesters(Request $request, Plan $plan)
     {
         $user = Auth::user();
@@ -52,31 +43,6 @@ class FlowchartSemestersController extends Controller
         return $this->fractal->createData($resource)->toJson();
     }
 
-    public function postSemesterSave(Request $request, $id = -1)
-    {
-        if ($id < 0) {
-            //id not found
-            abort(404);
-        } else {
-            $user = Auth::user();
-            $plan = Plan::with('semesters')->findOrFail($id);
-            if ($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
-                $semester = Semester::findOrFail($request->input('id'));
-                if ($semester->plan_id == $id) {
-                    $semester->name = $request->input('name');
-                    $semester->save();
-                    return response()->json(trans('messages.item_saved'));
-                } else {
-                    //semester id does not match plan id given
-                    abort(404);
-                }
-            } else {
-                //cannot edit a plan if you aren't the student or an advisor
-                abort(404);
-            }
-        }
-    }
-
     public function renameSemester(Request $request, Plan $plan, Semester $semester)
     {
         $user = Auth::user();
@@ -94,17 +60,6 @@ class FlowchartSemestersController extends Controller
         return response()->json(trans('messages.item_saved'));
     }
 
-    public function postSemesterDelete(Request $request, $id = -1)
-    {
-        if ($id < 0) {
-            //id not found
-            abort(404);
-        }
-        $plan = Plan::findOrFail($id);
-        $semester = Semester::findOrFail($request->input('id'));
-        return $this->deleteSemester($request, $plan, $semester);
-    }
-
     public function deleteSemester(Request $request, Plan $plan, Semester $semester)
     {
         $user = Auth::user();
@@ -117,16 +72,6 @@ class FlowchartSemestersController extends Controller
 
         $semester->delete();
         return response()->json(trans('messages.item_deleted'));
-    }
-
-    public function postSemesterAdd(Request $request, $id = -1)
-    {
-        if ($id < 0) {
-            //id not found
-            abort(404);
-        }
-        $plan = Plan::findOrFail($id);
-        return $this->addSemester($request, $plan);
     }
 
     public function addSemester(Request $request, Plan $plan)
@@ -186,16 +131,6 @@ class FlowchartSemestersController extends Controller
                 abort(404);
             }
         }
-    }
-
-    public function postSemesterMove(Request $request, $id = -1)
-    {
-        if ($id < 0) {
-            //id not found
-            abort(404);
-        }
-        $plan = Plan::findOrFail($id);
-        return $this->moveSemester($request, $plan);
     }
 
     public function moveSemester(Request $request, Plan $plan)

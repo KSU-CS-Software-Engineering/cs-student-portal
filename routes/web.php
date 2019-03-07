@@ -60,16 +60,10 @@ Route::get('flowcharts/new/{id}', 'FlowchartsController@newFlowchart');
 Route::post('flowcharts/new/{id}', 'FlowchartsController@saveNewFlowchart');
 Route::get('flowcharts/{id?}', 'FlowchartsController@getIndex');
 Route::get('flowcharts/view/{id}', 'FlowchartsController@getFlowchart');
-Route::get('flowcharts/data/{id}', 'FlowchartRequirementsController@getFlowchartData');
 Route::get('flowcharts/edit/{id}', 'FlowchartsController@editFlowchart');
 Route::post('flowcharts/edit/{id}', 'FlowchartsController@saveFlowchart');
 Route::post('flowcharts/delete', 'FlowchartsController@deleteFlowchart');
 Route::post('flowcharts/reset', 'FlowchartsController@resetFlowchart');
-Route::get('flowcharts/semesters/{id}', 'FlowchartSemestersController@getSemesterData');
-Route::post('flowcharts/semesters/{id}/save', 'FlowchartSemestersController@postSemesterSave');
-Route::post('flowcharts/semesters/{id}/delete', 'FlowchartSemestersController@postSemesterDelete');
-Route::post('flowcharts/semesters/{id}/add', 'FlowchartSemestersController@postSemesterAdd');
-Route::post('flowcharts/semesters/{id}/move', 'FlowchartSemestersController@postSemesterMove');
 Route::post('flowcharts/semesters/{id}/setsummer', 'FlowchartSemestersController@postSemesterSetSummer');
 
 Route::get('flowcharts/{plan}/semesters', 'FlowchartSemestersController@getSemesters');

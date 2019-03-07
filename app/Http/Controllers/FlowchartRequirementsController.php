@@ -24,15 +24,6 @@ class FlowchartRequirementsController extends Controller
         $this->fractal = new Manager();
     }
 
-    public function getFlowchartData(Request $request, $id = -1)
-    {
-        if ($id < 0) {
-            abort(404);
-        }
-        $plan = Plan::findOrFail($id);
-        return $this->getCourses($request, $plan);
-    }
-
     public function getCourses(Request $request, Plan $plan)
     {
         $user = Auth::user();
