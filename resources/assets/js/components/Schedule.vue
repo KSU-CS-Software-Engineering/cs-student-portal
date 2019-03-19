@@ -28,13 +28,13 @@
                 </label>
                 <br>
                 <select id="available-classes" v-model="selectedCourse">
-                    <option v-for="availableClass in availableClasses" :value="availableClass">{{ availableClass.name }}</option>
+                    <option v-for="course in allCourses" :value="course">{{ course.slug }} - {{ course.title}}</option>
                 </select>
             </form>
             <button @click="addSelectedCourse" :disabled="selectedCourse == null">Add</button>
             <hr>
             <div class="class-finder-selected">
-                <schedule-added-course v-for="course in selectedCourses" :key="course.name" :course="course" :layoutMethods="layoutMethods"></schedule-added-course>
+                <schedule-added-course v-for="course in selectedCourses" :key="course.id" :course="course" :layoutMethods="layoutMethods"></schedule-added-course>
             </div>
         </div>
     </div>
@@ -104,73 +104,7 @@
                         }
                     ]
                 },
-                allClasses: [
-                    // {
-                    //     name: course_name,
-                    //     times: [
-                    //         {
-                    //
-                    //             days: ,
-                    //             begin: ,
-                    //             end: ,
-                    //             location: ,
-                    //             teacher: ,
-                    //
-                    //         }
-                    //     ]
-                    //
-                    //
-                    // },
-                    {
-                        name: "CIS 643",
-                        times: [
-                            {
-                                days: "M W F",
-                                begin: 16 * 60 + 5,
-                                end: 17 * 60 + 20,
-                                location: "Somewhere",
-                                teacher: "Someone",
-                                added: false
-                            },
-                            {
-                                days: " T T ",
-                                begin: 16 * 60 + 5,
-                                end: 17 * 60 + 20,
-                                location: "Somewhere",
-                                teacher: "Someone",
-                                added: false
-                            }
-                        ]
-                    },
-                    {
-                        name: "CIS 530",
-                        times: [
-                            {
-                                days: "M W F",
-                                begin: 16 * 60 + 5,
-                                end: 17 * 60 + 20,
-                                location: "Somewhere",
-                                teacher: "Someone",
-                                added: false
-                            }
-                        ]
-                    },
-                    {
-                        name: "CIS 580",
-                        times: [
-                            {
-                                days: "M W F",
-                                begin: 16 * 60 + 5,
-                                end: 17 * 60 + 20,
-                                location: "Somewhere",
-                                teacher: "Someone",
-                                added: false
-                            }
-                        ]
-                    }
-                ],
-
-
+                allCourses: [],
                 selectedCourse: null,
                 selectedCourses: [],
                 scheduleBegin: 7 * 60 + 30,
@@ -207,7 +141,7 @@
                 }
             },
             availableClasses: function () {
-                return this.allClasses;
+                return this.allCourses;
             }
         },
         methods: {
@@ -239,10 +173,9 @@
     function getAllCourses(){
         axios.get(`/scheduler/${this.semesterId}/sections`)
             .then((response) => {
-                let coursesTimes = response.data;
-                console.log("test");
-                console.log(coursesTimes);
-
+                this.allCourses = response.data
+                    .map(course => course.course)
+                    .filter(course => course != null && course.sections.length > 0);
 
             })
             .catch((error) => {
