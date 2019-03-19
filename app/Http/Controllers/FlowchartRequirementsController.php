@@ -21,10 +21,7 @@ class FlowchartRequirementsController extends Controller
 
     public function getCourses(Request $request, Plan $plan)
     {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
-            abort(404);
-        }
+        $this->authorize('read', $plan);
 
         $requirements = $plan->requirements()->orderBy('ordering')->get();
         $requirements->load('electivelist');
@@ -56,11 +53,7 @@ class FlowchartRequirementsController extends Controller
 
     public function moveRequirement(Request $request, Plan $plan, Planrequirement $requirement)
     {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
-            //cannot edit a plan if you aren't the student or an advisor
-            abort(404);
-        }
+        $this->authorize('modify', $plan);
 
         //move requirement to new semester
         if ($requirement->plan_id !== $plan->id) {
@@ -93,11 +86,7 @@ class FlowchartRequirementsController extends Controller
 
     public function addRequirement(Request $request, Plan $plan)
     {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
-            // cannot edit a plan if you aren't the student or an advisor
-            abort(404);
-        }
+        $this->authorize('modify', $plan);
 
         $requirement = new Planrequirement();
         if (!$requirement->customEditValidate($request->all(), [$plan->student_id])) {
@@ -115,11 +104,8 @@ class FlowchartRequirementsController extends Controller
 
     public function updateRequirement(Request $request, Plan $plan, Planrequirement $requirement)
     {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
-            // cannot edit a plan if you aren't the student or an advisor
-            abort(404);
-        }
+        $this->authorize('modify', $plan);
+
         if ($requirement->plan_id !== $plan->id) {
             // can't edit course not on the plan;
             abort(404);
@@ -144,11 +130,8 @@ class FlowchartRequirementsController extends Controller
 
     public function deleteRequirement(Request $request, Plan $plan, Planrequirement $requirement)
     {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
-            //cannot edit a plan if you aren't the student or an advisor
-            abort(404);
-        }
+        $this->authorize('modify', $plan);
+
         if ($requirement->plan_id !== $plan->id) {
             //can't edit course not on the plan;
             abort(404);

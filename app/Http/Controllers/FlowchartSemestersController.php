@@ -20,10 +20,7 @@ class FlowchartSemestersController extends Controller
 
     public function getSemesters(Request $request, Plan $plan)
     {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
-            abort(404);
-        }
+        $this->authorize('read', $plan);
 
         $semesters = $plan->semesters()->orderBy('ordering')->get();
         $resource = new Collection();
@@ -40,11 +37,8 @@ class FlowchartSemestersController extends Controller
 
     public function renameSemester(Request $request, Plan $plan, Semester $semester)
     {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
-            //cannot edit a plan if you aren't the student or an advisor
-            abort(404);
-        }
+        $this->authorize('modify', $plan);
+
         if ($semester->plan_id !== $plan->id) {
             //semester id does not match plan id given
             abort(404);
@@ -57,10 +51,8 @@ class FlowchartSemestersController extends Controller
 
     public function deleteSemester(Request $request, Plan $plan, Semester $semester)
     {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
-            abort(404);
-        }
+        $this->authorize('modify', $plan);
+
         if ($semester->plan_id !== $plan->id) {
             abort(404);
         }
@@ -71,11 +63,7 @@ class FlowchartSemestersController extends Controller
 
     public function addSemester(Request $request, Plan $plan)
     {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
-            //cannot edit a plan if you aren't the student or an advisor
-            abort(404);
-        }
+        $this->authorize('modify', $plan);
 
         $semester = new Semester();
         $semester->plan_id = $plan->id;
@@ -99,39 +87,34 @@ class FlowchartSemestersController extends Controller
         //I think this may work.
         if ($id < 0) {
             abort(404);
+        }
+
+        $plan = Plan::with('semesters')->findOrFail($id);
+
+        $this->authorize('modify', $plan);
+
+        $semester = Semester::findOrFail($request->input('id'));
+
+        $lastSemester = Semester::where('plan_id', $plan->id)->orderby('ordering', 'DESC')->first();
+        $seasonYear = explode(' ', $lastSemester->name);
+        $year = $seasonYear[1];
+        if ($seasonYear[0] == "Fall") {
+            $seasonYear[1]++;
+        }
+
+        if ($semester->plan_id == $id) {
+            $semester->name = "Summer " . $year;// . $semester->year();
+            $semester->save();
+            return;
         } else {
-            $user = Auth::user();
-            $plan = Plan::with('semesters')->findOrFail($id);
-            $semester = Semester::findOrFail($request->input('id'));
-
-            $lastSemester = Semester::where('plan_id', $plan->id)->orderby('ordering', 'DESC')->first();
-            $seasonYear = explode(' ', $lastSemester->name);
-            $year = $seasonYear[1];
-            if ($seasonYear[0] == "Fall") {
-                $seasonYear[1]++;
-            }
-
-            if ($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
-                if ($semester->plan_id == $id) {
-                    $semester->name = "Summer " . $year;// . $semester->year();
-                    $semester->save();
-                    return;
-                } else {
-                    //semester id does not match plan id given
-                    abort(404);
-                }
-            } else {
-                abort(404);
-            }
+            //semester id does not match plan id given
+            abort(404);
         }
     }
 
     public function moveSemester(Request $request, Plan $plan)
     {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id != $plan->student_id) {
-            abort(404);
-        }
+        $this->authorize('modify', $plan);
 
         $semesters = $plan->semesters;
         $orderings = $request->input('ordering');
