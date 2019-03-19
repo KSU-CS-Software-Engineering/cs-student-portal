@@ -38,15 +38,13 @@ class FlowchartRequirementsController extends Controller
                 'semester_id' => $requirement->semester_id,
                 'credits' => $requirement->credits,
                 'name' => $requirement->course_name,
-                'electivelist_name' => $requirement->electivelist()->exists() ? $requirement->electivelist->name : null,
-                'electivelist_abbr' => $requirement->electivelist()
-                    ->exists() ? $requirement->electivelist->abbreviation : null,
+                'electivelist_name' => $requirement->electivelist !== null ? $requirement->electivelist->name : null,
+                'electivelist_abbr' => $requirement->electivelist !== null ? $requirement->electivelist->abbreviation : null,
                 'electivelist_id' => $requirement->electivelist_id,
                 'degreerequirement_id' => $requirement->degreerequirement_id,
-                'course_name' => $requirement->course()->exists() ? $requirement->course->fullTitle : null,
+                'course_name' => $requirement->course !== null ? $requirement->course->fullTitle : null,
                 'course_id' => $requirement->course_id,
-                'completedcourse_name' => $requirement->completedcourse()
-                    ->exists() ? $requirement->completedcourse->fullTitle : null,
+                'completedcourse_name' => $requirement->completedcourse !== null ? $requirement->completedcourse->fullTitle : null,
                 'completedcourse_id' => $requirement->completedcourse_id,
                 'course_id_lock' => $requirement->course_id_lock === 1 ? true : false,
                 'completedcourse_id_lock' => $requirement->completedcourse_id_lock === 1 ? true : false,
@@ -166,7 +164,7 @@ class FlowchartRequirementsController extends Controller
 
     public function filterRequirementEditData(Request $request, Planrequirement $requirement)
     {
-        if ($requirement->degreerequirement()->exists()) {
+        if ($requirement->degreerequirement !== null) {
             // is not custom, so only certain fields can be updated
             $allowedFields = [
                 'notes',
@@ -176,7 +174,7 @@ class FlowchartRequirementsController extends Controller
                 'completedcourse_id_lock',
             ];
 
-            if ($requirement->electivelist()->exists()) {
+            if ($requirement->electivelist !== null) {
                 // has elective list, so course name can also be changed
                 $allowedFields += [
                     'course_name',
