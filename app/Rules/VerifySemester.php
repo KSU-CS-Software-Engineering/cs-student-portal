@@ -1,138 +1,112 @@
 <?php
 
 namespace App\Rules;
-use App\Models\Course;
+
 use App\Models\Plan;
-use App\Models\Semester;
-use App\Models\Student;
-use App\Models\Planrequirement;
-use App\Models\Completedcourse;
-use spec\PhpSpec\Process\Prerequisites\SuitePrerequisitesSpec;
 
 class VerifySemester
 {
 
-
-//Checks to see if the student has the correct number of hours to be a full time student
-//Hours need to be less than 21 and greater than 0
-    public function CheckHours(Plan $plan)
+    public static function checkHours(Plan $plan)
     {
-        //This is the array that will be returned with the bad semesters in it.
-        $returnArray = [];
-        //Get the semesters for the plan
-        $semesters = Semester::where('plan_id', $plan->id)->get();
-        //Foreach of those smesters
-        foreach($semesters as $semester) {
-          //grab the plan requirements for that semester
-            $classesForTheSemester = Planrequirement::where('plan_id', $plan->id)->where('semester_id', $semester->id)->get();
-            //Need to keep track of the creditHOurs in this scope
-            $creditHours = 0;
-            //Foreach class in that semester
-            foreach($classesForTheSemester as $class) {
-                //Add the credits for that class to the credit hours
-                $creditHours += $class->credits;
-            }
-            //If something is inocrrect with the semester add the semester to the array
+        $semestersOver21 = [];
+
+        $semesters = $plan->semesters;
+
+        foreach ($semesters as $semester) {
+            $creditHours = $semester->requirements->sum->credits;
+
             if ($creditHours > 21) {
-              $returnArray[] = ['message' => $semester->name . ' needs to be under 21 hours'];
+                $semestersOver21[] = ['message' => "{$semester->name} needs to be under 21 hours"];
             }
         }
-        return $returnArray;
+
+        return $semestersOver21;
     }
 
-//Checks to see if the student has the correct prereqs to take the current semester worth of classes
-//Returns an array with the courses they need to take for a class if needed
-    public function CheckPreReqs(Plan $plan)
+    public static function checkPreReqs(Plan $plan)
     {
-      $returnArray = [];
-      //Get all of the semesters from the plan to iterate through
-      $plannedSemesters = Semester::where('plan_id', $plan->id)->get();
-      //Get all of the completedcourses for the student's plan
-      $completedCourses = Completedcourse::where('student_id', $plan->student_id)->get();
-      //Foreach semester in the plan
-      foreach($plannedSemesters as $plannedSemester) {
-          //Get the courses that are being taken that semester.
-          $semesterCourses = Planrequirement::where('semester_id', $plannedSemester->id)->get();
-          //Get all of the classes that are taken in the semesters before the semester we're iterating on.
-          $previousSemestersClasses = Planrequirement::where('plan_id', $plan->id)->where('semester_id', '<', $plannedSemester->id)->get();
-          //Foreach course being taken that semester.
-          foreach($semesterCourses as $semesterCourse) {
-            //If the Planrequirement object is not mapped to a course object (This is an elective that does not have a course matched with it yet.)
-            if($semesterCourse->course != NULL) {
-                //Get the prereqs for that course.
-                $prereqObjs = \App\Models\Prerequisite::where('prerequisite_for_course_id', $semesterCourse->course->id)->get();
-                //Foreach one of these prereqs
-                foreach($prereqObjs as $prereqObj) {
-                    //In theory there should only be one of these in the database, but it's giving me a collection object like there's multiple  objects.
-                    //Get the course object for that prereq (This is used to get the course name)
-                    $courseObj = Course::where('id', $prereqObj->prerequisite_course_id)->get()[0];
-                    //Concatenate the course Prefix and the course number ot get the name of the course
-                    $courseObjGetName = $courseObj->prefix . " " . $courseObj->number;
-                    //If the prereq does not appear in the previous semesters or completed courses.
-                    if($previousSemestersClasses->contains('course_name', $courseObjGetName) == FALSE && $completedCourses->contains('name', $courseObjGetName) == FALSE) {
-                          $item = ['message' => $courseObjGetName . " is a prerequisite for " . $semesterCourse->course_name];
-                          if(in_array($item, $returnArray) == FALSE) {
-                            $returnArray[] = $item;
-                          }
+        $missingPrerequisites = [];
+
+        $semesters = $plan->semesters;
+        $completedCourses = $plan->student->completedcourses;
+
+        foreach($semesters as $semester) {
+            $semesterRequirements = $semester->requirements;
+            $previousSemestersClasses = $plan->requirements
+                ->where('semesters.ordering', '<', $semester->ordering);
+
+            foreach ($semesterRequirements as $semesterRequirement) {
+                if ($semesterRequirement->course === null) {
+                    continue;
+                }
+
+                $prerequisites = $semesterRequirement->course->prerequisites;
+
+                foreach ($prerequisites as $prerequisite) {
+                    $prereqName = $prerequisite->prefix . ' ' . $prerequisite->number;
+
+                    if ($previousSemestersClasses->contains('course_id', $prerequisite->id)
+                        || $completedCourses->contains('name', $prereqName)) {
+                        continue;
+                    }
+
+                    $item = ['message' => "{$prereqName} is a prerequisite for {$semesterRequirement->course_name}"];
+
+                    if (!in_array($item, $missingPrerequisites)) {
+                        $missingPrerequisites[] = $item;
                     }
                 }
             }
+        }
 
-          }
-      }
-      //dd($returnArray);
-      return $returnArray;
+        return $missingPrerequisites;
     }
 
-    public function CheckCoursePlacement(Plan $plan){
-        $returnArray = [];
-        $semesterNameStrings = [];
-        //Get the semesters for that plan
-        $planSemesters = Semester::where('plan_id', $plan->id)->get();
-        //Foreach of those semesters.
-        foreach($planSemesters as $planSemester) {
-            //Get the name of the semester Spring, Fall, Summer
-            $semesterNameStrings = explode(" ", $planSemester->name);
+    public static function checkCoursePlacement(Plan $plan)
+    {
+        $misplacedCourses = [];
+
+        $semesters = $plan->semesters;
+
+        foreach($semesters as $semester) {
+            $semesterNameStrings = explode(' ', $semester->name);
             $semesterName = $semesterNameStrings[0];
-            //Get the plan requirements that match the plan Id and semester id.
-            $planRequirementsForSemester = Planrequirement::where('plan_id', $plan->id)->where('semester_id', $planSemester->id)->get();
-            //foreach one of these classes
-            foreach($planRequirementsForSemester as $planRequirementForSemester) {
-              //if the class has a name
-                if($planRequirementForSemester->course_name != "") {
-                    //Get the course object for that course
-                    $coursePlanRequirementForSemester = Course::where('id', $planRequirementForSemester->course_id)->get()[0];
-                    //Get when the semester is offered.
-                    $courseSemestersOffered = explode(", ", $coursePlanRequirementForSemester->semesters);
-                    //If the class has a special semester value of on sufficient demand, show that.
-                    if(in_array("On sufficient demand", $courseSemestersOffered)) {
-                        $returnArray[] = ['message' => $coursePlanRequirementForSemester->slug . " is offered with sufficient demand. Please consult your advisor for more information"];
+            $semesterRequirements = $semester->requirements;
+
+            foreach($semesterRequirements as $semesterRequirement) {
+                if ($semesterRequirement->electivelist === null) {
+                    $course = $semesterRequirement->course;
+                    $courseSemestersOffered = explode(', ', $course->semesters);
+
+                    if (in_array("On sufficient demand", $courseSemestersOffered)) {
+                        $misplacedCourses[] = ['message' => "{$course->slug} is offered with sufficient demand. " .
+                            'Please consult your advisor for more information'];
                     }
-                    //If the class is only in odd years
-                    if(in_array("odd years", $courseSemestersOffered)) {
+
+                    if (in_array("odd years", $courseSemestersOffered)) {
                         $year = (int)$semesterNameStrings[1];
-                        if($year % 2 != 1) {
-                            $returnArray[] = ['message' => $coursePlanRequirementForSemester->slug . " is only offered in odd years"];
+
+                        if ($year % 2 === 0) {
+                            $misplacedCourses[] = ['message' => "{$course->slug} is only offered in odd years"];
                         }
                     }
-                    //If the class is only in even years
-                    if(in_array("even years", $courseSemestersOffered)) {
-                      $year = (int)$semesterNameStrings[1];
-                      if($year % 2 != 0) {
-                          $returnArray[] = ['message' => $coursePlanRequirementForSemester->slug . " is only offered in even years"];
-                      }
+
+                    if (in_array("even years", $courseSemestersOffered)) {
+                        $year = (int)$semesterNameStrings[1];
+
+                        if($year % 2 === 1) {
+                            $misplacedCourses[] = ['message' => "{$course->slug} is only offered in even years"];
+                        }
                     }
-                    //If the semester's offerings do not match the current smeester.
-                    if(in_array($semesterName, $courseSemestersOffered) == FALSE) {
-                        $returnArray[] = ['message' => $coursePlanRequirementForSemester->slug . " is not offered in the " . $semesterName];
+
+                    if (!in_array($semesterName, $courseSemestersOffered)) {
+                        $misplacedCourses[] = ['message' => "{$course->slug} is not offered in the {$semesterName}"];
                     }
                 }
             }
         }
 
-
-
-        return $returnArray;
+        return $misplacedCourses;
     }
-
 }

@@ -215,95 +215,74 @@ class Plan extends Validatable
     }
 
     public function getErrors() {
+        $this->load([
+            'semesters.requirements.electivelist',
+            'semesters.requirements.course.prerequisites',
+            'student.completedcourses',
+            'degreeprogram.requirements',
+            'requirements.course.areas',
+        ]);
+
         return [
             // [
             //     'title' => 'Not finished courses',
-            //     'errors' => $this->CheckGradPlanRules(),
+            //     'errors' => $this->checkGradPlanRules(),
             // ],
             [
                 'title' => 'Courses missing',
-                'errors' => $this->CheckCISReqRules(),
+                'errors' => $this->checkCISReqRules(),
             ],
             [
                 'title' => '',
-                'errors' => $this->CheckHoursRules(),
+                'errors' => $this->checkHoursRules(),
             ],
             [
                 'title' => 'Prerequisities missing',
-                'errors' => $this->CheckPreReqRules(),
+                'errors' => $this->checkPreReqRules(),
             ],
             [
                 'title' => 'Courses not offered in its current semester placement',
-                'errors' => $this->CheckCoursePlacement(),
+                'errors' => $this->checkCoursePlacement(),
             ],
             [
                 'title' => 'K-State 8 Requirements Missing',
-                'errors' => $this->CheckKState8(),
+                'errors' => $this->checkKState8(),
             ],
         ];
     }
 
-    public function CheckCISReqRules()
+    public function checkCISReqRules()
     {
-        $firstArrs = [];
-        //Set the variables for the rules case
-        $rules = new VerifyFourYearPlan();
-
-        //Check the first one.
-        $firstArrs = $rules->CheckCISRequirementsPlan($this);
-
-        return $firstArrs;
+        return VerifyFourYearPlan::checkCISRequirementsPlan($this);
     }
 
-    public function CheckGradPlanRules()
+    public function checkGradPlanRules()
     {
-        //Check the second one.
-        //This handles graduation ability, not validity of the plan, so no flag.
-        $planreqs = [];
-        $rules = new VerifyFourYearPlan();
-        $planreqs = $rules->CheckGraduationValidityPlan($this);
-
-        return $planreqs;
+        return VerifyFourYearPlan::checkGraduationValidityPlan($this);
     }
 
-    public function CheckGradRequirementsRules()
+    public function checkGradRequirementsRules()
     {
-        //Check the third one.
-        //This handles graduation ability, not validity of the plan, so no fla
-        $array = [];
-        $rules = new VerifyFourYearPlan();
-        $array = $rules->CheckGraduationValidityDegreeRequirements($this);
+        return VerifyFourYearPlan::checkGraduationValidityDegreeRequirements($this);
     }
 
-    public function CheckHoursRules()
+    public function checkHoursRules()
     {
-        $rules = new VerifySemester();
-
-        //returns true if correct number of hours and false if not
-        //if not correct number of hours displays an alert
-        $correcthours = $rules->CheckHours($this);
-        return $correcthours;
+        return VerifySemester::checkHours($this);
     }
 
-    public function CheckPreReqRules()
+    public function checkPreReqRules()
     {
-        $rules = new VerifySemester();
-        //returns an array with the missing prereqs or empty if all good
-        $prereqs = $rules->CheckPreReqs($this);
-        return $prereqs;
+        return VerifySemester::checkPreReqs($this);
     }
 
-    public function CheckCoursePlacement()
+    public function checkCoursePlacement()
     {
-        $rules = new VerifySemester();
-        $courseplacement = $rules->CheckCoursePlacement($this);
-        return $courseplacement;
+        return VerifySemester::checkCoursePlacement($this);
     }
 
-    public function CheckKState8()
+    public function checkKState8()
     {
-        $rules = new VerifyFourYearPlan();
-        $kstate8 = $rules->CheckKstate8($this);
-        return $kstate8;
+        return VerifyFourYearPlan::checkKState8($this);
     }
 }
