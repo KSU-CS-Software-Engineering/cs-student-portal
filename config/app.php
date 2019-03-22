@@ -239,6 +239,5 @@ return [
 
     'auth_type' => env('AUTH_TYPE', 'off'),
     'in_advance' => env('IN_ADVANCE', 'P1D'),
-    'send_email' => env('SEND_EMAIL', false),
 
 ];
