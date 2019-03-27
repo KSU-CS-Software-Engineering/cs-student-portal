@@ -12,9 +12,39 @@ use App\Models\Semester;
 class SchedulerController extends Controller
 {
 
+    function getCurrentSemester(Semester $semester){
+
+        $dateSemester = $semester->currentSemester();
+
+        foreach ($semester as $studentSemester){
+
+            if($studentSemester->name == $dateSemester){
+                $currentSemester = Planrequirement::where('semester_id', $studentSemester->id)->get();
+            }
+            //If times don't match, default to first semester
+            else {
+                $currentSemester = Planrequirement::where('semester_id', $semester[0]->id)->get();;
+            }
+        }
+
+        return $currentSemester;
+    }
+
     public function getSemesterSections(Semester $semester){
 
         return Semester::find($semester->id)->sections();
+
+    }
+
+
+    public function show()
+    {
+
+        return view('scheduler.schedule');
+    }
+
+
+ }
 
 //        $courses = [];
 //        $elective_id = [];
@@ -70,15 +100,3 @@ class SchedulerController extends Controller
 //        }
 
 //        dd($returnArray);
-
-
-    }
-
-
-    public function show()
-    {
-
-        return view('scheduler.schedule');
-    }
-
- }

@@ -111,7 +111,7 @@
                 scheduleEnd: 21 * 60 + 30,
                 showOwnClasses: true,
                 //placeholder
-                semesterId: 1,
+                semesterId: 0,
             }
         },
         computed: {
@@ -161,10 +161,15 @@
             },
 
             getAllCourses: getAllCourses,
+            getCurrentSemester: getCurrentSemester,
         },
 
         created() {
             this.getAllCourses();
+        },
+
+        created() {
+            this.getCurrentSemester;
         }
     }
 
@@ -182,6 +187,14 @@
                 site.handleError("get data", "", error);
             });
     }
+
+    function getCurrentSemester(){
+        axios.get(`/scheduler/currentsemester`)
+            .then((response)=>{
+                this.semesterId = response.data;
+            })
+    }
+
 </script>
 
 <style scoped>

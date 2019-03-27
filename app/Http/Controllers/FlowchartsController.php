@@ -38,27 +38,6 @@ class FlowchartsController extends Controller
     }
 
 
-    // public function currentSemester() {
-    //   $returner = "";
-    //   $carbon = new Carbon();
-    //   Carbon::today('America/Chicago');
-    //   //August to December is Fall semester
-    //   if($carbon->month >= 8 && $carbon <= 12) {
-    //     $returner = "Fall" + $carbon->year;
-    //   }
-    //   //Spring semester
-    //   else if ($carbon->month >= 1 && $carbon->month <= 5) {
-    //     $returner = "Spring" + $carbon->year;
-    //   }
-    //   //None of these then it must be Summer
-    //   else {
-    //     $returner = "Summer" + $carbon->year;
-    //   }
-    //   dd($returner);
-    //   return $returner;
-    // }
-
-
     /**
      * Responds to requests to GET /courses
      */

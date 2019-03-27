@@ -85,6 +85,7 @@ Route::delete('flowcharts/{plan}/requirements/{requirement}', 'FlowchartsControl
 Route::get('flowcharts/{plan}/errors', 'FlowchartsController@errors');
 
 Route::get('scheduler/{semester}/sections', 'SchedulerController@getSemesterSections');
+Route::get('scheduler/currentsemester' , 'SchedulerController@getCurrentSemester');
 
 /*
  * Routes for the AdvisingController
