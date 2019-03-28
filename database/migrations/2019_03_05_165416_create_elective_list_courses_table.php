@@ -31,7 +31,6 @@ class CreateElectiveListCoursesTable extends Migration
      */
     public function down()
     {
-        //
         Schema::dropIfExists('elective_list_courses');
     }
 }
