@@ -1,7 +1,7 @@
 <template>
     <div class="added-course-root">
         <div @click="toggleExpand" class="added-course-title">
-            <h5><b>{{ course.name }}</b></h5>
+            <h5><b>{{ course.slug }} - {{ course.title }}</b></h5>
             <i class="fa expand-btn" :class="{ 'fa-angle-up' : isExpanded, 'fa-angle-down' : !isExpanded }"></i>
         </div>
         <table v-show="isExpanded" class="added-course-time">
@@ -12,17 +12,17 @@
                 <th>Hours</th>
                 <th>Instructor</th>
             </tr>
-            <tr v-for="time in course.times">
+            <tr v-for="section in course.sections">
                 <td>
-                    <i v-if="!courseIsAdded" @click="addTime(time)" class="fa fa-plus time-btn"></i>
-                    <i v-else-if="timeIsAdded(time)" @click="removeTime" class="fa fa-minus time-btn"></i>
-                    <i v-else @click="addTime(time)" class="fa fa-exchange time-btn"></i>
-                    A
+                    <i v-if="!courseIsAdded" @click="addTime(section)" class="fa fa-plus time-btn"></i>
+                    <i v-else-if="timeIsAdded(section)" @click="removeTime" class="fa fa-minus time-btn"></i>
+                    <i v-else @click="addTime(section)" class="fa fa-exchange time-btn"></i>
+                    {{ section.section }}
                 </td>
-                <td>LEC</td>
-                <td>{{ time.days }}</td>
-                <td>{{ layoutMethods.formatTime(time.begin) }} - {{ layoutMethods.formatTime(time.end) }}</td>
-                <td>{{ time.teacher }}</td>
+                <td>{{ section.type }}</td>
+                <td>{{ section.days }}</td>
+                <td>{{ section.hours }}</td>
+                <td>{{ section.instructor }}</td>
             </tr>
         </table>
     </div>
@@ -42,7 +42,7 @@
         },
         computed: {
             courseIsAdded: function () {
-                return this.course.times.some(time => time.added);
+                return this.course.sections.some(section => section.added);
             }
         },
         methods: {
@@ -54,7 +54,7 @@
                 time.added = true;
             },
             removeTime: function () {
-                this.course.times.forEach(time => time.added = false);
+                this.course.sections.forEach(section => section.added = false);
             },
             toggleExpand: function () {
                 this.isExpanded = !this.isExpanded;

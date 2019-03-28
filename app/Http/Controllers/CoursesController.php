@@ -63,6 +63,7 @@ class CoursesController extends Controller
             'query' => 'required|string',
             'electiveListId' => 'integer',
         ]);
+<<<<<<< HEAD
         //Get the list of electivelistcourses, this will then be used to grab the matching course objects.
         $electiveListModels = elective_list_courses::where('electivelist_id', $electiveListId)->get();
 
@@ -71,6 +72,10 @@ class CoursesController extends Controller
         //Need to go to the electivelistcourses and fgrab the slug, and then go through courses and grab the slugs and then compare.
         //$courses = Course::where('elective_list_id')->course
 
+=======
+
+        $courses = Course::filterName($request->input('query'))->get();
+>>>>>>> 6bd559a075bae58af839567c790d92167e264b34
 
         $resource = new Collection($courses, function ($course) {
             return [
