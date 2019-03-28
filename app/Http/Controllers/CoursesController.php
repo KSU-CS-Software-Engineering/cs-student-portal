@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\JsonSerializer;
 use App\Models\Category;
+use App\Models\elective_list_id;
 use App\Models\College;
 use App\Models\Course;
 use Illuminate\Http\Request;
@@ -18,7 +19,6 @@ class CoursesController extends Controller
     {
         $this->fractal = new Manager();
     }
-
     /**
      * Responds to requests to GET /courses
      */
@@ -63,23 +63,9 @@ class CoursesController extends Controller
             'query' => 'required|string',
             'electiveListId' => 'integer',
         ]);
-
-        $courseSlugs = array();
         //Get the list of electivelistcourses, this will then be used to grab the matching course objects.
-        $electiveListModels = ElectiveListCourses::where('electivelist_id', $electiveListId)->get();
-        //For each of the returned elective list
-        foreach($electiveListModel as $electiveListModels) {
-          //If electiveliostModel does not have a course_max_number, that means it only has the min_number so it's ajust a single class
-          if($electiveListModel->course_max_number != null) {
-            //When it has a the max, that means we want to iterate through the difference between max and min
-            for($i = 0; $i < ($electiveListModel->course_max_number - $electiveListModel->course_min_number); $i++) {
-              $currentCourseNumber = $electiveListModel->course_min_number + 1;
-              $courseSlugs[] = $electiveListModel->course_prefix + $currentCourseNumber;
-            }
-          }
-          $courseSlugs[] = $electiveListModel->course_prefix + $electiveListModel->course_min_number;
-        }
-        dd($courseSlugs);
+        $electiveListModels = elective_list_courses::where('electivelist_id', $electiveListId)->get();
+
         $courses = Course::whereIn('slug', $courseSlugs);
         //$courses = Course::filterName($request->input('query'))->get();
         //Need to go to the electivelistcourses and fgrab the slug, and then go through courses and grab the slugs and then compare.
