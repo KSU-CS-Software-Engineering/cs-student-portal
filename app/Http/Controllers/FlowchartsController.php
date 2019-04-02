@@ -78,6 +78,7 @@ class FlowchartsController extends Controller
             //no ID provided - redirect back to index
             return redirect('flowcharts/index');
         } else {
+
             //self::currentSemester();
             $user = Auth::user();
             $plan = Plan::findOrFail($id);

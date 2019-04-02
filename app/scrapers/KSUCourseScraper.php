@@ -45,6 +45,7 @@ class KSUCourseScraper
                     //The variable names match the name of the section on the site.
                     while ($sibling !== null && $sibling->classList->contains('section')) {
                         $sectionRow = $sibling->firstChild;
+                        $commentRow = $sibling->lastChild;
                         $offset = 0;
                         $daysEl = $sibling->firstChild->childNodes[5];
                         if ($daysEl->hasAttribute('colspan')) {
@@ -68,6 +69,7 @@ class KSUCourseScraper
                         }
                         $sectionInstructor = $sectionRow->childNodes[9 - (int) $offset]->textContent;
                         $courseId = $course == null ? null : $course->id;
+                        $sectionNotes = str_replace($this->NBSP5 , ' ', $commentRow->textContent);
 
                         $returnArray[] = [
                             'courseNumber' => $courseSlug,
@@ -81,6 +83,7 @@ class KSUCourseScraper
                             'facility' => $sectionFacility,//$sibling->firstChild->childNodes[7]->textContent, //This is the room
                             'instructor' => $sectionInstructor,//$sibling->firstChild->childNodes[9]->textContent, //The course instructor
                             'courseId' => $courseId,
+                            'notes' => $sectionNotes,
                         ];
 
                         // }
@@ -92,6 +95,7 @@ class KSUCourseScraper
                 }
             }
         }
+        dd($returnArray);
         return $returnArray;
     }
 }

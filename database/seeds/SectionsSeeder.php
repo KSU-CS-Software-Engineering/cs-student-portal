@@ -27,6 +27,7 @@ class SectionsSeeder extends Seeder
                     'facility' => $courseSection['facility'],
                     'instructor' => $courseSection['instructor'],
                     'course_id' => $courseSection['courseId'], //The matching course object id.
+                    'notes' => $courseSection['notes'],
                 ]);
             } catch (QueryException $exception) {
                 echo($exception->getMessage() . "\n");
