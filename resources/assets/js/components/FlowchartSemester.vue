@@ -64,12 +64,10 @@
     }
 
     function setSummer(event) {
-        let id = document.getElementById("id").value;
-        let data = {
-            id: this.id,
-        };
-        axios.post(`/flowcharts/semesters/${id}/setsummer`, data)
+        let planId = document.getElementById("id").value;
+        axios.post(`/flowcharts/${planId}/semesters/${this.id}/set-summer`)
             .then((response) => {
+                site.displayMessage(response.data, "success");
                 eventDispatcher.$emit("updateFlowchart");
             })
             .catch((error) => {
