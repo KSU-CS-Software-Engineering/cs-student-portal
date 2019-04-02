@@ -28,7 +28,7 @@
                 </label>
                 <br>
                 <select id="available-classes" v-model="selectedCourse">
-                    <option v-for="course in allCourses" :value="course">{{ course.slug }} - {{ course.title}}</option>
+                    <option v-for="course in allCourses" v-if="!selectedCourses.includes(course)" :value="course">{{ course.slug }} - {{ course.title}}</option>
                 </select>
             </form>
             <button @click="addSelectedCourse" :disabled="selectedCourse == null">Add</button>
