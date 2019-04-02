@@ -4,7 +4,7 @@
             <h5><b>{{ course.slug }} - {{ course.title }}</b></h5>
             <i class="fa expand-btn" :class="{ 'fa-angle-up' : isExpanded, 'fa-angle-down' : !isExpanded }"></i>
         </div>
-        <table v-show="isExpanded" class="added-course-time">
+        <table v-show="isExpanded" class="added-course-section">
             <tr>
                 <th>Section</th>
                 <th>Type</th>
@@ -14,9 +14,9 @@
             </tr>
             <tr v-for="section in course.sections">
                 <td>
-                    <i v-if="!courseIsAdded" @click="addTime(section)" class="fa fa-plus time-btn"></i>
-                    <i v-else-if="timeIsAdded(section)" @click="removeTime" class="fa fa-minus time-btn"></i>
-                    <i v-else @click="addTime(section)" class="fa fa-exchange time-btn"></i>
+                    <i v-if="!courseIsAdded" @click="addSection(section)" class="fa fa-plus section-btn"></i>
+                    <i v-else-if="sectionIsAdded(section)" @click="addSection(null)" class="fa fa-minus section-btn"></i>
+                    <i v-else @click="addSection(section)" class="fa fa-exchange section-btn"></i>
                     {{ section.section }}
                 </td>
                 <td>{{ section.type }}</td>
@@ -46,15 +46,11 @@
             }
         },
         methods: {
-            timeIsAdded: function (time) {
-                return time.added;
+            sectionIsAdded: function (section) {
+                return section.added;
             },
-            addTime: function (time) {
-                this.removeTime();
-                time.added = true;
-            },
-            removeTime: function () {
-                this.course.sections.forEach(section => section.added = false);
+            addSection: function (section) {
+                this.$emit('putSection', section)
             },
             toggleExpand: function () {
                 this.isExpanded = !this.isExpanded;
@@ -109,7 +105,7 @@
 
     .added-course-title {
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
         background-color: #512888;
         color: white;
@@ -120,7 +116,7 @@
         margin: 0;
     }
 
-    .time-btn {
+    .section-btn {
         position: absolute;
         left: -15px;
         top: 5px;

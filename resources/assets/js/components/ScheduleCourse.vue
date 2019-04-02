@@ -1,8 +1,8 @@
 <template>
     <div class="schedule-course" :style="style">
-        <span class="course-name">{{ course.name }}</span>
-        <span class="course-time">{{ layoutMethods.formatTime(course.begin) }} - {{ layoutMethods.formatTime(course.end) }}</span>
-        <span class="course-location">{{ course.location }}</span>
+        <span class="course-name">{{ course.course_number }}</span>
+        <span class="course-time">{{ course.hours }}</span>
+        <span class="course-location">{{ course.facility }}</span>
     </div>
 </template>
 

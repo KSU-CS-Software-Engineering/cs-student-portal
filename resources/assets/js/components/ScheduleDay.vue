@@ -1,8 +1,8 @@
 <template>
     <div class="schedule-day">
-        <schedule-course v-for="course in courses" :key="course.id" :course="course"
-                         :offset="layoutMethods.calculateOffset(course.begin)"
-                         :height="layoutMethods.calculateHeight(course.begin, course.end)"
+        <schedule-course v-for="section in sections" :key="section.id" :course="section"
+                         :offset="layoutMethods.calculateOffset(layoutMethods.parseTimes(section)[0])"
+                         :height="layoutMethods.calculateHeight.apply(null, layoutMethods.parseTimes(section))"
                             :layoutMethods="layoutMethods"/>
     </div>
 </template>
@@ -16,7 +16,7 @@
             ScheduleCourse
         },
         props: {
-            courses: {
+            sections: {
                 type: Array
             },
             layoutMethods: {}
