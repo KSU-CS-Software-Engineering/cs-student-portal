@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\JsonSerializer;
 use App\Models\Category;
-use App\Models\elective_list_id;
+use App\Models\Elective_List_Course;
 use App\Models\College;
 use App\Models\Course;
 use Illuminate\Http\Request;
@@ -63,27 +63,19 @@ class CoursesController extends Controller
             'query' => 'required|string',
             'electiveListId' => 'integer',
         ]);
-<<<<<<< HEAD
-        //Get the list of electivelistcourses, this will then be used to grab the matching course objects.
-        $electiveListModels = elective_list_courses::where('electivelist_id', $electiveListId)->get();
-
-        $courses = Course::whereIn('slug', $courseSlugs);
-        //$courses = Course::filterName($request->input('query'))->get();
-        //Need to go to the electivelistcourses and fgrab the slug, and then go through courses and grab the slugs and then compare.
-        //$courses = Course::where('elective_list_id')->course
-
-=======
-
-        $courses = Course::filterName($request->input('query'))->get();
->>>>>>> 6bd559a075bae58af839567c790d92167e264b34
-
+        if($request->input('electiveListId') != null && $request->input('electiveListId') != '9') {
+          $electiveListModels = elective_list_course::where('elective_list_id', $request->input('electiveListId'))->pluck('course_id');
+          $courses = Course::whereIn('id', $electiveListModels)->get();
+        }
+        else {
+          $courses = Course::filterName($request->input('query'))->get();
+        }
         $resource = new Collection($courses, function ($course) {
             return [
                 'value' => $course->fullTitle,
                 'data' => $course->id,
             ];
         });
-
         return $this->fractal->createData($resource)->toJson();
     }
 

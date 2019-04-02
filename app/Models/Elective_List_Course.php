@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-class Elective_List_Course extends Validatable
+class elective_list_course extends Validatable
 {
     protected $dates = ['created_at', 'updated_at'];
 
