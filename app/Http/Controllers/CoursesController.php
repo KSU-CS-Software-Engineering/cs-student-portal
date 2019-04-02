@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\JsonSerializer;
 use App\Models\Category;
+use App\Models\Elective_List_Course;
 use App\Models\College;
 use App\Models\Course;
 use Illuminate\Http\Request;
@@ -18,7 +19,6 @@ class CoursesController extends Controller
     {
         $this->fractal = new Manager();
     }
-
     /**
      * Responds to requests to GET /courses
      */
@@ -63,16 +63,19 @@ class CoursesController extends Controller
             'query' => 'required|string',
             'electiveListId' => 'integer',
         ]);
-
-        $courses = Course::filterName($request->input('query'))->get();
-
+        if($request->input('electiveListId') != null && $request->input('electiveListId') != '9') {
+          $electiveListModels = elective_list_course::where('elective_list_id', $request->input('electiveListId'))->pluck('course_id');
+          $courses = Course::whereIn('id', $electiveListModels)->get();
+        }
+        else {
+          $courses = Course::filterName($request->input('query'))->get();
+        }
         $resource = new Collection($courses, function ($course) {
             return [
                 'value' => $course->fullTitle,
                 'data' => $course->id,
             ];
         });
-
         return $this->fractal->createData($resource)->toJson();
     }
 
