@@ -33,7 +33,8 @@
         name: "ScheduleAddedCourse",
         props: {
             course: {},
-            layoutMethods: {}
+            layoutMethods: {},
+            addedSection: {}
         },
         data() {
             return {
@@ -42,15 +43,15 @@
         },
         computed: {
             courseIsAdded: function () {
-                return this.course.sections.some(section => section.added);
+                return this.addedSection && true;
             }
         },
         methods: {
             sectionIsAdded: function (section) {
-                return section.added;
+                return this.addedSection === section;
             },
             addSection: function (section) {
-                this.$emit('putSection', section)
+                this.$emit('putSection', this.course.id, section)
             },
             toggleExpand: function () {
                 this.isExpanded = !this.isExpanded;

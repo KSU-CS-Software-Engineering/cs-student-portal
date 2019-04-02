@@ -34,7 +34,7 @@
             <button @click="addSelectedCourse" :disabled="selectedCourse == null">Add</button>
             <hr>
             <div class="class-finder-selected">
-                <schedule-added-course v-for="course in selectedCourses" :key="course.id" :course="course"
+                <schedule-added-course v-for="course in selectedCourses" :key="course.id" :course="course" :addedSection="selectedSections[course.id]"
                                        :layoutMethods="layoutMethods" @putSection="putSection"></schedule-added-course>
             </div>
         </div>
@@ -57,54 +57,6 @@
         data() {
             return {
                 days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-                dummyClasses: {
-                    Monday: [
-                        {
-                            id: 0,
-                            name: "Test1",
-                            begin: 9 * 60 + 15,
-                            end: 10 * 60 + 45,
-                            location: "Somewhere",
-                            teacher: "Someone"
-                        }
-                    ],
-                    Tuesday: [
-                        {
-                            id: 1,
-                            name: "Test2",
-                            begin: 12 * 60 + 30,
-                            end: 13 * 60 + 20,
-                            location: "Somewhere",
-                            teacher: "Someone"
-                        },
-                        {
-                            id: 2,
-                            name: "Test3",
-                            begin: 16 * 60 + 30,
-                            end: 17 * 60 + 20,
-                            location: "Somewhere",
-                            teacher: "Someone"
-                        }
-                    ],
-                    Thursday: [
-                        {
-                            id: 3,
-                            name: "Test2",
-                            begin: 12 * 60 + 30,
-                            end: 13 * 60 + 20,
-                            location: "Somewhere",
-                            teacher: "Someone"
-                        },
-                        {
-                            id: 4,
-                            name: "Test3",
-                            begin: 16 * 60 + 30,
-                            end: 17 * 60 + 20,
-                            location: "Somewhere",
-                            teacher: "Someone"
-                        }
-                    ]
-                },
                 allCourses: [],
                 selectedCourse: null,
                 selectedCourses: [],
@@ -118,9 +70,6 @@
             }
         },
         computed: {
-            courses: function () {
-                return this.showOwnClasses ? this.dummyClasses : [];
-            },
             scheduleDuration: function () {
                 return this.scheduleEnd - this.scheduleBegin;
             },
@@ -188,8 +137,8 @@
 
             getAllCourses: getAllCourses,
 
-            putSection: function (section) {
-                this.selectedSections[section.course_id] = section;
+            putSection: function (courseId, section) {
+                this.selectedSections[courseId] = section;
                 this.updateSelectedSectionsByDays();
             },
             updateSelectedSectionsByDays: function () {
@@ -198,9 +147,11 @@
                 for (let key in this.selectedSections) {
                     if (!this.selectedSections.hasOwnProperty(key)) continue;
                     let section = this.selectedSections[key];
-                    for (let c of section.days) {
-                        if (c === ' ') continue;
-                        ret[dayMapping[c]].push(section);
+                    if (section) {
+                        for (let c of section.days) {
+                            if (c === ' ') continue;
+                            ret[dayMapping[c]].push(section);
+                        }
                     }
                 }
                 this.selectedSectionsByDays = ret;
