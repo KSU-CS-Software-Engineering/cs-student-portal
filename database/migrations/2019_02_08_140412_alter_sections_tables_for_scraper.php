@@ -70,6 +70,7 @@ class AlterSectionsTablesForScraper extends Migration
             $table->string('type', 10)->change();
             $table->string('section', 10)->change();
             $table->string('course_number', 10)->change();
+
         });
     }
 }

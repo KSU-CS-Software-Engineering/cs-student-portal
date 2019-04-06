@@ -21,6 +21,11 @@ class Course extends Model
         return $this->belongsToMany('App\Models\Area', 'kstate8', 'course_id', 'area_id');
     }
 
+    public function sections()
+    {
+        return $this->hasMany('App\Models\Section');
+    }
+
     public function getNumberStrAttribute()
     {
         return str_pad($this->number, 3, '0', STR_PAD_LEFT);

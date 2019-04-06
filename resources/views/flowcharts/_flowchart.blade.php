@@ -21,7 +21,6 @@
   		</div>
 			<b>Description: </b>{{ $plan->description }}<br>
 			<b>Starts: </b>{{ $plan->starttext }}<br>
-			<b>Test: </b>
 			<p>
 				<a href="{{ url('flowcharts/' . $plan->student_id)}}" class="btn btn-primary"><i class="fa fa-list"></i> Select a Different Flowchart</a>
 				<button class="btn btn-default" id="reset" title="Refresh Flowchart"><i class="fa fa-refresh"></i></button>

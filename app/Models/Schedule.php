@@ -19,6 +19,10 @@ class Schedule extends Model {
         return $this->hasMany('App\Models\Section');
     }
 
+    public function semester() {
+      return $this->belongsTo('App\Models\Semester');
+    }
+
 
     protected $rules = array(
       'id' => 'required|integer',

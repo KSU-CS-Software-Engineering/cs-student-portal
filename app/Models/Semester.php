@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Support\Collection;
+use Carbon\Carbon;
 
 class Semester extends Validatable
 {
@@ -29,6 +30,26 @@ class Semester extends Validatable
 
     protected $fillable = ['name', 'ordering', 'plan_id'];
 
+    public function currentSemester(){
+
+        $carbon = new Carbon();
+        Carbon::today('America/Chicago');
+        //Fall semester
+        if($carbon->month >= 8 && $carbon <= 12) {
+            $currentSemester = "Fall $carbon->year";
+        }
+        //Spring semester
+        else if ($carbon->month >= 1 && $carbon->month <= 5) {
+            $currentSemester= "Spring $carbon->year";
+        }
+        //Summer
+        else {
+            $currentSemester = "Summer $carbon->year";
+        }
+        return $currentSemester;
+
+    }
+
     public function plan()
     {
         return $this->belongsTo('App\Models\Plan')->withTrashed();
@@ -37,6 +58,11 @@ class Semester extends Validatable
     public function requirements()
     {
         return $this->hasMany('App\Models\Planrequirement');
+    }
+
+    public function sections()
+    {
+        return $this->requirements()->with('course.sections')->get();
     }
 
     public function repairRequirementsOrder()

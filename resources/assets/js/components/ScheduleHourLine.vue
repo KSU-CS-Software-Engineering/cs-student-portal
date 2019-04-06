@@ -1,7 +1,7 @@
 <template>
     <div class="schedule-hourLine" :style="style">
         <hr>
-        {{ time }}
+        <span>{{ time }}</span>
     </div>
 </template>
 
