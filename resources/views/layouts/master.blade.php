@@ -6,7 +6,7 @@
     </head>
     <body role="document">
         @include('includes.navbar')
-        <div class="container" role="main">
+        <div class="{{ empty($wide) ? 'container' : 'container-fluid' }}" role="main">
             <div id="message">
               @if(session('message') !== null)
                 <input type="hidden" id="message_flash" value="{{ Session::pull('message') }}">

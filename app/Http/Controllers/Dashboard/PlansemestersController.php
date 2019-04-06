@@ -2,21 +2,14 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use App\Helpers\JsonSerializer;
 use App\Http\Controllers\Controller;
 use App\Models\Plan;
 use App\Models\Semester;
 use Illuminate\Http\Request;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
+use Illuminate\Support\Collection;
 
 class PlansemestersController extends Controller
 {
-
-    public function __construct()
-    {
-        $this->fractal = new Manager();
-    }
 
     public function getPlansemestersForPlan(Request $request, $id = -1)
     {
@@ -24,15 +17,16 @@ class PlansemestersController extends Controller
             abort(404);
         } else {
             $plan = Plan::withTrashed()->with('semesters')->findOrFail($id);
-            $resource = new Collection($plan->semesters, function ($semester) {
-                return [
+            $resource = new Collection();
+            foreach ($plan->semesters as $semester) {
+                $resource->push([
                     'id' => $semester->id,
                     'name' => $semester->name,
                     'ordering' => $semester->ordering,
-                ];
-            });
-            $this->fractal->setSerializer(new JsonSerializer());
-            return $this->fractal->createData($resource)->toJson();
+                ]);
+            }
+
+            return response()->json($resource);
         }
     }
 

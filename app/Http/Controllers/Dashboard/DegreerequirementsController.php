@@ -2,22 +2,14 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use App\Helpers\JsonSerializer;
 use App\Http\Controllers\Controller;
 use App\Models\Degreeprogram;
 use App\Models\Degreerequirement;
 use Illuminate\Http\Request;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
+use Illuminate\Support\Collection;
 
 class DegreerequirementsController extends Controller
 {
-
-    public function __construct()
-    {
-        $this->fractal = new Manager();
-    }
 
     public function getDegreerequirementsForProgram(Request $request, $id = -1)
     {
@@ -25,29 +17,30 @@ class DegreerequirementsController extends Controller
             abort(404);
         } else {
             $degreeprogram = Degreeprogram::withTrashed()->with('requirements')->findOrFail($id);
-            $resource = new Collection($degreeprogram->requirements, function ($requirement) {
+            $resource = new Collection();
+            foreach ($degreeprogram->requirements as $requirement) {
                 if (!empty($requirement->course_name)) {
-                    return [
+                    $resource->push([
                         'id' => $requirement->id,
                         'notes' => $requirement->notes,
                         'semester' => $requirement->semester,
                         'ordering' => $requirement->ordering,
                         'credits' => $requirement->credits,
                         'name' => $requirement->course_name,
-                    ];
+                    ]);
                 } else {
-                    return [
+                    $resource->push([
                         'id' => $requirement->id,
                         'notes' => $requirement->notes,
                         'semester' => $requirement->semester,
                         'ordering' => $requirement->ordering,
                         'credits' => $requirement->credits,
                         'name' => $requirement->electivelist->name,
-                    ];
+                    ]);
                 }
-            });
-            $this->fractal->setSerializer(new JsonSerializer());
-            return $this->fractal->createData($resource)->toJson();
+            }
+
+            return response()->json($resource);
         }
     }
 
@@ -58,32 +51,31 @@ class DegreerequirementsController extends Controller
         } else {
             $degreerequirement = Degreerequirement::findOrFail($id);
 
-            $resource = new Item($degreerequirement, function ($requirement) {
-                if (!empty($requirement->course_name)) {
-                    return [
-                        'id' => $requirement->id,
-                        'notes' => $requirement->notes,
-                        'semester' => $requirement->semester,
-                        'ordering' => $requirement->ordering,
-                        'credits' => $requirement->credits,
-                        'type' => 'course',
-                        'course_name' => $requirement->course_name,
-                    ];
-                } else {
-                    return [
-                        'id' => $requirement->id,
-                        'notes' => $requirement->notes,
-                        'semester' => $requirement->semester,
-                        'ordering' => $requirement->ordering,
-                        'credits' => $requirement->credits,
-                        'type' => 'electivelist',
-                        'electivelist_id' => $requirement->electivelist->id,
-                        'electivelist_name' => $requirement->electivelist->name,
-                    ];
-                }
-            });
-            $this->fractal->setSerializer(new JsonSerializer());
-            return $this->fractal->createData($resource)->toJson();
+            $requirement = $degreerequirement;
+            if (!empty($requirement->course_name)) {
+                $resource = [
+                    'id' => $requirement->id,
+                    'notes' => $requirement->notes,
+                    'semester' => $requirement->semester,
+                    'ordering' => $requirement->ordering,
+                    'credits' => $requirement->credits,
+                    'type' => 'course',
+                    'course_name' => $requirement->course_name,
+                ];
+            } else {
+                $resource = [
+                    'id' => $requirement->id,
+                    'notes' => $requirement->notes,
+                    'semester' => $requirement->semester,
+                    'ordering' => $requirement->ordering,
+                    'credits' => $requirement->credits,
+                    'type' => 'electivelist',
+                    'electivelist_id' => $requirement->electivelist->id,
+                    'electivelist_name' => $requirement->electivelist->name,
+                ];
+            }
+
+            return response()->json($resource);
         }
     }
 
