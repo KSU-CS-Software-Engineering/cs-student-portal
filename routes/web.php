@@ -64,13 +64,14 @@ Route::get('flowcharts/edit/{id}', 'FlowchartsController@editFlowchart');
 Route::post('flowcharts/edit/{id}', 'FlowchartsController@saveFlowchart');
 Route::post('flowcharts/delete', 'FlowchartsController@deleteFlowchart');
 Route::post('flowcharts/reset', 'FlowchartsController@resetFlowchart');
-Route::post('flowcharts/semesters/{id}/setsummer', 'FlowchartSemestersController@postSemesterSetSummer');
 
 Route::get('flowcharts/{plan}/semesters', 'FlowchartSemestersController@getSemesters');
 Route::post('flowcharts/{plan}/semesters', 'FlowchartSemestersController@addSemester');
 Route::patch('flowcharts/{plan}/semesters', 'FlowchartSemestersController@moveSemester');
 Route::patch('flowcharts/{plan}/semesters/{semester}', 'FlowchartSemestersController@renameSemester');
 Route::delete('flowcharts/{plan}/semesters/{semester}', 'FlowchartSemestersController@deleteSemester');
+Route::post('flowcharts/{plan}/semesters/{semester}/set-summer', 'FlowchartSemestersController@setSummer');
+
 Route::get('flowcharts/{plan}/courses', 'FlowchartRequirementsController@getCourses');
 Route::post('flowcharts/{plan}/requirements', 'FlowchartRequirementsController@addRequirement');
 Route::put('flowcharts/{plan}/requirements/{requirement}', 'FlowchartRequirementsController@updateRequirement');

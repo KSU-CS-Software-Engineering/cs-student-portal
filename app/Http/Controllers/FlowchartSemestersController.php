@@ -81,35 +81,20 @@ class FlowchartSemestersController extends Controller
         return response()->json($resource);
     }
 
-    public function postSemesterSetSummer(Request $request, $id = -1)
+    public function setSummer(Request $request, Plan $plan, Semester $semester)
     {
-        //What if I change this to be an alert, where the user can press Summer or not.
-        //I think this may work.
-        if ($id < 0) {
-            abort(404);
-        }
-
-        $plan = Plan::with('semesters')->findOrFail($id);
-
         $this->authorize('modify', $plan);
 
-        $semester = Semester::findOrFail($request->input('id'));
-
-        $lastSemester = Semester::where('plan_id', $plan->id)->orderby('ordering', 'DESC')->first();
-        $seasonYear = explode(' ', $lastSemester->name);
-        $year = $seasonYear[1];
-        if ($seasonYear[0] == "Fall") {
-            $seasonYear[1]++;
-        }
-
-        if ($semester->plan_id == $id) {
-            $semester->name = "Summer " . $year;// . $semester->year();
-            $semester->save();
-            return;
-        } else {
-            //semester id does not match plan id given
+        if ($semester->plan_id !== $plan->id) {
             abort(404);
         }
+
+        $seasonYear = explode(' ', $semester->name);
+        $seasonYear[0] = 'Summer';
+        $semester->name = implode(' ', $seasonYear);
+        $semester->save();
+
+        return response()->json(trans('messages.item_saved'));
     }
 
     public function moveSemester(Request $request, Plan $plan)
