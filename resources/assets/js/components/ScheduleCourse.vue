@@ -1,5 +1,5 @@
 <template>
-    <div class="schedule-course" :style="style">
+    <div class="schedule-course" v-bind:class="{ 'schedule-course-conflict': width < 1 }" :style="style">
         <span class="course-name">{{ course.course_number }}</span>
         <span class="course-time">{{ course.hours }}</span>
         <span class="course-location">{{ course.facility }}</span>
@@ -19,11 +19,20 @@
                 type: Number,
                 required: true
             },
-            layoutMethods: {}
+            width: {
+                type: Number,
+                required: true
+            },
+            layoutMethods: {},
+            vPosition: {}
         },
         computed: {
             style: function () {
-                return `top: ${this.offset * 100}%; height: ${this.height * 100}%;`;
+                return `top: ${this.offset * 100}%;
+                 height: ${this.height * 100}%;
+                  margin: 0.2em;
+                   width: calc(${this.width * 100}% - 0.2em);
+                    left: ${this.vPosition * this.width * 100}%;`;
             }
         }
 
