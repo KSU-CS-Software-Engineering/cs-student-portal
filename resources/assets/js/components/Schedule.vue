@@ -14,7 +14,7 @@
                                         :offset="hourLine.offset"/>
                 </div>
                 <div class="schedule-courses">
-                    <schedule-day v-for="day in days" :key="day" :courses="courses[day]"
+                    <schedule-day v-for="(sections, index) in selectedSectionsByDays" :key="`section-${index}`" :sections="sections"
                                   :layoutMethods="layoutMethods"/>
                 </div>
             </div>
@@ -28,13 +28,14 @@
                 </label>
                 <br>
                 <select id="available-classes" v-model="selectedCourse">
-                    <option v-for="course in allCourses" :value="course">{{ course.slug }} - {{ course.title}}</option>
+                    <option v-for="course in allCourses" v-if="!selectedCourses.includes(course)" :value="course">{{ course.slug }} - {{ course.title}}</option>
                 </select>
             </form>
             <button @click="addSelectedCourse" :disabled="selectedCourse == null">Add</button>
             <hr>
             <div class="class-finder-selected">
-                <schedule-added-course v-for="course in selectedCourses" :key="course.id" :course="course" :layoutMethods="layoutMethods"></schedule-added-course>
+                <schedule-added-course v-for="course in selectedCourses" :key="course.id" :course="course" :addedSection="selectedSections[course.id]"
+                                       :layoutMethods="layoutMethods" @putSection="putSection"></schedule-added-course>
             </div>
         </div>
     </div>
@@ -56,68 +57,19 @@
         data() {
             return {
                 days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-                dummyClasses: {
-                    Monday: [
-                        {
-                            id: 0,
-                            name: "Test1",
-                            begin: 9 * 60 + 15,
-                            end: 10 * 60 + 45,
-                            location: "Somewhere",
-                            teacher: "Someone"
-                        }
-                    ],
-                    Tuesday: [
-                        {
-                            id: 1,
-                            name: "Test2",
-                            begin: 12 * 60 + 30,
-                            end: 13 * 60 + 20,
-                            location: "Somewhere",
-                            teacher: "Someone"
-                        },
-                        {
-                            id: 2,
-                            name: "Test3",
-                            begin: 16 * 60 + 30,
-                            end: 17 * 60 + 20,
-                            location: "Somewhere",
-                            teacher: "Someone"
-                        }
-                    ],
-                    Thursday: [
-                        {
-                            id: 3,
-                            name: "Test2",
-                            begin: 12 * 60 + 30,
-                            end: 13 * 60 + 20,
-                            location: "Somewhere",
-                            teacher: "Someone"
-                        },
-                        {
-                            id: 4,
-                            name: "Test3",
-                            begin: 16 * 60 + 30,
-                            end: 17 * 60 + 20,
-                            location: "Somewhere",
-                            teacher: "Someone"
-                        }
-                    ]
-                },
                 allCourses: [],
                 selectedCourse: null,
                 selectedCourses: [],
                 scheduleBegin: 7 * 60 + 30,
                 scheduleEnd: 21 * 60 + 30,
+                selectedSections: {},
+                selectedSectionsByDays: [[], [], [], [], [], [], []],
                 showOwnClasses: true,
                 //placeholder
-                semesterId: 0,
+                semesterId: 1,
             }
         },
         computed: {
-            courses: function () {
-                return this.showOwnClasses ? this.dummyClasses : [];
-            },
             scheduleDuration: function () {
                 return this.scheduleEnd - this.scheduleBegin;
             },
@@ -137,7 +89,8 @@
                 return {
                     calculateOffset: this.calculateOffset,
                     calculateHeight: this.calculateHeight,
-                    formatTime: this.formatTime
+                    formatTime: this.formatTime,
+                    parseTimes: this.parseTimes,
                 }
             },
             availableClasses: function () {
@@ -151,6 +104,28 @@
             calculateHeight: function (begin, end) {
                 return (end - begin) / this.scheduleDuration;
             },
+            parseTimes: function (section) {
+                if (!section.hours.match(/\s*\d\d?\:\d\d\s*(a\.m\.|p\.m\.)?\s*\-\s*\d\d?\:\d\d\s*(a\.m\.|p\.m\.)?\s*/g)) {
+                    console.error(`Unknown time format: ${section.hours}`);
+                    return null;
+                }
+                let times = [];
+                let periods = [];
+                let timeRegex = /\d\d?/g;
+                let periodRegex = /(a\.m\.|p\.m\.)/g;
+                section.hours.match(timeRegex).forEach(time => times.push(parseInt(time)));
+                section.hours.match(periodRegex).forEach(period => {
+                    if (period.match('a\.m\.')) {
+                        periods.push(0);
+                    } else {
+                        periods.push(12 * 60);
+                    }
+                });
+                return [
+                    (times[0] === 12 ? 0 : times[0]) * 60 + periods[0] + times[1],
+                    (times[2] === 12 ? 0 : times[2]) * 60 + periods[periods.length - 1] + times[3]
+                ]
+            },
             addSelectedCourse: function () {
                 if (!this.selectedCourses.includes(this.selectedCourse)) {
                     this.selectedCourses.push(this.selectedCourse);
@@ -162,15 +137,33 @@
 
             getAllCourses: getAllCourses,
             getCurrentSemester: getCurrentSemester,
+
+            putSection: function (courseId, section) {
+                this.selectedSections[courseId] = section;
+                this.updateSelectedSectionsByDays();
+            },
+            updateSelectedSectionsByDays: function () {
+                const dayMapping = {M: 0, T: 1, W: 2, U: 3, F: 4}; //Saturday and Sunday?
+                let ret = [[], [], [], [], [], [], []];
+                for (let key in this.selectedSections) {
+                    if (!this.selectedSections.hasOwnProperty(key)) continue;
+                    let section = this.selectedSections[key];
+                    if (section) {
+                        for (let c of section.days) {
+                            if (c === ' ') continue;
+                            ret[dayMapping[c]].push(section);
+                        }
+                    }
+                }
+                this.selectedSectionsByDays = ret;
+            }
         },
 
         created() {
             this.getAllCourses();
+            this.getCurrentSemester();
         },
 
-        created() {
-            this.getCurrentSemester;
-        }
     }
 
     //need to assign semesterId to current semester

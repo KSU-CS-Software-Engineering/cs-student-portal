@@ -32,6 +32,6 @@
         width: 100%;
         margin-top: 0;
         margin-bottom: 2px;
-        z-index: -1;
+        z-index: 1;
     }
 </style>

@@ -1,5 +1,6 @@
 $clock-width: 50px;
 $schedule-day-h-padding: 0.5em;
+$schedule-bg-color: #fafafb;
 
 #schedule-root {
   display: flex;
@@ -12,7 +13,7 @@ $schedule-day-h-padding: 0.5em;
   width: 80%;
   margin: 24px 16px;
   padding: 8px;
-  background-color: rgba(151, 160, 179, 0.05);
+  background-color: $schedule-bg-color;
 }
 
 #class-finder {
@@ -67,7 +68,7 @@ $schedule-day-h-padding: 0.5em;
   flex-direction: column;
   position: relative;
   width: calc(100%/7);
-  padding: 0 $schedule-day-h-padding;
+  margin: 0 $schedule-day-h-padding;
 }
 
 .schedule-course {
@@ -77,12 +78,21 @@ $schedule-day-h-padding: 0.5em;
   padding: $schedule-day-h-padding $schedule-day-h-padding;
   background-color: #512888;
   color: white;
-  margin: auto;
-  width: calc(100% - 2 * #{$schedule-day-h-padding});
+  overflow: hidden;
+  z-index: 2;
+}
+
+.schedule-course-conflict {
+  background-color: #881a1b;
 }
 
 .schedule-course:hover {
   height: auto !important;
+  width: 100% !important;
+  left: 0 !important;
+  z-index: 9999;
+  outline: 1px solid $schedule-bg-color;
+  margin-top: 0.6em !important;
 }
 
 .schedule-hourLine {
