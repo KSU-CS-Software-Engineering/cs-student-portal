@@ -2,41 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\JsonSerializer;
 use App\Models\Degreeprogram;
 use App\Models\Plan;
-use App\Models\Planrequirement;
-use App\Models\Section;
-use App\Models\Semester;
 use App\Models\Student;
-use Carbon\Carbon;
-use App\Rules\VerifySemester;
 use Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\MessageBag;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
-
-//This is my dependency that I've added.
-use App\Rules\VerifyFourYearPlan;
-use App\scrapers\KSUCourseScraper;
 
 class FlowchartsController extends Controller
 {
-
-    private $fractal;
-
-    //public $currentSemester;
 
     public function __construct()
     {
         $this->middleware('cas');
         $this->middleware('update_profile');
-        $this->fractal = new Manager();
     }
-
 
     /**
      * Responds to requests to GET /courses
@@ -77,24 +56,11 @@ class FlowchartsController extends Controller
         if ($id < 0) {
             //no ID provided - redirect back to index
             return redirect('flowcharts/index');
-        } else {
-
-            //self::currentSemester();
-            $user = Auth::user();
-            $plan = Plan::findOrFail($id);
-            $planreqs = self::CheckGradPlanRules($plan);
-            $CISreqs = self::CheckCISReqRules($plan);
-            $hours = self::CheckHoursRules($plan);
-            $prereqs = self::CheckPreReqRules($plan);
-            $courseplacement = self::CheckCoursePlacement($plan);
-            $kstate = self::CheckKState8($plan); //Should all of these change to be the UpdatedView()?
         }
-        $user = Auth::user();
+
         $plan = Plan::findOrFail($id);
 
-        if (!$user->is_advisor && $plan->student_id !== $user->student->id) {
-            abort(403);
-        }
+        $this->authorize('read', $plan);
 
         return view('flowcharts/flowchart')
             ->with('plan', $plan);
@@ -175,15 +141,15 @@ class FlowchartsController extends Controller
         $this->validate($request, [
             'id' => 'required|exists:plans',
         ]);
-        $user = Auth::user();
+
         $plan = Plan::findOrFail($request->input('id'));
-        if ($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
-            $plan->removeRequirements();
-            $plan->fillRequirementsFromDegree();
-            return response()->json(trans('messages.item_populated'));
-        } else {
-            abort(404);
-        }
+
+        $this->authorize('modify', $plan);
+
+        $plan->removeRequirements();
+        $plan->fillRequirementsFromDegree();
+
+        return response()->json(trans('messages.item_populated'));
     }
 
     public function deleteFlowchart(Request $request)
@@ -191,527 +157,71 @@ class FlowchartsController extends Controller
         $this->validate($request, [
             'id' => 'required|exists:plans',
         ]);
-        $user = Auth::user();
+
         $plan = Plan::findOrFail($request->input('id'));
-        if ($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
-            $plan->delete();
-            $request->session()->put('message', trans('messages.item_deleted'));
-            $request->session()->put('type', 'success');
-            return response()->json(trans('messages.item_deleted'));
-        } else {
-            abort(404);
-        }
+
+        $this->authorize('modify', $plan);
+
+        $plan->delete();
+
+        $request->session()->put('message', trans('messages.item_deleted'));
+        $request->session()->put('type', 'success');
+
+        return response()->json(trans('messages.item_deleted'));
     }
 
     public function editFlowchart($id = -1)
     {
         if ($id < 0) {
             abort(404);
-        } else {
-            $user = Auth::user();
-            $plan = Plan::findOrFail($id);
-            if ($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
-                $degreeprograms = Degreeprogram::orderBy('name', 'asc')->get();
-                $degreeprogramUnknown = new Degreeprogram();
-                $degreeprogramUnknown->name = "Unassigned";
-                $degreeprogramUnknown->id = 0;
-                $degreeprograms->prepend($degreeprogramUnknown);
-                $semesters = collect([
-                    (object) ['id' => 0, 'name' => 'Unassigned'],
-                    (object) ['id' => 1, 'name' => 'Spring'],
-                    (object) ['id' => 2, 'name' => 'Summer'],
-                    (object) ['id' => 3, 'name' => 'Fall'],
-                ]);
-                return view('flowcharts.edit')
-                    ->with('plan', $plan)
-                    ->with('semesters', $semesters)
-                    ->with('degreeprograms', $degreeprograms);
-            } else {
-                abort(404);
-            }
         }
+
+        $plan = Plan::findOrFail($id);
+
+        $this->authorize('modify', $plan);
+
+        $degreeprograms = Degreeprogram::orderBy('name', 'asc')->get();
+        $degreeprogramUnknown = new Degreeprogram();
+        $degreeprogramUnknown->name = "Unassigned";
+        $degreeprogramUnknown->id = 0;
+        $degreeprograms->prepend($degreeprogramUnknown);
+        $semesters = collect([
+            (object) ['id' => 0, 'name' => 'Unassigned'],
+            (object) ['id' => 1, 'name' => 'Spring'],
+            (object) ['id' => 2, 'name' => 'Summer'],
+            (object) ['id' => 3, 'name' => 'Fall'],
+        ]);
+
+        return view('flowcharts.edit')
+            ->with('plan', $plan)
+            ->with('semesters', $semesters)
+            ->with('degreeprograms', $degreeprograms);
     }
 
     public function saveFlowchart($id = -1, Request $request)
     {
         if ($id < 0) {
             abort(404);
+        }
+
+        $plan = Plan::findOrFail($id);
+        $this->authorize('modify', $plan);
+        $data = $request->all();
+        $data['student_id'] = $plan->student_id;
+        if ($plan->validate($data)) {
+            $plan->fill($data);
+            $plan->save(); //This writes to the DB. do the rules checking before this.
+            return response()->json(trans('messages.item_saved'));
         } else {
-            $user = Auth::user();
-            $plan = Plan::findOrFail($id);
-            $data = $request->all();
-            if ($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
-                $data['student_id'] = $plan->student_id;
-                if ($plan->validate($data)) {
-                    $plan->fill($data);
-                    $plan->save(); //This writes to the DB. do the rules checking before this.
-                    return response()->json(trans('messages.item_saved'));
-                } else {
-                    return response()->json($plan->errors(), 422);
-                }
-            } else {
-                abort(404);
-            }
+            return response()->json($plan->errors(), 422);
         }
-    }
-
-    public function getFlowchartData(Request $request, $id = -1)
-    {
-        if ($id < 0) {
-            abort(404);
-        }
-        $plan = Plan::findOrFail($id);
-        return $this->getCourses($request, $plan);
-    }
-
-    public function getCourses(Request $request, Plan $plan) {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
-            abort(404);
-        }
-
-        $requirements = $plan->requirements()->orderBy('ordering')->get();
-        $requirements->load('electivelist');
-        $requirements->load('course');
-        $requirements->load('completedcourse');
-        $resource = new Collection($requirements, function (Planrequirement $requirement) {
-            return [
-                'id' => $requirement->id,
-                'notes' => $requirement->notes,
-                'semester_id' => $requirement->semester_id,
-                'credits' => $requirement->credits,
-                'name' => $requirement->course_name,
-                'electivelist_name' => $requirement->electivelist()->exists() ? $requirement->electivelist->name : null,
-                'electivelist_abbr' => $requirement->electivelist()->exists() ? $requirement->electivelist->abbreviation : null,
-                'electivelist_id' => $requirement->electivelist_id,
-                'degreerequirement_id' => $requirement->degreerequirement_id,
-                'course_name' => $requirement->course()->exists() ? $requirement->course->fullTitle : null,
-                'course_id' => $requirement->course_id,
-                'completedcourse_name' => $requirement->completedcourse()->exists() ? $requirement->completedcourse->fullTitle : null,
-                'completedcourse_id' => $requirement->completedcourse_id,
-                'course_id_lock' => $requirement->course_id_lock === 1 ? true : false,
-                'completedcourse_id_lock' => $requirement->completedcourse_id_lock === 1 ? true : false,
-            ];
-        });
-        $this->fractal->setSerializer(new JsonSerializer());
-        return $this->fractal->createData($resource)->toJson();
-    }
-
-    public function getSemesterData(Request $request, $id = -1)
-    {
-        if ($id < 0) {
-            abort(404);
-        }
-        $plan = Plan::findOrFail($id);
-        return $this->getSemesters($request, $plan);
-    }
-
-    public function getSemesters(Request $request, Plan $plan) {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
-            abort(404);
-        }
-
-        $semesters = $plan->semesters()->orderBy('ordering')->get();
-        $resource = new Collection($semesters, function ($semester) {
-            return [
-                'id' => $semester->id,
-                'name' => $semester->name,
-                'courses' => [],
-            ];
-        });
-        $this->fractal->setSerializer(new JsonSerializer());
-        return $this->fractal->createData($resource)->toJson();
-    }
-
-    public function postSemesterSave(Request $request, $id = -1)
-    {
-        if ($id < 0) {
-            //id not found
-            abort(404);
-        } else {
-            $user = Auth::user();
-            $plan = Plan::with('semesters')->findOrFail($id);
-
-            if ($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
-                $semester = Semester::findOrFail($request->input('id'));
-                if ($semester->plan_id == $id) {
-                    $semester->name = $request->input('name');
-                    $semester->save();
-                    return response()->json(trans('messages.item_saved'));
-                } else {
-                    //semester id does not match plan id given
-                    abort(404);
-                }
-            } else {
-                //cannot edit a plan if you aren't the student or an advisor
-                abort(404);
-            }
-        }
-    }
-
-    public function renameSemester(Request $request, Plan $plan, Semester $semester) {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
-            //cannot edit a plan if you aren't the student or an advisor
-            abort(404);
-        }
-        if ($semester->plan_id !== $plan->id) {
-            //semester id does not match plan id given
-            abort(404);
-        }
-
-        $semester->name = $request->input('name');
-        $semester->save();
-        return response()->json(trans('messages.item_saved'));
-    }
-
-    public function postSemesterDelete(Request $request, $id = -1)
-    {
-        if ($id < 0) {
-            //id not found
-            abort(404);
-        }
-        $plan = Plan::findOrFail($id);
-        $semester = Semester::findOrFail($request->input('id'));
-        return $this->deleteSemester($request, $plan, $semester);
-    }
-
-    public function deleteSemester(Request $request, Plan $plan, Semester $semester)
-    {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
-            abort(404) ;
-        }
-        if ($semester->plan_id !== $plan->id) {
-            abort(404);
-        }
-
-        $rules = $this->UpdatedView($plan);
-
-        $semester->delete();
-        return response()->json(trans('messages.item_deleted'));
-    }
-
-    public function postSemesterAdd(Request $request, $id = -1)
-    {
-        if ($id < 0) {
-            //id not found
-            abort(404);
-        }
-        $plan = Plan::findOrFail($id);
-        return $this->addSemester($request, $plan);
-    }
-
-    public function addSemester(Request $request, Plan $plan) {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
-            //cannot edit a plan if you aren't the student or an advisor
-            abort(404);
-        }
-
-        $semester = new Semester();
-        $semester->plan_id = $plan->id;
-        $semester->name = "New Semester";
-        $semester->ordering = $plan->semesters->max('ordering') + 1;
-        $semester->save();
-        $plan->DynamicallyRenameSemesters();
-        $resource = new Item($semester, function ($semester) {
-            return [
-                'id' => $semester->id,
-                'name' => $semester->name,
-                'ordering' => $semester->ordering,
-                'courses' => [],
-            ];
-        });
-        $this->fractal->setSerializer(new JsonSerializer());
-        return $this->fractal->createData($resource)->toJson();
-    }
-
-    public function postSemesterSetSummer(Request $request, $id = -1)
-    {
-        //What if I change this to be an alert, where the user can press Summer or not.
-        //I think this may work.
-        if ($id < 0) {
-            abort(404);
-        }
-        else {
-            $user = Auth::user();
-            $plan = Plan::with('semesters')->findOrFail($id);
-            $semester = Semester::findOrFail($request->input('id'));
-
-            $lastSemester = Semester::where('plan_id', $plan->id)->orderby('ordering', 'DESC')->first();
-            $seasonYear = explode(' ', $lastSemester->name);
-            $year = $seasonYear[1];
-            if ($seasonYear[0] == "Fall") {
-                $seasonYear[1]++;
-            }
-
-            if ($user->is_advisor || (!$user->is_advisor && $user->student->id == $plan->student_id)) {
-
-                if ($semester->plan_id == $id) {
-                    $semester->name = "Summer " . $year;// . $semester->year();
-                    $semester->save();
-                    return;
-                } else {
-                    //semester id does not match plan id given
-                    abort(404);
-                }
-            } else {
-              abort(404);
-            }
-        }
-    }
-
-    public function postSemesterMove(Request $request, $id = -1)
-    {
-        if ($id < 0) {
-            //id not found
-            abort(404);
-        }
-        $plan = Plan::findOrFail($id);
-        return $this->moveSemester($request, $plan);
-    }
-
-    public function moveSemester(Request $request, Plan $plan) {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id != $plan->student_id) {
-            abort(404);
-        }
-
-        $rules = $this->UpdatedView($plan);
-        $semesters = $plan->semesters;
-        $orderings = $request->input('ordering');
-
-        if ($semesters->count() !== count($orderings)) {
-            abort(404);
-        }
-
-        $offset = $semesters->max('ordering') + 1;
-
-        DB::beginTransaction();
-        foreach ($orderings as $ordering) {
-            $semester = $semesters->where('id', $ordering['id'])->first();
-            $semester->ordering = $ordering['ordering'] + $offset;
-            $semester->save();
-        }
-        foreach ($orderings as $ordering) {
-            $semester = $semesters->where('id', $ordering['id'])->first();
-            $semester->ordering -= + $offset;
-            $semester->save();
-        }
-        DB::commit();
-
-        $plan->DynamicallyRenameSemesters();
-        return response()->json(trans('messages.item_saved'));
-    }
-
-    public function moveRequirement(Request $request, Plan $plan, Planrequirement $requirement)
-    {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
-            //cannot edit a plan if you aren't the student or an advisor
-            abort(404);
-        }
-
-        //move requirement to new semester
-        if ($requirement->plan_id !== $plan->id) {
-            //can't move course not on the plan;
-            abort(404);
-        }
-
-        $semester = Semester::findOrFail($request->input('semesterId'));
-        if ($semester->plan_id !== $plan->id) {
-            //can't move course to semester not on the plan;
-            abort(404);
-        }
-
-        //move requirement to new semester
-        if ($requirement->semester_id !== $semester->id) {
-            $oldSemester = $requirement->semester;
-            $maxOrder = $semester->requirements->count();
-            $requirement->semester_id = $semester->id;
-            $requirement->ordering = $maxOrder;
-            $requirement->save();
-            $oldSemester->repairRequirementsOrder();
-        }
-
-        $newOrder = collect($request->input('order'));
-
-        $semester->reorderRequirements($newOrder);
-
-        return response()->json(trans('messages.item_saved'));
-    }
-
-    public function addRequirement(Request $request, Plan $plan)
-    {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
-            // cannot edit a plan if you aren't the student or an advisor
-            abort(404);
-        }
-
-        $requirement = new Planrequirement();
-        if (!$requirement->customEditValidate($request->all(), [$plan->student_id])) {
-            return response()->json($requirement->errors(), 422);
-        }
-
-        $semester = $plan->semesters->sortBy('ordering')->last();
-        $requirement->fill($request->all());
-        $requirement->semester()->associate($semester);
-        $requirement->ordering = $semester->requirements->sortBy('ordering')->last()->ordering + 1;
-        $requirement->plan()->associate($plan);
-        $requirement->save();
-        return response()->json(trans('messages.item_saved'));
-    }
-
-    public function updateRequirement(Request $request, Plan $plan, Planrequirement $requirement)
-    {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
-            // cannot edit a plan if you aren't the student or an advisor
-            abort(404);
-        }
-        if ($requirement->plan_id !== $plan->id) {
-            // can't edit course not on the plan;
-            abort(404);
-        }
-
-        $data = $this->filterRequirementEditData($request, $requirement);
-
-        if (!$requirement->validateEdit($data, [$plan->student_id])) {
-            return response()->json($requirement->errors(), 422);
-        }
-
-        $requirement->fill($data);
-        if (!$requirement->validateElectiveCourse()) {
-            $errors = new MessageBag();
-            $errors->add('course_name', 'Course is not listed in selected elective list');
-            return response()->json($errors, 422);
-        }
-
-        $requirement->save();
-        return response()->json(trans('messages.item_saved'));
-    }
-
-    public function deleteRequirement(Request $request, Plan $plan, Planrequirement $requirement)
-    {
-        $user = Auth::user();
-        if (!$user->is_advisor && $user->student->id !== $plan->student_id) {
-            //cannot edit a plan if you aren't the student or an advisor
-            abort(404);
-        }
-        if ($requirement->plan_id !== $plan->id) {
-            //can't edit course not on the plan;
-            abort(404);
-        }
-        if ($requirement->degreerequirement_id !== null) {
-            return response()->json(trans('errors.default_req'), 403);
-        }
-
-        $requirement->delete();
-
-        return response()->json(trans('messages.item_deleted'));
-    }
-
-    public function filterRequirementEditData(Request $request, Planrequirement $requirement)
-    {
-        if ($requirement->degreerequirement()->exists()) {
-            // is not custom, so only certain fields can be updated
-            $allowedFields = [
-                'notes',
-                'completedcourse_id',
-                'course_id',
-                'course_id_lock',
-                'completedcourse_id_lock',
-            ];
-
-            if ($requirement->electivelist()->exists()) {
-                // has elective list, so course name can also be changed
-                $allowedFields += [
-                    'course_name',
-                ];
-            }
-
-            return $request->only($allowedFields);
-        }
-
-        return $request->all();
     }
 
     public function errors(Plan $plan)
     {
+        $this->authorize('read', $plan);
+
         return $plan->getErrors();
     }
-
-    public static function CheckCISReqRules(Plan $plan) {
-
-        $firstArrs = [];
-        //Set the variables for the rules case
-        $rules = new VerifyFourYearPlan();
-
-        //Check the first one.
-        $firstArrs = $rules->CheckCISRequirementsPlan($plan);
-
-        return $firstArrs;
-
-
-    }
-
-    public static function CheckGradPlanRules(Plan $plan){
-
-        //Check the second one.
-        //This handles graduation ability, not validity of the plan, so no flag.
-        $planreqs = [];
-        $rules = new VerifyFourYearPlan();
-        $planreqs = $rules->CheckGraduationValidityPlan($plan);
-
-        return $planreqs;
-
-    }
-
-    public static function CheckGradRequirementsRules(Plan $plan){
-
-        //Check the third one.
-        //This handles graduation ability, not validity of the plan, so no fla
-        $array = [];
-        $rules = new VerifyFourYearPlan();
-        $array = $rules->CheckGraduationValidityDegreeRequirements($plan);
-
-    }
-
-    public static function CheckHoursRules(Plan $plan) {
-        $rules = new VerifySemester();
-
-        //returns true if correct number of hours and false if not
-        //if not correct number of hours displays an alert
-        $correcthours = $rules->CheckHours($plan);
-        return $correcthours;
-    }
-
-    public static function CheckPreReqRules(Plan $plan) {
-
-        $rules = new VerifySemester();
-        //returns an array with the missing prereqs or empty if all good
-        $prereqs = $rules->CheckPreReqs($plan);
-        return $prereqs;
-
-    }
-
-    public static function CheckCoursePlacement(Plan $plan){
-
-
-        $rules = new VerifySemester();
-        $courseplacement = $rules->CheckCoursePlacement($plan);
-        return $courseplacement;
-
-    }
-
-    public static function CheckKState8(Plan $plan) {
-        $rules = new VerifyFourYearPlan();
-        $kstate8 = $rules->CheckKstate8($plan);
-        return $kstate8;
-    }
-
 
 }

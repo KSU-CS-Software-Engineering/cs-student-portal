@@ -52,9 +52,9 @@ class Planrequirement extends Validatable
                 'credits' => 'required|integer',
                 'notes' => 'string|max:20',
                 'course_name' => 'required_without:electivelist_id|string',
-                'electivelist_id' => 'required_without:course_name|exists_or_null:electivelists,id',
-                'course_id' => 'sometimes|exists_or_null:courses,id',
-                'completedcourse_id' => 'sometimes|exists_or_null:completedcourses,id,student_id,' . $params[2],
+                'electivelist_id' => 'required_without:course_name|exists:electivelists,id|nullable',
+                'course_id' => 'sometimes|exists:courses,id|nullable',
+                'completedcourse_id' => "sometimes|exists:completedcourses,id,student_id,{$params[2]}|nullable",
                 'course_id_lock' => 'required|boolean',
                 'completedcourse_id_lock' => 'required|boolean',
             );
@@ -66,9 +66,9 @@ class Planrequirement extends Validatable
                 'credits' => 'required|integer',
                 'notes' => 'string|max:20',
                 'course_name' => 'required_without:electivelist_id|string',
-                'electivelist_id' => 'required_without:course_name|exists_or_null:electivelists,id',
-                'course_id' => 'sometimes|exists_or_null:courses,id',
-                'completedcourse_id' => 'sometimes|exists_or_null:completedcourses,id,student_id,' . $params[2],
+                'electivelist_id' => 'required_without:course_name|exists:electivelists,id|nullable',
+                'course_id' => 'sometimes|exists:courses,id|nullable',
+                'completedcourse_id' => "sometimes|exists:completedcourses,id,student_id,{$params[2]}|nullable",
                 'course_id_lock' => 'required|boolean',
                 'completedcourse_id_lock' => 'required|boolean',
             );
@@ -80,10 +80,10 @@ class Planrequirement extends Validatable
         $rules = array(
             'notes' => 'string|max:20',
             'course_name' => 'required_without:electivelist_id|string',
-            'electivelist_id' => 'required_without:course_name|exists_or_null:electivelists,id',
+            'electivelist_id' => 'required_without:course_name|exists:electivelists,id|nullable',
             'credits' => 'required|integer',
-            'course_id' => 'sometimes|exists_or_null:courses,id',
-            'completedcourse_id' => 'sometimes|exists_or_null:completedcourses,id,student_id,' . $params[0],
+            'course_id' => 'sometimes|exists:courses,id|nullable',
+            'completedcourse_id' => "sometimes|exists:completedcourses,id,student_id,{$params[0]}|nullable",
             'course_id_lock' => 'required|boolean',
             'completedcourse_id_lock' => 'required|boolean',
         );
@@ -106,8 +106,8 @@ class Planrequirement extends Validatable
         $rules = array(
             'notes' => 'string|max:20',
             'course_name' => 'sometimes|string',
-            'course_id' => 'sometimes|exists_or_null:courses,id',
-            'completedcourse_id' => 'sometimes|exists_or_null:completedcourses,id,student_id,' . $params[0],
+            'course_id' => 'sometimes|exists:courses,id|nullable',
+            'completedcourse_id' => "sometimes|exists:completedcourses,id,student_id,{$params[0]}|nullable",
             'course_id_lock' => 'required|boolean',
             'completedcourse_id_lock' => 'required|boolean',
         );

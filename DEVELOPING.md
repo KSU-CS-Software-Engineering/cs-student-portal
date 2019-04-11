@@ -25,7 +25,7 @@ Install the following packages and all their dependencies:
 5. PHP extensions required by Laravel: `php-mysql php-mbstring php-xml`
 6. PHP extensions required by the application: `php-curl`
 7. Composer:
-    1. Follow the instructions at [Composer's website](https://getcomposer.org/download/ 'Composer') to install the Composer
+    1. Follow the instructions at [Composer's website][composer] to install the Composer
     2. Then, to install the Composer globally (recommended), run
         ```sh
         sudo mv composer.phar /usr/local/bin/composer
@@ -33,9 +33,9 @@ Install the following packages and all their dependencies:
 8. `curl` – used for installing `nodejs` and `yarn`
 9. `nodejs`
     - To make sure you get the latest version, follow
-      [this guide](https://github.com/nodesource/distributions/blob/master/README.md#debinstall 'NodeSource – GitHub')
-10. `yarn` – Follow the instructions at [Yarn's website](https://yarnpkg.com/en/docs/install#debian-stable 'Yarn installation guide')
-11. [Adminer](https://www.adminer.org/en/ "Adminer.org") – Database management tool written in PHP
+      [this guide][nodesourse]
+10. `yarn` – Follow the instructions at [Yarn's website][yarn]
+11. [Adminer][adminer] – Database management tool written in PHP
     - To install the latest version, run:
         ```sh
         sudo wget -O '/var/www/html/adminer.php' 'https://www.adminer.org/latest-mysql-en.php'
@@ -49,7 +49,7 @@ Install the following packages and all their dependencies:
     ```sh
     ssh-keygen
     ```
-2. Upload the public key to your [GitHub account](https://github.com/settings/ssh/new 'Add SSH keys – GitHub')
+2. Upload the public key to your [GitHub account][github-add-ssh]
 3. Configure Git
     1. name:
         ```sh
@@ -190,9 +190,9 @@ Then, follow the instructions below for your web server.
 
 ## IDE
 
-The recommended IDE is [PhpStorm](https://www.jetbrains.com/phpstorm/ 'Jetbrains – PhpStorm'),
-but code editors like [VS Code](https://code.visualstudio.com 'Visual Studio Code')
-or [Atom](https://atom.io 'Atom') can also be used.
+The recommended IDE is [PhpStorm][phpstorm],
+but code editors like [VS Code][vscode]
+or [Atom][atom] can also be used.
 
 For better PhpStorm auto-completion run the following three commands in the project root:
 ```sh
@@ -212,7 +212,7 @@ from the project root directory.
 
 ## Deployment
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md 'Deployment guide') for instructions on configuring the deployment
+See [DEPLOYMENT.md][deployment-guide] for instructions on configuring the deployment
 
 
 ## References
@@ -235,3 +235,14 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md 'Deployment guide') for instructions on conf
 
 **Vue.js video tutorials**
 - https://laracasts.com/series/learn-vue-2-step-by-step
+
+[composer]: https://getcomposer.org/download/ 'Composer'
+[nodesourse]: https://github.com/nodesource/distributions/blob/master/README.md#debinstall 'NodeSource – GitHub'
+[yarn]: https://yarnpkg.com/en/docs/install#debian-stable 'Yarn installation guide'
+[adminer]: https://www.adminer.org/en/ 'Adminer.org'
+[github-add-ssh]: https://github.com/settings/ssh/new 'Add SSH keys – GitHub'
+[phpstorm]: https://www.jetbrains.com/phpstorm/ 'Jetbrains – PhpStorm'
+[vscode]: https://code.visualstudio.com 'Visual Studio Code'
+[atom]: https://atom.io 'Atom'
+
+[deployment-guide]: ./DEPLOYMENT.md 'Deployment guide'

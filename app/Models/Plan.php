@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use App\Http\Controllers\FlowchartsController;
+use App\Rules\VerifyFourYearPlan;
+use App\Rules\VerifySemester;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Plan extends Validatable
@@ -214,31 +215,74 @@ class Plan extends Validatable
     }
 
     public function getErrors() {
+        $this->load([
+            'semesters.requirements.electivelist',
+            'semesters.requirements.course.prerequisites',
+            'student.completedcourses',
+            'degreeprogram.requirements',
+            'requirements.course.areas',
+        ]);
+
         return [
             // [
             //     'title' => 'Not finished courses',
-            //     'errors' => FlowchartsController::CheckGradPlanRules($this),
+            //     'errors' => $this->checkGradPlanRules(),
             // ],
             [
                 'title' => 'Courses missing',
-                'errors' => FlowchartsController::CheckCISReqRules($this),
+                'errors' => $this->checkCISReqRules(),
             ],
             [
                 'title' => '',
-                'errors' => FlowchartsController::CheckHoursRules($this),
+                'errors' => $this->checkHoursRules(),
             ],
             [
                 'title' => 'Prerequisities missing',
-                'errors' => FlowchartsController::CheckPreReqRules($this),
+                'errors' => $this->checkPreReqRules(),
             ],
             [
                 'title' => 'Courses not offered in its current semester placement',
-                'errors' => FlowchartsController::CheckCoursePlacement($this),
+                'errors' => $this->checkCoursePlacement(),
             ],
             [
                 'title' => 'K-State 8 Requirements Missing',
-                'errors' => FlowchartsController::CheckKState8($this),
+                'errors' => $this->checkKState8(),
             ],
         ];
+    }
+
+    public function checkCISReqRules()
+    {
+        return VerifyFourYearPlan::checkCISRequirementsPlan($this);
+    }
+
+    public function checkGradPlanRules()
+    {
+        return VerifyFourYearPlan::checkGraduationValidityPlan($this);
+    }
+
+    public function checkGradRequirementsRules()
+    {
+        return VerifyFourYearPlan::checkGraduationValidityDegreeRequirements($this);
+    }
+
+    public function checkHoursRules()
+    {
+        return VerifySemester::checkHours($this);
+    }
+
+    public function checkPreReqRules()
+    {
+        return VerifySemester::checkPreReqs($this);
+    }
+
+    public function checkCoursePlacement()
+    {
+        return VerifySemester::checkCoursePlacement($this);
+    }
+
+    public function checkKState8()
+    {
+        return VerifyFourYearPlan::checkKState8($this);
     }
 }

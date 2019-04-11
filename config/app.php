@@ -181,6 +181,7 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         App\Providers\ComposerServiceProvider::class,
+        App\Providers\ResponseMacroServiceProvider::class,
 
     ],
 
@@ -238,6 +239,5 @@ return [
 
     'auth_type' => env('AUTH_TYPE', 'off'),
     'in_advance' => env('IN_ADVANCE', 'P1D'),
-    'send_email' => env('SEND_EMAIL', false),
 
 ];

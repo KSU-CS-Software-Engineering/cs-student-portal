@@ -2,23 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\JsonSerializer;
 use App\Models\Category;
 use App\Models\Elective_List_Course;
 use App\Models\College;
 use App\Models\Course;
 use Illuminate\Http\Request;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
+use Illuminate\Support\Collection;
 
 class CoursesController extends Controller
 {
 
-    public function __construct()
-    {
-        $this->fractal = new Manager();
-    }
     /**
      * Responds to requests to GET /courses
      */
@@ -63,33 +56,34 @@ class CoursesController extends Controller
             'query' => 'required|string',
             'electiveListId' => 'integer',
         ]);
-        if($request->input('electiveListId') != null && $request->input('electiveListId') != '9') {
-          $electiveListModels = elective_list_course::where('elective_list_id', $request->input('electiveListId'))->pluck('course_id');
-          $courses = Course::whereIn('id', $electiveListModels)->get();
+
+        if ($request->input('electiveListId') != null && $request->input('electiveListId') != '9') {
+            $electiveListModels = elective_list_course::where('elective_list_id', $request->input('electiveListId'))->pluck('course_id');
+            $courses = Course::whereIn('id', $electiveListModels)->get();
+        } else {
+            $courses = Course::filterName($request->input('query'))->get();
         }
-        else {
-          $courses = Course::filterName($request->input('query'))->get();
-        }
-        $resource = new Collection($courses, function ($course) {
-            return [
+
+        $resource = new Collection();
+        foreach ($courses as $course) {
+            $resource->push([
                 'value' => $course->fullTitle,
                 'data' => $course->id,
-            ];
-        });
-        return $this->fractal->createData($resource)->toJson();
+            ]);
+        }
+
+        return response()->jsonApi($resource);
     }
 
     public function getPrereqs($id)
     {
         $course = Course::findOrFail($id);
-        $resource = new Item($course, function ($course) {
-            return [
-                'prerequisites' => $course->prerequisites->pluck(['id'])->toArray(),
-                'followers' => $course->followers->pluck(['id'])->toArray(),
-            ];
-        });
-        $this->fractal->setSerializer(new JsonSerializer());
-        return $this->fractal->createData($resource)->toJson();
+        $resource = [
+            'prerequisites' => $course->prerequisites->pluck(['id'])->toArray(),
+            'followers' => $course->followers->pluck(['id'])->toArray(),
+        ];
+
+        return response()->json($resource);
     }
 
 }
