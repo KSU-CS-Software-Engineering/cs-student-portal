@@ -95,7 +95,6 @@ class KSUCourseScraper
                 }
             }
         }
-        dd($returnArray);
         return $returnArray;
     }
 }
