@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddNotesColumnToSections extends Migration
+class AddSectionNumberColumnToSectionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,7 +15,7 @@ class AddNotesColumnToSections extends Migration
     {
 
         Schema::table('sections', function (Blueprint $table) {
-            $table->string('notes');
+            $table->string('section_number');
         });
 
     }
@@ -28,7 +28,7 @@ class AddNotesColumnToSections extends Migration
     public function down()
     {
         Schema::table('sections', function (Blueprint $table) {
-            $table->dropColumn('notes');
+            $table->dropColumn('section_number');
         });
 
     }
