@@ -67,6 +67,7 @@
                 showOwnClasses: true,
                 //placeholder
                 semesterId: 1,
+                planId: null,
             }
         },
         computed: {
@@ -160,15 +161,14 @@
         },
 
         created() {
-            this.getAllCourses();
+            this.planId = document.getElementById("planId").value;
             this.getCurrentSemester();
         },
-
     }
 
     //need to assign semesterId to current semester
     //gets semester course times
-    function getAllCourses(){
+    function getAllCourses() {
         axios.get(`/scheduler/${this.semesterId}/sections`)
             .then((response) => {
                 this.allCourses = response.data
@@ -181,11 +181,12 @@
             });
     }
 
-    function getCurrentSemester(){
-        axios.get(`/scheduler/currentsemester`)
+    function getCurrentSemester() {
+        axios.get(`/scheduler/${this.planId}/current-semester`)
             .then((response)=>{
                 this.semesterId = response.data;
-            })
+                this.getAllCourses();
+            });
     }
 
 </script>

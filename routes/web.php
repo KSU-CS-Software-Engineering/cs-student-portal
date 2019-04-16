@@ -47,10 +47,9 @@ Route::get('completedcourses/completedcoursefeed/{id}', 'CompletedcoursesControl
 /*
  * Routes for Scheduler controller
  */
-
-Route::get('schedule', 'SchedulerController@show');
-
-
+Route::get('scheduler/{plan}', 'SchedulerController@show');
+Route::get('scheduler/{plan}/current-semester' , 'SchedulerController@getCurrentSemesterId');
+Route::get('scheduler/{semester}/sections', 'SchedulerController@getSemesterSections');
 
 /*
  * Routes for the FlowchartsController
@@ -78,9 +77,6 @@ Route::put('flowcharts/{plan}/requirements/{requirement}', 'FlowchartRequirement
 Route::patch('flowcharts/{plan}/requirements/{requirement}', 'FlowchartRequirementsController@moveRequirement');
 Route::delete('flowcharts/{plan}/requirements/{requirement}', 'FlowchartRequirementsController@deleteRequirement');
 Route::get('flowcharts/{plan}/errors', 'FlowchartsController@errors');
-
-Route::get('scheduler/{semester}/sections', 'SchedulerController@getSemesterSections');
-Route::get('scheduler/currentsemester' , 'SchedulerController@getCurrentSemester');
 
 /*
  * Routes for the AdvisingController
