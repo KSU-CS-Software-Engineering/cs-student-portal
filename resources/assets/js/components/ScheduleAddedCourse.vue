@@ -12,11 +12,9 @@
                 <th>Hours</th>
                 <th>Instructor</th>
             </tr>
-            <tr v-for="section in course.sections">
+            <tr v-for="section in course.sections" @click="addSection(sectionIsAdded(section) ? null : section)">
                 <td>
-                    <i v-if="!courseIsAdded" @click="addSection(section)" class="fa fa-plus section-btn"></i>
-                    <i v-else-if="sectionIsAdded(section)" @click="addSection(null)" class="fa fa-minus section-btn"></i>
-                    <i v-else @click="addSection(section)" class="fa fa-exchange section-btn"></i>
+                    <i class="fa section-btn" :class="faIconClass(section)"></i>
                     {{ section.section }}
                 </td>
                 <td>{{ section.type }}</td>
@@ -44,11 +42,15 @@
         computed: {
             courseIsAdded: function () {
                 return this.addedSection && true;
-            }
+            },
         },
         methods: {
             sectionIsAdded: function (section) {
                 return this.addedSection === section;
+            },
+            faIconClass: function (section) {
+                return this.sectionIsAdded(section) ? 'fa-minus'
+                    : this.courseIsAdded ? 'fa-exchange' : 'fa-plus';
             },
             addSection: function (section) {
                 this.$emit('putSection', this.course.id, section)
@@ -83,6 +85,10 @@
         background-color: rgba(151, 160, 179, 0.05);
     }
 
+    tr:not(:first-child) {
+        cursor: pointer;
+    }
+
     tr:first-child {
         background-color: transparent;
     }
@@ -104,6 +110,10 @@
         padding-bottom: 0.2rem;
     }
 
+    .added-course-root:not(:first-child) {
+        margin-top: 0.1rem;
+    }
+
     .added-course-title {
         display: flex;
         justify-content: space-between;
@@ -111,6 +121,7 @@
         background-color: #512888;
         color: white;
         padding: 0.8em 2em;
+        cursor: pointer;
     }
 
     .added-course-title > h5 {
