@@ -27,6 +27,7 @@ class Elective_List_CoursesSeeder extends Seeder
           //When it has a the max, that means we want to iterate through the difference between max and min
           for($i = 0; $i <= ($electiveListModel->course_max_number - $electiveListModel->course_min_number); $i++) {
             $currentCourseNumber = $electiveListModel->course_min_number + $i;
+            $tempInserter = Course::where("slug", $electiveListModel->course_prefix.$currentCourseNumber)->first();
               if($tempInserter != NULL && !in_array($tempInserter->id, $courseSlugs)) {
                 array_push($courseSlugs, $tempInserter->id);
                 array_push($courseElectiveListIds, $electiveListModel->electivelist_id);
