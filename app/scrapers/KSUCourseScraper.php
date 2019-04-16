@@ -53,7 +53,7 @@ class KSUCourseScraper
                         }
                         $sectionSection = $sectionRow->childNodes[0]->textContent;
                         $sectionType = $sectionRow->childNodes[1]->textContent;
-                        // $sectionNumber = $sectionRow->childNodes[2]->textContent;
+                        $sectionNumber = $sectionRow->childNodes[2]->textContent;
                         $sectionUnits = $sectionRow->childNodes[3]->textContent;
                         // $sectionBasis = $sectionRow->childNodes[4]->textContent;
                         $sectionDays = str_replace($this->NBSP5, ' ', $sectionRow->childNodes[5]->textContent);
@@ -74,7 +74,7 @@ class KSUCourseScraper
                         $returnArray[] = [
                             'courseNumber' => $courseSlug,
                             'section' => $sectionSection,//$sibling->firstChild->childNodes[0]->textContent, //This may be slightly unclear. This is the section label as in A, B, C to distinguish the different sections in the class.
-                            // 'sectionNumber' => $sectionNumber,
+                            'sectionNumber' => $sectionNumber,
                             'type' => $sectionType,//$sibling->firstChild->childNodes[1]->textContent, //This is means recitation, lecture etc. Not 100% sure of the format yet.
                             'units' => $sectionUnits,//$sibling->firstChild->childNodes[3]->textContent, //This is the amount of credits it's worth
                             // 'basis' => $sectionBasis,
