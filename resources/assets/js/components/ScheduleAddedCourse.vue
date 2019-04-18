@@ -12,7 +12,7 @@
                 <th>Hours</th>
                 <th>Instructor</th>
             </tr>
-            <tr v-for="section in course.sections" @click="addSection(sectionIsAdded(section) ? null : section)">
+            <tr v-for="section in course.sections" @click="addSection(section.type, sectionIsAdded(section) ? null : section)">
                 <td>
                     <i class="fa section-btn" :class="faIconClass(section)"></i>
                     {{ section.section }}
@@ -32,7 +32,7 @@
         props: {
             course: {},
             layoutMethods: {},
-            addedSection: {}
+            addedSectionTypes: {}
         },
         data() {
             return {
@@ -41,19 +41,23 @@
         },
         computed: {
             courseIsAdded: function () {
-                return this.addedSection && true;
+                return Object.values(this.addedSectionTypes).some(type => type != null);
             },
         },
         methods: {
             sectionIsAdded: function (section) {
-                return this.addedSection === section;
+                return this.addedSectionTypes[section.type] === section;
+            },
+            typeIsAdded: function (type) {
+                return this.addedSectionTypes[type] != null;
             },
             faIconClass: function (section) {
                 return this.sectionIsAdded(section) ? 'fa-minus'
-                    : this.courseIsAdded ? 'fa-exchange' : 'fa-plus';
+                    : this.typeIsAdded(section.type) ? 'fa-exchange' : 'fa-plus';
             },
-            addSection: function (section) {
-                this.$emit('putSection', this.course.id, section)
+            addSection: function (type, section) {
+                this.$emit('putSection', this.course.id, type, section);
+                this.$forceUpdate();
             },
             toggleExpand: function () {
                 this.isExpanded = !this.isExpanded;
