@@ -2,16 +2,9 @@ import Vue from "vue";
 import Flowchart from "../components/Flowchart";
 import CourseFormModal from "../components/CourseFormModal";
 import FlowchartErrors from "../components/FlowchartErrors";
-import axios from "axios";
-import site from "../util/site";
 import { eventDispatcher } from "../util/vueEventDispatcher";
 
 export function init() {
-
-    window.axios = axios;
-    window.site = site;
-
-    window.eventDispatcher = eventDispatcher;
 
     let app = new Vue({
         el: "#flowchart",
