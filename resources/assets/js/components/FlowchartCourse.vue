@@ -38,6 +38,9 @@
 </template>
 
 <script>
+    import axios from "axios";
+    import * as site from "../util/site";
+    import { eventDispatcher } from "../util/vueEventDispatcher";
 
     export default {
         name: "FlowchartCourse",
