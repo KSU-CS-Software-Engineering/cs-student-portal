@@ -6,7 +6,7 @@ import { eventDispatcher } from "../util/vueEventDispatcher";
 
 export function init() {
 
-    let app = new Vue({
+    const app = new Vue({
         el: "#flowchart",
         template: "<flowchart />",
         components: {
@@ -26,7 +26,7 @@ export function init() {
         }
     });
 
-    let courseModal = new Vue({
+    const courseModal = new Vue({
         el: "#course-modal",
         template: "<course-form-modal />",
         components: {
@@ -34,7 +34,7 @@ export function init() {
         },
     });
 
-    let errors = new Vue({
+    const errors = new Vue({
         el: "#flowchart-errors",
         template: "<flowchart-errors />",
         components: {
@@ -42,8 +42,12 @@ export function init() {
         },
     });
 
-    document.getElementById("reset").addEventListener("click", () => eventDispatcher.$emit("updateFlowchart"));
-    document.getElementById("add-sem").addEventListener("click", () => eventDispatcher.$emit("addSemester"));
-    document.getElementById("add-course").addEventListener("click", () => eventDispatcher.$emit("createCourse"));
+    document.getElementById("reset")
+        .addEventListener("click", () => eventDispatcher.$emit("updateFlowchart"));
 
+    document.getElementById("add-sem")
+        .addEventListener("click", () => eventDispatcher.$emit("addSemester"));
+
+    document.getElementById("add-course")
+        .addEventListener("click", () => eventDispatcher.$emit("createCourse"));
 }

@@ -3,8 +3,8 @@
 
 import * as calendar from "./pages/calendar";
 import * as flowchart from "./pages/flowchart";
-import * as flowchartList from "./pages/flowchartlist";
-import * as flowchartEdit from "./pages/flowchartedit";
+import * as flowchartList from "./pages/flowchartList";
+import * as flowchartEdit from "./pages/flowchartEdit";
 import * as groupSession from "./pages/groupsession";
 import * as profile from "./pages/profile";
 import * as scheduler from "./pages/scheduler"
