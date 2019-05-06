@@ -10,6 +10,8 @@
     import axios from "axios";
     import Draggable from "vuedraggable";
     import FlowchartSemester from "./FlowchartSemester";
+    import * as site from "../util/site";
+    import { eventDispatcher } from "../util/vueEventDispatcher";
 
     export default {
         name: "Flowchart",

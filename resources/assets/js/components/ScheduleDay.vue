@@ -37,7 +37,7 @@
                 let intervals = [/* sections: arr, begin, end */];
                 let section2BiggestInterval = {};
                 let collidesWith = function (begin, end) {
-                    return intervals.filter(interval => (begin > interval.end || end > interval.begin))
+                    return intervals.filter(interval => !(begin > interval.end || end < interval.begin))
                 };
                 for (let section of this.sections) {
                     let times = this.sectionTimes[section.id];

@@ -48,8 +48,11 @@
 </template>
 
 <script>
+    import axios from "axios";
     import FormText from "./FormText";
     import FormAutofill from "./FormAutofill";
+    import * as site from "../util/site";
+    import { eventDispatcher } from "../util/vueEventDispatcher";
 
     export default {
         name: "CourseFormModal",
