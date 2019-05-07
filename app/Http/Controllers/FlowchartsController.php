@@ -68,6 +68,7 @@ class FlowchartsController extends Controller
 
     public function newFlowchart($id = -1)
     {
+
         if ($id < 0) {
             abort(404);
         } else {
