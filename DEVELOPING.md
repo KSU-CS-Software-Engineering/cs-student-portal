@@ -4,9 +4,12 @@ Follow these instructions to configure your development environment.
 
 Latest release of Ubuntu LTS (currently 18.04) is a recommended development system.
 It is easiest to just set up a virtual machine with Ubuntu installed so you have a total control of your environment.
-If you want to use a different system, you may have to adjust these instructions to match your environment.
 
-A familiarity with elementary Linux commands is assumed (e.g. `cd`, `cp`, `mv`, `sudo`).
+If you want to use a different system, you may have to adjust these instructions
+to match your environment. Also make sure that your system meets the requirements
+specified in [README][readme].
+
+A familiarity with elementary Linux and Ubuntu commands is assumed (e.g. `cd`, `cp`, `mv`, `sudo`, `apt`).
 
 
 ## Before cloning the repository
@@ -246,3 +249,4 @@ See [DEPLOYMENT.md][deployment-guide] for instructions on configuring the deploy
 [atom]: https://atom.io 'Atom'
 
 [deployment-guide]: ./DEPLOYMENT.md 'Deployment guide'
+[readme]: ./README.md#system-requirements 'Readme'

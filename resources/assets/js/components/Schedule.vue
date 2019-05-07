@@ -22,11 +22,6 @@
         <div id="class-finder">
             <h3>Class Finder</h3>
             <form class="class-finder-form">
-                <label>
-                    <input type="checkbox" name="showOwnClasses" v-model="showOwnClasses">
-                    Show Your Own Classes
-                </label>
-                <br>
                 <select id="available-classes" v-model="selectedCourse">
                     <option v-for="course in allCourses" v-if="!selectedCourses.includes(course)" :value="course">{{ course.slug }} - {{ course.title}}</option>
                 </select>
@@ -34,7 +29,8 @@
             <button @click="addSelectedCourse" :disabled="selectedCourse == null">Add</button>
             <hr>
             <div class="class-finder-selected">
-                <schedule-added-course v-for="course in selectedCourses" :key="course.id" :course="course" :addedSection="selectedSections[course.id]"
+                <schedule-added-course v-for="course in selectedCourses" :key="course.id" :course="course"
+                                       :addedSectionTypes="selectedSections[course.id]"
                                        :layoutMethods="layoutMethods" @putSection="putSection"></schedule-added-course>
             </div>
         </div>
@@ -139,8 +135,8 @@
             getAllCourses: getAllCourses,
             getCurrentSemester: getCurrentSemester,
 
-            putSection: function (courseId, section) {
-                this.selectedSections[courseId] = section;
+            putSection: function (courseId, type, section) {
+                this.selectedSections[courseId][type] = section;
                 this.updateSelectedSectionsByDays();
             },
             updateSelectedSectionsByDays: function () {
@@ -148,11 +144,17 @@
                 let ret = [[], [], [], [], [], [], []];
                 for (let key in this.selectedSections) {
                     if (!this.selectedSections.hasOwnProperty(key)) continue;
-                    let section = this.selectedSections[key];
-                    if (section) {
-                        for (let c of section.days) {
-                            if (c === ' ') continue;
-                            ret[dayMapping[c]].push(section);
+                    let sectionTypes = this.selectedSections[key];
+                    if (sectionTypes) {
+                        for (let sectionKey in sectionTypes) {
+                            if (!sectionTypes.hasOwnProperty(sectionKey)) continue;
+                            let section = sectionTypes[sectionKey];
+                            if (section) {
+                                for (let c of section.days) {
+                                    if (c === ' ') continue;
+                                    ret[dayMapping[c]].push(section);
+                                }
+                            }
                         }
                     }
                 }
@@ -174,7 +176,13 @@
                 this.allCourses = response.data
                     .map(course => course.course)
                     .filter(course => course != null && course.sections.length > 0);
-
+                this.allCourses.forEach(course => {
+                    let courseSectionTypes = {};
+                    this.selectedSections[course.id] = courseSectionTypes;
+                    course.sections.forEach(section => {
+                        courseSectionTypes[section.type] = null;
+                    });
+                });
             })
             .catch((error) => {
                 site.handleError("get data", "", error);

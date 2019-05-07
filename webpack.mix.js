@@ -1,6 +1,4 @@
-////https://mattstauffer.com/blog/introducing-laravel-mix-new-in-laravel-5-4/
-
-const mix = require('laravel-mix');
+const mix = require("laravel-mix");
 
 /*
  |--------------------------------------------------------------------------
@@ -13,62 +11,34 @@ const mix = require('laravel-mix');
  |
  */
 
-//https://github.com/JeffreyWay/laravel-mix/blob/master/docs/quick-webpack-configuration.md
-//fixes https://www.fixtheerror.com/bootstrap-errors/fix-bootstrap-error-jquery-is-not-defined-238223
+const scssDir = "resources/assets/sass";
+const jsDir = "resources/assets/js";
+const cssPubDir = "public/css";
+const jsPubDir = "public/js";
+
 mix.webpackConfig(webpack => {
     return {
         plugins: [
             new webpack.ProvidePlugin({
                 $: 'jquery',
                 jQuery: 'jquery',
-                'window.jQuery': 'jquery',
             })
-        ]
+        ],
     };
 });
 
+// Global CSS styles definition
+mix.sass(`${scssDir}/app.scss`, cssPubDir)
+    .sass(`${scssDir}/flowchart.scss`, cssPubDir)
+    .sass(`${scssDir}/dashboard.scss`, cssPubDir)
+    .sass(`${scssDir}/schedule.scss`, cssPubDir);
 
-//Global CSS styles definition
+// Global Javascript Stuff
+mix.js(`${jsDir}/app.js`, jsPubDir)
+    .js(`${jsDir}/pages/scheduler.js`, jsPubDir)
+    .extract();
 
-mix.setPublicPath('public');
-
-mix.sass('resources/assets/sass/app.scss', 'public/css');
-
-mix.sass('resources/assets/sass/flowchart.scss', 'public/css');
-
-mix.sass('resources/assets/sass/dashboard.scss', 'public/css/dashboard.css');
-
-
-//Global Javascript Stuff
-
-mix.js('resources/assets/js/app.js', 'public/js')
-    .extract([
-        'jquery',
-        'bootstrap',
-        'lodash',
-        'axios',
-        'summernote',
-        'codemirror',
-        'fullcalendar',
-        'devbridge-autocomplete',
-        'moment',
-        'eonasdan-bootstrap-datetimepicker-russfeld',
-        'vue',
-        'pusher-js',
-        'ion-sound',
-        'laravel-echo',
-        'admin-lte',
-        'datatables.net',
-        'datatables.net-bs',
-        'sortablejs',
-        'vuedraggable'
-    ]);
-
-mix.js('resources/assets/js/pages/scheduler.js', 'public/js');
-
-mix.sass('resources/assets/sass/schedule.scss', 'public/css');
-
-mix.copy('node_modules/ion-sound/sounds/door_bell*', 'public/sounds');
+mix.copy("node_modules/ion-sound/sounds/door_bell*", "public/sounds");
 
 if (mix.inProduction()) {
     mix.version();

@@ -1,6 +1,6 @@
 <template>
     <div class="schedule-course" v-bind:class="{ 'schedule-course-conflict': width < 1 }" :style="style">
-        <span class="course-name">{{ course.course_number }}</span>
+        <span class="course-name">{{ course.course_number }} <span class="course-type">{{ course.type }}</span></span>
         <span class="course-time">{{ course.hours }}</span>
         <span class="course-location">{{ course.facility }}</span>
     </div>
@@ -49,6 +49,12 @@
 
     .course-name {
         font-weight: bold;
+    }
+
+    .course-type {
+        font-weight: normal;
+        font-style: italic;
+        float: right;
     }
 
     .course-time {

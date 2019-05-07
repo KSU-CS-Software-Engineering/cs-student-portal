@@ -1,6 +1,6 @@
 <template>
     <div class="added-course-root">
-        <div @click="toggleExpand" class="added-course-title">
+        <div @click="toggleExpand" :class="titleClass()">
             <h5><b>{{ course.slug }} - {{ course.title }}</b></h5>
             <i class="fa expand-btn" :class="{ 'fa-angle-up' : isExpanded, 'fa-angle-down' : !isExpanded }"></i>
         </div>
@@ -12,7 +12,7 @@
                 <th>Hours</th>
                 <th>Instructor</th>
             </tr>
-            <tr v-for="section in course.sections" @click="addSection(sectionIsAdded(section) ? null : section)">
+            <tr v-for="section in course.sections" @click="addSection(section.type, sectionIsAdded(section) ? null : section)">
                 <td>
                     <i class="fa section-btn" :class="faIconClass(section)"></i>
                     {{ section.section }}
@@ -32,7 +32,7 @@
         props: {
             course: {},
             layoutMethods: {},
-            addedSection: {}
+            addedSectionTypes: {}
         },
         data() {
             return {
@@ -40,20 +40,31 @@
             }
         },
         computed: {
-            courseIsAdded: function () {
-                return this.addedSection && true;
-            },
+
         },
         methods: {
+            courseIsAdded: function () {
+                return Object.values(this.addedSectionTypes).some(type => type != null);
+            },
+            allTypesAreAdded: function () {
+                return Object.values(this.addedSectionTypes).every(type => type != null);
+            },
             sectionIsAdded: function (section) {
-                return this.addedSection === section;
+                return this.addedSectionTypes[section.type] === section;
+            },
+            typeIsAdded: function (type) {
+                return this.addedSectionTypes[type] != null;
             },
             faIconClass: function (section) {
                 return this.sectionIsAdded(section) ? 'fa-minus'
-                    : this.courseIsAdded ? 'fa-exchange' : 'fa-plus';
+                    : this.typeIsAdded(section.type) ? 'fa-exchange' : 'fa-plus';
             },
-            addSection: function (section) {
-                this.$emit('putSection', this.course.id, section)
+            titleClass: function () {
+                return `added-course-title ${this.allTypesAreAdded() ? 'completed' : ''}`
+            },
+            addSection: function (type, section) {
+                this.$emit('putSection', this.course.id, type, section);
+                this.$forceUpdate();
             },
             toggleExpand: function () {
                 this.isExpanded = !this.isExpanded;
@@ -118,10 +129,16 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: #512888;
+        background-color: rgba(81, 40, 136, 0.86);
         color: white;
         padding: 0.8em 2em;
         cursor: pointer;
+    }
+
+
+    .added-course-title.completed {
+        background-color: #512888;
+        color: white;
     }
 
     .added-course-title > h5 {
