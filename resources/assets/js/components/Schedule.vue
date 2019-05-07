@@ -22,6 +22,24 @@
         <div id="class-finder">
             <h3>Class Finder</h3>
             <form class="class-finder-form">
+                <label>
+                    Select semester you want to plan.
+                </label>
+                <select id="select-semester" v-model="studentSelectedSemester">
+                    <option v-for="semester in semesterList" :value="semester.id">  {{semester.name}} </option>
+                </select>
+            </form>
+
+            <label v-if="studentSelectedSemester !== dateSemester.id"> Warning: semester chosen class times have not yet been published! </label>
+            <button @click="selectSemester" >Select</button>
+
+            <form class="class-finder-form">
+
+                <label>
+                    <input type="checkbox" name="showOwnClasses" v-model="showOwnClasses">
+                    Show Your Own Classes
+                </label>
+                <br>
                 <select id="available-classes" v-model="selectedCourse">
                     <option v-for="course in allCourses" v-if="!selectedCourses.includes(course)" :value="course">{{ course.slug }} - {{ course.title}}</option>
                 </select>
@@ -61,9 +79,13 @@
                 selectedSections: {},
                 selectedSectionsByDays: [[], [], [], [], [], [], []],
                 showOwnClasses: true,
-                //placeholder
-                semesterId: 1,
+                semesterId: null,
                 planId: null,
+                semesterList: null,
+                studentSelectedSemester: null,
+                dateSemester: null,
+
+
             }
         },
         computed: {
@@ -128,12 +150,21 @@
                     this.selectedCourses.push(this.selectedCourse);
                 }
             },
+
+            selectSemester: function(){
+
+                this.semesterId = this.studentSelectedSemester;
+                this.getAllCourses();
+
+            },
+
             formatTime: function (time) {
                 return `${Math.floor(time / 60)}:${('0' + time % 60).slice(-2)}`;
             },
 
             getAllCourses: getAllCourses,
             getCurrentSemester: getCurrentSemester,
+            getSemesters: getSemesters,
 
             putSection: function (courseId, type, section) {
                 this.selectedSections[courseId][type] = section;
@@ -165,10 +196,11 @@
         created() {
             this.planId = document.getElementById("planId").value;
             this.getCurrentSemester();
+            this.getSemesters();
         },
     }
 
-    //need to assign semesterId to current semester
+
     //gets semester course times
     function getAllCourses() {
         axios.get(`/scheduler/${this.semesterId}/sections`)
@@ -189,11 +221,19 @@
             });
     }
 
+    //gets students semesters in their plan
+    function getSemesters(){
+        axios.get(`/scheduler/${this.planId}/get-semester`)
+            .then((response)=>{
+                this.semesterList = response.data;
+            });
+    }
+
     function getCurrentSemester() {
         axios.get(`/scheduler/${this.planId}/current-semester`)
             .then((response)=>{
-                this.semesterId = response.data;
-                this.getAllCourses();
+                this.dateSemester = response.data;
+                //this.getAllCourses();
             });
     }
 

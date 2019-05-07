@@ -16,6 +16,16 @@ class SchedulerController extends Controller
             ->with(['planId' => $plan->id]);
     }
 
+    function getSemesters(Plan $plan){
+
+        $this->authorize('read', $plan);
+
+        $semesters = $plan->semesters;
+
+        return $semesters;
+
+    }
+
     function getCurrentSemesterId(Plan $plan)
     {
         $this->authorize('read', $plan);
@@ -24,7 +34,7 @@ class SchedulerController extends Controller
 
         $currentSemester = $plan->semesters->where('name', $currentSemesterName)->first();
 
-        return $currentSemester->id;
+        return $currentSemester;
     }
 
     public function getSemesterSections(Semester $semester)
