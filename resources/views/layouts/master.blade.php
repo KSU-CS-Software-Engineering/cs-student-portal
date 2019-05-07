@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         @include('includes.head')
         <title>K-State Engineering Advising - @yield('title')</title>
     </head>
     <body role="document">
         @include('includes.navbar')
-        <div class="container" role="main">
+        <div class="{{ empty($wide) ? 'container' : 'container-fluid' }}" role="main">
             <div id="message">
               @if(session('message') !== null)
                 <input type="hidden" id="message_flash" value="{{ Session::pull('message') }}">

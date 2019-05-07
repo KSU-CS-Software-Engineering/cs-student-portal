@@ -4,7 +4,7 @@
             <h5><b>{{ course.slug }} - {{ course.title }}</b></h5>
             <i class="fa expand-btn" :class="{ 'fa-angle-up' : isExpanded, 'fa-angle-down' : !isExpanded }"></i>
         </div>
-        <table v-show="isExpanded" class="added-course-time">
+        <table v-show="isExpanded" class="added-course-section">
             <tr>
                 <th>Section</th>
                 <th>Type</th>
@@ -12,11 +12,9 @@
                 <th>Hours</th>
                 <th>Instructor</th>
             </tr>
-            <tr v-for="section in course.sections">
+            <tr v-for="section in course.sections" @click="addSection(sectionIsAdded(section) ? null : section)">
                 <td>
-                    <i v-if="!courseIsAdded" @click="addTime(section)" class="fa fa-plus time-btn"></i>
-                    <i v-else-if="timeIsAdded(section)" @click="removeTime" class="fa fa-minus time-btn"></i>
-                    <i v-else @click="addTime(section)" class="fa fa-exchange time-btn"></i>
+                    <i class="fa section-btn" :class="faIconClass(section)"></i>
                     {{ section.section }}
                 </td>
                 <td>{{ section.type }}</td>
@@ -33,7 +31,8 @@
         name: "ScheduleAddedCourse",
         props: {
             course: {},
-            layoutMethods: {}
+            layoutMethods: {},
+            addedSection: {}
         },
         data() {
             return {
@@ -42,19 +41,19 @@
         },
         computed: {
             courseIsAdded: function () {
-                return this.course.sections.some(section => section.added);
-            }
+                return this.addedSection && true;
+            },
         },
         methods: {
-            timeIsAdded: function (time) {
-                return time.added;
+            sectionIsAdded: function (section) {
+                return this.addedSection === section;
             },
-            addTime: function (time) {
-                this.removeTime();
-                time.added = true;
+            faIconClass: function (section) {
+                return this.sectionIsAdded(section) ? 'fa-minus'
+                    : this.courseIsAdded ? 'fa-exchange' : 'fa-plus';
             },
-            removeTime: function () {
-                this.course.sections.forEach(section => section.added = false);
+            addSection: function (section) {
+                this.$emit('putSection', this.course.id, section)
             },
             toggleExpand: function () {
                 this.isExpanded = !this.isExpanded;
@@ -86,6 +85,10 @@
         background-color: rgba(151, 160, 179, 0.05);
     }
 
+    tr:not(:first-child) {
+        cursor: pointer;
+    }
+
     tr:first-child {
         background-color: transparent;
     }
@@ -107,20 +110,25 @@
         padding-bottom: 0.2rem;
     }
 
+    .added-course-root:not(:first-child) {
+        margin-top: 0.1rem;
+    }
+
     .added-course-title {
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
         background-color: #512888;
         color: white;
         padding: 0.8em 2em;
+        cursor: pointer;
     }
 
     .added-course-title > h5 {
         margin: 0;
     }
 
-    .time-btn {
+    .section-btn {
         position: absolute;
         left: -15px;
         top: 5px;

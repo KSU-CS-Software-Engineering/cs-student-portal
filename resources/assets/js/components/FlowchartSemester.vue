@@ -3,12 +3,15 @@
         <div class="panel panel-default">
             <div class="panel-heading clearfix move">
                 <h4 class="panel-title pull-left">{{ name }}</h4>
-                <div class="btn-group pull-right">
-                    <button type="button" title="Delete Semester" class="delete-sem btn btn-default btn-xs" aria-label="Delete" v-if="courses.length === 0" @!click="deleteSemester"><i class="fa fa-times"></i></button>
-                    <button type="button" title="Set Summer" class="set-summer btn btn-default btn-xs" aria-label="Summer" @!click="setSummer"><i class="fa fa-pencil"></i></button>
+                <div class="btn-group pull-right" v-if="courses.length === 0">
+                    <button type="button" title="Delete Semester" class="delete-sem btn btn-default btn-xs"
+                            aria-label="Delete" @!click="deleteSemester"><i class="fa fa-times"></i></button>
+                    <button type="button" title="Set Summer" class="set-summer btn btn-default btn-xs"
+                            aria-label="Summer" @!click="setSummer"><i class="fa fa-pencil"></i></button>
                 </div>
             </div>
-            <draggable class="list-group" v-model="courses" :options="{group: 'courses', animation: 150}" @add="addCourse" @end="endDragging">
+            <draggable class="list-group" v-model="courses" :options="{group: 'courses', animation: 150}"
+                    @add="addCourse" @end="endDragging">
                 <flowchart-course v-for="course in courses" :key="course.id" :course-props="course" />
             </draggable>
         </div>
@@ -64,12 +67,10 @@
     }
 
     function setSummer(event) {
-        let id = document.getElementById("id").value;
-        let data = {
-            id: this.id,
-        };
-        axios.post(`/flowcharts/semesters/${id}/setsummer`, data)
+        let planId = document.getElementById("id").value;
+        axios.post(`/flowcharts/${planId}/semesters/${this.id}/set-summer`)
             .then((response) => {
+                site.displayMessage(response.data, "success");
                 eventDispatcher.$emit("updateFlowchart");
             })
             .catch((error) => {

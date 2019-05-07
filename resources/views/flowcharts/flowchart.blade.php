@@ -1,4 +1,4 @@
-@extends('layouts.masterwide')
+@extends('layouts.master', ['wide' => true])
 
 @section('title', 'Flowcharts - Manage Flowchart')
 

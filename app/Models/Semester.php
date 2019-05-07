@@ -30,26 +30,6 @@ class Semester extends Validatable
 
     protected $fillable = ['name', 'ordering', 'plan_id'];
 
-    public function currentSemester(){
-
-        $carbon = new Carbon();
-        Carbon::today('America/Chicago');
-        //Fall semester
-        if($carbon->month >= 8 && $carbon <= 12) {
-            $currentSemester = "Fall $carbon->year";
-        }
-        //Spring semester
-        else if ($carbon->month >= 1 && $carbon->month <= 5) {
-            $currentSemester= "Spring $carbon->year";
-        }
-        //Summer
-        else {
-            $currentSemester = "Summer $carbon->year";
-        }
-        return $currentSemester;
-
-    }
-
     public function plan()
     {
         return $this->belongsTo('App\Models\Plan')->withTrashed();
@@ -60,7 +40,7 @@ class Semester extends Validatable
         return $this->hasMany('App\Models\Planrequirement');
     }
 
-    public function sections()
+    public function getSections()
     {
         return $this->requirements()->with('course.sections')->get();
     }
@@ -99,6 +79,22 @@ class Semester extends Validatable
             $requirement->ordering -= $offset;
             $requirement->save();
         }
+    }
+
+    public static function currentSemester()
+    {
+        $carbon = Carbon::now(config('app.timezone'));
+
+        if ($carbon->month >= 1 && $carbon->month <= 5) {
+            $currentSemester = "Spring $carbon->year";
+        } elseif ($carbon->month >= 8 && $carbon->month <= 12) {
+            $currentSemester = "Fall $carbon->year";
+        } else {
+            $currentSemester = "Summer $carbon->year";
+        }
+
+        return $currentSemester;
+
     }
 
 }

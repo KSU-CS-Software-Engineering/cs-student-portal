@@ -4,16 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Electivelist;
 use Illuminate\Http\Request;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
+use Illuminate\Support\Collection;
 
 class ElectivelistsController extends Controller
 {
-
-    public function __construct()
-    {
-        $this->fractal = new Manager();
-    }
 
     public function getElectivelistfeed(Request $request)
     {
@@ -23,13 +17,14 @@ class ElectivelistsController extends Controller
 
         $electivelists = Electivelist::filterName($request->input('query'))->get();
 
-        $resource = new Collection($electivelists, function ($electivelist) {
-            return [
+        $resource = new Collection();
+        foreach ($electivelists as $electivelist) {
+            $resource->push([
                 'value' => $electivelist->name,
                 'data' => $electivelist->id,
-            ];
-        });
+            ]);
+        }
 
-        return $this->fractal->createData($resource)->toJson();
+        return response()->jsonApi($resource);
     }
 }

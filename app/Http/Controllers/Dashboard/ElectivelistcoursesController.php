@@ -2,22 +2,14 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use App\Helpers\JsonSerializer;
 use App\Http\Controllers\Controller;
 use App\Models\Electivelist;
 use App\Models\Electivelistcourse;
 use Illuminate\Http\Request;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
+use Illuminate\Support\Collection;
 
 class ElectivelistcoursesController extends Controller
 {
-
-    public function __construct()
-    {
-        $this->fractal = new Manager();
-    }
 
     public function getElectivelistcoursesforList(Request $request, $id = -1)
     {
@@ -25,14 +17,15 @@ class ElectivelistcoursesController extends Controller
             abort(404);
         } else {
             $electivelist = Electivelist::withTrashed()->with('courses')->findOrFail($id);
-            $resource = new Collection($electivelist->courses, function ($course) {
-                return [
+            $resource = new Collection();
+            foreach ($electivelist->courses as $course) {
+                $resource->push([
                     'id' => $course->id,
                     'name' => $course->full_range,
-                ];
-            });
-            $this->fractal->setSerializer(new JsonSerializer());
-            return $this->fractal->createData($resource)->toJson();
+                ]);
+            }
+
+            return response()->json($resource);
         }
     }
 
@@ -42,16 +35,15 @@ class ElectivelistcoursesController extends Controller
             abort(404);
         } else {
             $electivelistcourse = Electivelistcourse::findOrFail($id);
-            $resource = new Item($electivelistcourse, function ($course) {
-                return [
-                    'id' => $course->id,
-                    'course_prefix' => $course->course_prefix,
-                    'course_min_number' => $course->course_min_number,
-                    'course_max_number' => $course->course_max_number,
-                ];
-            });
-            $this->fractal->setSerializer(new JsonSerializer());
-            return $this->fractal->createData($resource)->toJson();
+            $course = $electivelistcourse;
+            $resource = [
+                'id' => $course->id,
+                'course_prefix' => $course->course_prefix,
+                'course_min_number' => $course->course_min_number,
+                'course_max_number' => $course->course_max_number,
+            ];
+
+            return response()->json($resource);
         }
     }
 

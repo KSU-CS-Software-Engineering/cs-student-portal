@@ -1,4 +1,4 @@
-@extends('layouts.masterwide')
+@extends('layouts.master', ['wide' => true])
 
 @section('title', 'Scheduler')
 
@@ -6,19 +6,23 @@
 
     <div id="schedule" class="schedule"> </div>
 
+    <input type="hidden" id="planId" value="{{ $planId }}" />
+
 @endsection
 
 @section ('scripts')
 
     @parent
 
-    <script src="js/scheduler.js"></script>
+    <script src="{{ mix('js/scheduler.js') }}" defer="defer"></script>
 
-    @endsection
+@endsection
 
 @section('styles')
-    @parent
-        <link href="css/schedule.css" rel="stylesheet">
 
-    @endsection
+    @parent
+
+    <link rel="stylesheet" type="text/css" href="{{ mix('css/schedule.css') }}" />
+
+@endsection
 

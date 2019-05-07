@@ -5,8 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Completedcourse;
 use Auth;
 use Illuminate\Http\Request;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
+use Illuminate\Support\Collection;
 
 class CompletedcoursesController extends Controller
 {
@@ -14,7 +13,6 @@ class CompletedcoursesController extends Controller
     public function __construct()
     {
         $this->middleware('cas');
-        $this->fractal = new Manager();
     }
 
     public function getCompletedcoursefeed(Request $request, $id = -1)
@@ -32,14 +30,15 @@ class CompletedcoursesController extends Controller
 
             $completedcourses = Completedcourse::where('student_id', $id)->filterName($request->input('query'))->get();
 
-            $resource = new Collection($completedcourses, function ($course) {
-                return [
+            $resource = new Collection();
+            foreach ($completedcourses as $course) {
+                $resource->push([
                     'value' => $course->fullTitle,
                     'data' => $course->id,
-                ];
-            });
+                ]);
+            }
 
-            return $this->fractal->createData($resource)->toJson();
+            return response()->jsonApi($resource);
         } else {
             abort(404);
         }

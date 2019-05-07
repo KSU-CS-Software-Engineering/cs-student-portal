@@ -20,6 +20,7 @@ class SectionsSeeder extends Seeder
                 DB::table('sections')->insert([
                     'course_number' => $courseSection['courseNumber'], //The course slugline
                     'section' => $courseSection['section'],
+                    'section_number' => $courseSection['sectionNumber'],
                     'type' => $courseSection['type'],
                     'units' => $courseSection['units'],
                     'days' => $courseSection['days'],
@@ -28,7 +29,7 @@ class SectionsSeeder extends Seeder
                     'instructor' => $courseSection['instructor'],
                     'course_id' => $courseSection['courseId'], //The matching course object id.
                     'notes' => $courseSection['notes'],
-                ]);
+                                    ]);
             } catch (QueryException $exception) {
                 echo($exception->getMessage() . "\n");
             }
