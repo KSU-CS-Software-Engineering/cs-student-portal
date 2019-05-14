@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Models\Elective_List_Course;
+use App\Models\elective_list_course;
 use App\Models\College;
 use App\Models\Course;
 use Illuminate\Http\Request;
@@ -56,12 +56,12 @@ class CoursesController extends Controller
             'query' => 'required|string',
             'electiveListId' => 'integer',
         ]);
-
-        if ($request->input('electiveListId') != null && $request->input('electiveListId') != '9') {
-            $electiveListModels = elective_list_course::where('elective_list_id', $request->input('electiveListId'))->pluck('course_id');
-            $courses = Course::whereIn('id', $electiveListModels)->get();
-        } else {
-            $courses = Course::filterName($request->input('query'))->get();
+        if($request->input('electiveListId') != null && $request->input('electiveListId') != '9') {
+          $electiveListModels = elective_list_course::where('elective_list_id', $request->input('electiveListId'))->pluck('course_id');
+          $courses = Course::whereIn('id', $electiveListModels)->filterName($request->input('query'))->get();
+        }
+        else {
+          $courses = Course::filterName($request->input('query'))->get();
         }
 
         $resource = new Collection();
