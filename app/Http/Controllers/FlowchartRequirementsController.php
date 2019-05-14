@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Plan;
 use App\Models\Planrequirement;
 use App\Models\Semester;
+use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -123,7 +124,7 @@ class FlowchartRequirementsController extends Controller
             $errors->add('course_name', 'Course is not listed in selected elective list');
             return response()->json($errors, 422);
         }
-
+        $requirement->notes = Course::where('id', $request->course_id)->first()->slug;
         $requirement->save();
         return response()->json(trans('messages.item_saved'));
     }
