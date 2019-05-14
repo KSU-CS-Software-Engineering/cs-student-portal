@@ -30,7 +30,7 @@
                 </select>
             </form>
 
-            <label v-if="studentSelectedSemester !== dateSemester.id"> Warning: semester chosen class times have not yet been published! </label>
+            <label v-if="studentSelectedSemester != null && studentSelectedSemester !== dateSemester.id"> Warning: semester chosen class times have not yet been published! </label>
             <button @click="selectSemester" >Select</button>
 
             <form class="class-finder-form">
