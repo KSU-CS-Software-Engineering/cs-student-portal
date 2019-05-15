@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
         $this->call(DegreeProgramSeeder::class);
         $this->call(PlansSeeder::class);
         $this->call(SectionsSeeder::class);
+        $this->call(Elective_List_CoursesSeeder::class);
         Model::reguard();
     }
 }

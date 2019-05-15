@@ -95,10 +95,6 @@ class KSUCourseScraper
                 }
             }
         }
-<<<<<<< HEAD
-      //  dd($returnArray);
-=======
->>>>>>> b21d55100c78fd435dd683f6aeec77c9fda86afc
         return $returnArray;
     }
 }
